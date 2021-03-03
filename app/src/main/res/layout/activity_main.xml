@@ -36,5 +36,13 @@
         android:layout_centerVertical="true"
         android:text="Start Service" />
 
+    <Button
+        android:id="@+id/buttonExportData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="exportData"
+        android:layout_centerVertical="true"
+        android:text="Export Data" />
+
 
 </LinearLayout>

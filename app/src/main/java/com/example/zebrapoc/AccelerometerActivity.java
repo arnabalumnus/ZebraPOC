@@ -10,18 +10,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import static com.example.zebrapoc.utils.Constant.*;
+
 public class AccelerometerActivity extends AppCompatActivity implements SensorEventListener {
-
-    /**
-     * G_calibration_factor value need to decrease gradually to be more accurate about a free fall
-     */
-    private static final float G_CALIBRATION_FACTOR = 5.89F; //value need to decrease gradually to be more accurate about a free fall
-
-    /**
-     * throw_calibration_factor value need to increase gradually to be more accurate about a throw
-     */
-    private static final float THROW_CALIBRATION_FACTOR = 9.81F; //value need to decrease gradually to be more accurate about a free fall
-
 
     private final String TAG = this.getClass().getSimpleName();
     private SensorManager mSensorManager;
@@ -74,8 +65,8 @@ public class AccelerometerActivity extends AppCompatActivity implements SensorEv
         float G_towards_Z = event.values[2];
 
 
-        float total_G = event.values[0] + event.values[1] + event.values[2];
-        Log.d(TAG, "onSensorChanged: Total: " + total_G);
+        //float total_G = event.values[0] + event.values[1] + event.values[2];
+        //Log.d(TAG, "onSensorChanged: Total: " + total_G);
         if (Math.abs(G_towards_X) < G_CALIBRATION_FACTOR && Math.abs(G_towards_Y) < G_CALIBRATION_FACTOR && Math.abs(G_towards_Z) < G_CALIBRATION_FACTOR) {
             Log.e(TAG, "It's a free fall");
             textView.setText("It's a free fall");
