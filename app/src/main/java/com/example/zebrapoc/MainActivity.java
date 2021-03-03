@@ -13,6 +13,7 @@ import androidx.room.Room;
 
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.EventLogEntity;
+import com.example.zebrapoc.ui.DatabaseActivity;
 import com.example.zebrapoc.utils.DateFormatter;
 import com.opencsv.CSVWriter;
 
@@ -76,5 +77,9 @@ public class MainActivity extends AppCompatActivity {
         };
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    public void navigateToDatabase(View view) {
+        startActivity(new Intent(this, DatabaseActivity.class));
     }
 }
