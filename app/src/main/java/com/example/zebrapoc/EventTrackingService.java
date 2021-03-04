@@ -3,12 +3,15 @@ package com.example.zebrapoc;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -17,6 +20,8 @@ import androidx.room.Room;
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.EventLogEntity;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,22 +30,33 @@ import static com.example.zebrapoc.ZebraApp.CHANNEL_ID;
 
 public class EventTrackingService extends Service implements SensorEventListener {
 
-    //private final String TAG = this.getClass().getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
     private AppDatabase db;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
+    private int mStartId;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
+        Log.e(TAG, "attachBaseContext: ");
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.e(TAG, "onCreate: ");
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.e(TAG, "onStartCommand: ");
+        Log.e(TAG, "startId: " + startId);
+        this.mStartId = startId;
         String input = intent.getStringExtra("inputExtra");
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "database-name").build();
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -58,7 +74,7 @@ public class EventTrackingService extends Service implements SensorEventListener
         startForeground(1, notification);
 
         //do heavy work on a background thread
-        Runnable r = new Runnable() {
+        /*Runnable r = new Runnable() {
             @Override
             public void run() {
                 while (true) {
@@ -79,19 +95,10 @@ public class EventTrackingService extends Service implements SensorEventListener
             }
         };
         Thread t = new Thread(r);
-        t.start();
+        t.start();*/
         //stopSelf();
 
         return START_REDELIVER_INTENT;
-    }
-
-    private void startTheNeverEndingTask() {
-        //Log.d(TAG, " :Start the NEVER ENDING task: ");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Nullable
@@ -101,12 +108,63 @@ public class EventTrackingService extends Service implements SensorEventListener
     }
 
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.e(TAG, "onConfigurationChanged: ");
+    }
 
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        Log.e(TAG, "onLowMemory: ");
+        stopSelf(mStartId);
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        Log.e(TAG, "onTrimMemory: ");
+        stopSelf(mStartId);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.e(TAG, "onUnbind: ");
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+        Log.e(TAG, "onRebind: ");
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        Log.e(TAG, "onTaskRemoved: ");
+    }
+
+    @Override
+    protected void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
+        super.dump(fd, writer, args);
+        Log.e(TAG, "dump: ");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG, "onDestroy: ");
+    }
+
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        Log.e(TAG, "onAccuracyChanged: ");
     }
 
     public void onSensorChanged(SensorEvent event) {
-
+        Log.e("msg", "onSensorChanged: ");
         float G_towards_X = event.values[0];
         float G_towards_Y = event.values[1];
         float G_towards_Z = event.values[2];
@@ -140,5 +198,9 @@ public class EventTrackingService extends Service implements SensorEventListener
         Date date = new Date(currentTimeInMilliSec);
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         return format.format(date);
+    }
+
+    private void startTheNeverEndingTask() {
+        Log.d(TAG, " :Start the NEVER ENDING task: ");
     }
 }

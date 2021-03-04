@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     csvWrite.writeNext(arrStr);
                 }
                 csvWrite.close();
-                Toast.makeText(this, "Exported", Toast.LENGTH_LONG).show();
+                Log.e("csv", "exportData: Data Exported");
             } catch (Exception sqlEx) {
                 Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
             }

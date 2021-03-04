@@ -21,18 +21,16 @@ public interface EventLogDao {
     void delete(EventLogEntity eventLogs);
 
     @Query("Select count(*) from event_log;")
-    void getCount();
+    long getCount();
 
     @Query("Select MAX(uid) from event_log;")
-    void getMax();
+    long getMax();
 
     @Query("Select * from event_log where uid = (Select MAX(uid) from event_log);")
-    void getLastRecord();
+    EventLogEntity getLastRecord();
 
-    @Transaction
-    void getCustomRecord(
-
-    );
+    //@Query("Select time_stamp, count(*) from event_log group by time_stamp;")
+    //Object getGroupOfRecord();
 
     /*@Query("SELECT * FROM user WHERE uid IN (:userIds)")
     List<User> loadAllByIds(int[] userIds);
