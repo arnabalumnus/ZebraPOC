@@ -1,6 +1,5 @@
-package com.example.zebrapoc;
+package com.example.zebrapoc.broadcastReceiver;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +7,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+
+import com.example.zebrapoc.service.EventTrackingService;
 
 public class BootReceiver extends BroadcastReceiver {
 

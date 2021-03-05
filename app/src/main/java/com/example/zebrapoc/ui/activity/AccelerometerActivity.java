@@ -1,4 +1,4 @@
-package com.example.zebrapoc;
+package com.example.zebrapoc.ui.activity;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -9,6 +9,8 @@ import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.zebrapoc.R;
 
 import static com.example.zebrapoc.utils.Constant.*;
 

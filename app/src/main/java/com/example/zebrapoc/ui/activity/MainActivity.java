@@ -1,4 +1,4 @@
-package com.example.zebrapoc;
+package com.example.zebrapoc.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,9 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
+import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
-import com.example.zebrapoc.db.EventLogEntity;
-import com.example.zebrapoc.ui.DatabaseActivity;
+import com.example.zebrapoc.db.entity.EventLogEntity;
+import com.example.zebrapoc.service.EventTrackingService;
 import com.example.zebrapoc.utils.DateFormatter;
 import com.opencsv.CSVWriter;
 

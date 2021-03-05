@@ -1,4 +1,4 @@
-package com.example.zebrapoc.ui;
+package com.example.zebrapoc.ui.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -8,7 +8,6 @@ import android.view.View;
 
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
-import com.example.zebrapoc.db.EventLogEntity;
 
 public class DatabaseActivity extends AppCompatActivity {
 

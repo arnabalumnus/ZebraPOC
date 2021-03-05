@@ -1,4 +1,4 @@
-package com.example.zebrapoc;
+package com.example.zebrapoc.service;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -17,8 +17,10 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.room.Room;
 
+import com.example.zebrapoc.ui.activity.MainActivity;
+import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
-import com.example.zebrapoc.db.EventLogEntity;
+import com.example.zebrapoc.db.entity.EventLogEntity;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;

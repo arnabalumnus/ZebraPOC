@@ -1,4 +1,4 @@
-package com.example.zebrapoc.db;
+package com.example.zebrapoc.db.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

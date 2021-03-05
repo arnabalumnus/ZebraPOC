@@ -1,10 +1,11 @@
-package com.example.zebrapoc.db;
+package com.example.zebrapoc.db.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Transaction;
+
+import com.example.zebrapoc.db.entity.EventLogEntity;
 
 import java.util.List;
 

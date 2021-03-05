@@ -15,10 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ZebraPOC">
-        <activity android:name=".ui.DatabaseActivity"></activity>
+
+        <activity android:name=".ui.activity.DatabaseActivity" />
 
         <receiver
-            android:name=".BootReceiver"
+            android:name=".broadcastReceiver.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -26,8 +27,8 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".AccelerometerActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.activity.AccelerometerActivity" />
+        <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,7 +37,7 @@
         </activity>
 
         <service
-            android:name=".EventTrackingService"
+            android:name=".service.EventTrackingService"
             android:foregroundServiceType="dataSync" />
     </application>
 
