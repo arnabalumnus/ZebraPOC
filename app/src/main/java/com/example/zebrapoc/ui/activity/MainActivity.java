@@ -57,23 +57,27 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, DatabaseActivity.class));
     }
 
-    //region Export Data and save into SD card or Phone Storage - Working in API 29 i.e. Android 10
+    //region Export Data and save into SD card or Phone Storage
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
-            exportData();
+            exportDataIntoCSVFile();
         }
     }
 
-    public void exportData() {
+    public void exportDataIntoCSVFile() {
         Runnable runnable = () -> {
-            File exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp");
+            File exportDir;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                exportDir = new File(getExternalFilesDir("Accelerometer"), "ZebraApp"); // Working in API 30 i.e. Android 11 and higher
+            else
+                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp"); // Working in API 29 i.e. Android 10 and lower
             if (!exportDir.exists()) {
                 exportDir.mkdirs();
             }
 
             File file = new File(exportDir, "Zebra_" + DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
             try {
-                file.createNewFile();// File not found exception in API 30
+                file.createNewFile();
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                         AppDatabase.class, "database-name").build();
@@ -119,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
             //resume tasks needing this permission
-            exportData();
+            exportDataIntoCSVFile();
         }
     }
     //endregion
