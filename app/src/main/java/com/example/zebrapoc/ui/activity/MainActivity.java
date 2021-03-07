@@ -2,6 +2,7 @@ package com.example.zebrapoc.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
 import com.example.zebrapoc.R;
+import com.example.zebrapoc.broadcastReceiver.PowerConnectionReceiver;
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.entity.EventLogEntity;
 import com.example.zebrapoc.service.EventTrackingService;
@@ -34,6 +36,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        PowerConnectionReceiver receiver = new PowerConnectionReceiver();
+
+        IntentFilter ifilter = new IntentFilter();
+        ifilter.addAction(Intent.ACTION_POWER_CONNECTED);
+        ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        registerReceiver(receiver, ifilter);
     }
 
     public void goToAccelerometer(View view) {
@@ -75,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 exportDir.mkdirs();
             }
 
-            File file = new File(exportDir, "Zebra_" + DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
+            File file = new File(exportDir, DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
             try {
                 file.createNewFile();
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));

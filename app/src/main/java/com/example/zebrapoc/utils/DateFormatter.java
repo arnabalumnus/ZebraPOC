@@ -12,7 +12,7 @@ public class DateFormatter {
 
     public static String getTimeStampFileName(long currentTimeInMilliSec) {
         Date date = new Date(currentTimeInMilliSec);
-        SimpleDateFormat format = new SimpleDateFormat("dd_MM_yyyy HH_mm_ss");
+        SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy HH_mm_ss");
         return format.format(date);
     }
 }
