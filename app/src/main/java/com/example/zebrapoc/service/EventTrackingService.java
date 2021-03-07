@@ -17,10 +17,10 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.room.Room;
 
-import com.example.zebrapoc.ui.activity.MainActivity;
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.entity.EventLogEntity;
+import com.example.zebrapoc.ui.activity.MainActivity;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -50,33 +50,10 @@ public class EventTrackingService extends Service implements SensorEventListener
         Log.e(TAG, "onCreate: ");
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "onStartCommand: ");
-        Log.e(TAG, "startId: " + startId);
-        this.mStartId = startId;
-        String input = intent.getStringExtra("inputExtra");
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "database-name").build();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Example Service")
-                .setContentText(input)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.FLAG_FOREGROUND_SERVICE)
-                .build();
-
-        startForeground(1, notification);
-
-        //do heavy work on a background thread
-        /*Runnable r = new Runnable() {
+        Runnable r = new Runnable() {
             @Override
             public void run() {
                 while (true) {
@@ -97,9 +74,31 @@ public class EventTrackingService extends Service implements SensorEventListener
             }
         };
         Thread t = new Thread(r);
-        t.start();*/
-        //stopSelf();
+        t.start();
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.e(TAG, "onStartCommand: ");
+        Log.e(TAG, "startId: " + startId);
+        this.mStartId = startId;
+        //String input = intent.getStringExtra("inputExtra");
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-name").build();
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, notificationIntent, 0);
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Example Service")
+                .setContentText("Arnab")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.FLAG_FOREGROUND_SERVICE)
+                .build();
+
+        startForeground(1, notification);
         return START_REDELIVER_INTENT;
     }
 
