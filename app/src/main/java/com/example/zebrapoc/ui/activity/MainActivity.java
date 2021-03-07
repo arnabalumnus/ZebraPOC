@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -38,10 +39,13 @@ public class MainActivity extends AppCompatActivity {
 
         PowerConnectionReceiver receiver = new PowerConnectionReceiver();
 
-        IntentFilter ifilter = new IntentFilter();
-        ifilter.addAction(Intent.ACTION_POWER_CONNECTED);
-        ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
-        registerReceiver(receiver, ifilter);
+        IntentFilter iFilter = new IntentFilter();
+        iFilter.addAction(Intent.ACTION_POWER_CONNECTED);
+        iFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        iFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        iFilter.addAction(Intent.ACTION_BATTERY_LOW);
+        iFilter.addAction(Intent.ACTION_BATTERY_OKAY);
+        registerReceiver(receiver, iFilter);
     }
 
     public void goToAccelerometer(View view) {
@@ -50,9 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void startService(View v) {
-        //String input = editTextInput.getText().toString();
         Intent serviceIntent = new Intent(this, EventTrackingService.class);
-        serviceIntent.putExtra("inputExtra", "arnab");
+        serviceIntent.putExtra("inputExtra", "Accelerometer running");
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
@@ -80,12 +83,18 @@ public class MainActivity extends AppCompatActivity {
             else
                 exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp"); // Working in API 29 i.e. Android 10 and lower
             if (!exportDir.exists()) {
-                exportDir.mkdirs();
+                if(!exportDir.mkdirs()){
+                    Log.e(TAG, "Error in mkdirs" );
+                    return;
+                }
             }
 
             File file = new File(exportDir, DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
             try {
-                file.createNewFile();
+                if(!file.createNewFile()){
+                    Log.e(TAG, "Error in createNewFile" );
+                    return;
+                }
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                         AppDatabase.class, "database-name").build();
@@ -94,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 csvWrite.writeNext(new String[]{"id", "time_stamp", "event", "x", "y", "z"});
                 for (EventLogEntity eventLogEntity : eventLogEntityList) {
                     //Which column you want to export
-                    String arrStr[] = {String.valueOf(eventLogEntity.uid), eventLogEntity.time_stamp, eventLogEntity.event, String.valueOf(eventLogEntity.x), String.valueOf(eventLogEntity.y), String.valueOf(eventLogEntity.z)};
+                    String[] arrStr = {String.valueOf(eventLogEntity.uid), eventLogEntity.time_stamp, eventLogEntity.event, String.valueOf(eventLogEntity.x), String.valueOf(eventLogEntity.y), String.valueOf(eventLogEntity.z)};
                     csvWrite.writeNext(arrStr);
                 }
                 csvWrite.close();
@@ -109,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 Log.v(TAG, "Permission is granted");
                 return true;
             } else {
@@ -126,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
