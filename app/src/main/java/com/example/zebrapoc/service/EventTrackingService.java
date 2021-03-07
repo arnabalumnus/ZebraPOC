@@ -48,11 +48,6 @@ public class EventTrackingService extends Service implements SensorEventListener
     public void onCreate() {
         super.onCreate();
         Log.e(TAG, "onCreate: ");
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").build();
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -83,9 +78,12 @@ public class EventTrackingService extends Service implements SensorEventListener
         Log.e(TAG, "startId: " + startId);
         this.mStartId = startId;
         //String input = intent.getStringExtra("inputExtra");
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").build();
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW);    //Value=1 , Rate=48~50/sec
+        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM); //Value=2 , Rate=~15/sec
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_HIGH);   //Value=3 , Rate=~15/sec
+        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
@@ -99,7 +97,12 @@ public class EventTrackingService extends Service implements SensorEventListener
                 .build();
 
         startForeground(1, notification);
-        return START_REDELIVER_INTENT;
+
+        //do heavy work on a background thread
+
+        //stopSelf();
+
+        return START_STICKY;
     }
 
     @Nullable
@@ -119,14 +122,14 @@ public class EventTrackingService extends Service implements SensorEventListener
     public void onLowMemory() {
         super.onLowMemory();
         Log.e(TAG, "onLowMemory: ");
-        stopSelf(mStartId);
+        //stopSelf(mStartId);
     }
 
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         Log.e(TAG, "onTrimMemory: ");
-        stopSelf(mStartId);
+        //stopSelf(mStartId);
     }
 
     @Override
@@ -202,6 +205,7 @@ public class EventTrackingService extends Service implements SensorEventListener
     }
 
     private void startTheNeverEndingTask() {
-        Log.d(TAG, " :Start the NEVER ENDING task: ");
+        Log.e(TAG, " :Start the NEVER ENDING task: ");
+        //stopSelf(mStartId);
     }
 }
