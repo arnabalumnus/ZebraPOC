@@ -10,8 +10,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -23,16 +21,12 @@ import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.entity.EventLogEntity;
 import com.example.zebrapoc.ui.activity.MainActivity;
-import com.example.zebrapoc.utils.DateFormatter;
-import com.opencsv.CSVWriter;
+import com.example.zebrapoc.utils.TimeSpan;
 
-import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import static com.example.zebrapoc.ZebraApp.CHANNEL_ID;
 
@@ -59,7 +53,7 @@ public class EventTrackingService extends Service implements SensorEventListener
             @Override
             public void run() {
                 while (true) {
-                    long futureTime = System.currentTimeMillis() + 1000 * 60 * 15;
+                    long futureTime = System.currentTimeMillis() + TimeSpan.FIVE_MINUTES;
                     while (System.currentTimeMillis() < futureTime) {
                         synchronized (this) {
                             //Log.i(TAG, "Service is running");
@@ -214,7 +208,6 @@ public class EventTrackingService extends Service implements SensorEventListener
     private void startTheNeverEndingTask() {
         Log.e(TAG, " :Start the NEVER ENDING task: ");
         //stopSelf(mStartId);
-        exportDataIntoCSVFile();
 
         if (mSensorManager == null) {
             mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -227,52 +220,5 @@ public class EventTrackingService extends Service implements SensorEventListener
         }
         if (db == null)
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-    }
-
-    private void deleteRecordsUpTo() {
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-        db.eventLogDao().deleteOldRecord(System.currentTimeMillis());
-    }
-
-    public void exportDataIntoCSVFile() {
-        Runnable runnable = () -> {
-            File exportDir;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                exportDir = new File(getExternalFilesDir("Accelerometer"), "ZebraApp"); // Working in API 30 i.e. Android 11 and higher
-            else
-                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp"); // Working in API 29 i.e. Android 10 and lower
-            if (!exportDir.exists()) {
-                if (!exportDir.mkdirs()) {
-                    Log.e(TAG, "Error in mkdirs");
-                    return;
-                }
-            }
-
-            File file = new File(exportDir, DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
-            try {
-                if (!file.createNewFile()) {
-                    Log.e(TAG, "Error in createNewFile");
-                    return;
-                }
-                CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "database-name").build();
-
-                List<EventLogEntity> eventLogEntityList = db.eventLogDao().getAll();
-                csvWrite.writeNext(new String[]{"id", "time_stamp", "event", "x", "y", "z"});
-                for (EventLogEntity eventLogEntity : eventLogEntityList) {
-                    //Which column you want to export
-                    String[] arrStr = {String.valueOf(eventLogEntity.uid), eventLogEntity.time_stamp, eventLogEntity.event, String.valueOf(eventLogEntity.x), String.valueOf(eventLogEntity.y), String.valueOf(eventLogEntity.z)};
-                    csvWrite.writeNext(arrStr);
-                }
-                csvWrite.close();
-                Log.e("csv", "exportData: Data Exported");
-                deleteRecordsUpTo();
-            } catch (Exception sqlEx) {
-                Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
     }
 }

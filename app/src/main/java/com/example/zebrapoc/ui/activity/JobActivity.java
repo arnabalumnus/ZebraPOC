@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.service.SaveCsvJobService;
+import com.example.zebrapoc.utils.TimeSpan;
 
 public class JobActivity extends AppCompatActivity {
 
@@ -20,16 +21,15 @@ public class JobActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_job);
-
     }
 
     public void scheduleJob(View v) {
         ComponentName componentName = new ComponentName(this, SaveCsvJobService.class);
         JobInfo info = new JobInfo.Builder(123, componentName)
                 //.setRequiresCharging(true)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                //.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .setPersisted(true)
-                .setPeriodic(15 * 60 * 1000)
+                .setPeriodic(TimeSpan.FIFTEEN_MINUTES)
                 .build();
         JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         int resultCode = scheduler.schedule(info);
