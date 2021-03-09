@@ -15,20 +15,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ZebraPOC">
-
+        <activity android:name=".ui.activity.JobActivity" />
         <activity android:name=".ui.activity.DatabaseActivity" />
 
         <receiver android:name=".broadcastReceiver.PowerConnectionReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-
                 <action android:name="android.intent.action.BATTERY_CHANGED" />
                 <action android:name="android.intent.action.BATTERY_LOW" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".broadcastReceiver.BootReceiver"
             android:enabled="true"
@@ -51,6 +49,10 @@
             android:name=".service.EventTrackingService"
             android:foregroundServiceType="dataSync"
             android:process=":dataSync" />
+        <service
+            android:name=".service.SaveCsvJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
     </application>
 
 </manifest>

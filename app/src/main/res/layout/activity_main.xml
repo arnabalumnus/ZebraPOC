@@ -24,24 +24,24 @@
         android:id="@+id/buttonAccelerometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="goToAccelerometer"
         android:layout_centerVertical="true"
+        android:onClick="goToAccelerometer"
         android:text="ACCELEROMETER" />
 
     <Button
         android:id="@+id/buttonStartService"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="startService"
         android:layout_centerVertical="true"
+        android:onClick="startService"
         android:text="Start Service" />
 
     <Button
         android:id="@+id/buttonExportData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="exportDataButton"
         android:layout_centerVertical="true"
+        android:onClick="exportDataButton"
         android:text="Export Data" />
 
     <Button
@@ -50,6 +50,14 @@
         android:layout_height="wrap_content"
         android:onClick="navigateToDatabase"
         android:text="Database" />
+
+    <Button
+        android:id="@+id/buttonJob"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="navigateToJobActivity"
+        android:text="Job Service for save CSV file"
+        android:textAllCaps="false" />
 
 
 </LinearLayout>

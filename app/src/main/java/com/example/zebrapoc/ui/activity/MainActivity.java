@@ -75,6 +75,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void navigateToJobActivity(View view) {
+        startActivity(new Intent(this, JobActivity.class));
+    }
+
     public void exportDataIntoCSVFile() {
         Runnable runnable = () -> {
             File exportDir;
