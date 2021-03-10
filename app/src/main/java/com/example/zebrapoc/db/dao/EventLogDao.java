@@ -32,6 +32,10 @@ public interface EventLogDao {
 
     @Query("Delete from event_log where uid<:currentTime")
     void deleteOldRecord(long currentTime);
+
+    @Query("select * from event_log order by uid desc limit 10;")
+    List<EventLogEntity> getLatestTenLog();
+
     //@Query("Select time_stamp, count(*) from event_log group by time_stamp;")
     //Object getGroupOfRecord();
 

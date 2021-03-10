@@ -29,7 +29,8 @@ public class JobActivity extends AppCompatActivity {
                 //.setRequiresCharging(true)
                 //.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .setPersisted(true)
-                .setPeriodic(TimeSpan.FIFTEEN_MINUTES)
+                //.setRequiresDeviceIdle(true)
+                .setPeriodic(TimeSpan.FIFTEEN_MINUTES,0)
                 .build();
         JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         int resultCode = scheduler.schedule(info);

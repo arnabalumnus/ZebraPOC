@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
         iFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         iFilter.addAction(Intent.ACTION_BATTERY_LOW);
         iFilter.addAction(Intent.ACTION_BATTERY_OKAY);
-        registerReceiver(receiver, iFilter);
+        //registerReceiver(receiver, iFilter);
+        //unregisterReceiver(receiver);
     }
 
     public void goToAccelerometer(View view) {

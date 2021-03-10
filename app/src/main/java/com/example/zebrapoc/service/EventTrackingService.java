@@ -19,16 +19,17 @@ import androidx.room.Room;
 
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
+import com.example.zebrapoc.db.entity.AccLogEntity;
 import com.example.zebrapoc.db.entity.EventLogEntity;
 import com.example.zebrapoc.ui.activity.MainActivity;
 import com.example.zebrapoc.utils.TimeSpan;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.example.zebrapoc.ZebraApp.CHANNEL_ID;
+import static com.example.zebrapoc.utils.DateFormatter.getTimeStamp;
 
 
 public class EventTrackingService extends Service implements SensorEventListener {
@@ -193,16 +194,13 @@ public class EventTrackingService extends Service implements SensorEventListener
         }*/
 
         if (db != null) {
-            Runnable runnable = () -> db.eventLogDao().insert(new EventLogEntity(System.currentTimeMillis(), getTimeStamp(System.currentTimeMillis()), "No event", G_towards_X, G_towards_Y, G_towards_Z));
+            Runnable runnable = () -> {
+                db.eventLogDao().insert(new EventLogEntity(System.currentTimeMillis(), getTimeStamp(System.currentTimeMillis()), "No event", G_towards_X, G_towards_Y, G_towards_Z));
+                db.accLogDao().insert(new AccLogEntity(System.nanoTime(), G_towards_X, G_towards_Y, G_towards_Z));
+            };
             Thread thread = new Thread(runnable);
             thread.start();
         }
-    }
-
-    private String getTimeStamp(long currentTimeInMilliSec) {
-        Date date = new Date(currentTimeInMilliSec);
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        return format.format(date);
     }
 
     private void startTheNeverEndingTask() {
