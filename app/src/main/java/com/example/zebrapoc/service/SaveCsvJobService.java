@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.room.Room;
 
 import com.example.zebrapoc.db.AppDatabase;
+import com.example.zebrapoc.db.entity.AccLogEntity;
 import com.example.zebrapoc.db.entity.EventLogEntity;
 import com.example.zebrapoc.utils.DateFormatter;
 import com.opencsv.CSVWriter;
@@ -43,9 +44,9 @@ public class SaveCsvJobService extends JobService {
             public void run() {
                 File exportDir;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                    exportDir = new File(getExternalFilesDir("Accelerometer"), "ZebraApp"); // Working in API 30 i.e. Android 11 and higher
+                    exportDir = new File(getExternalFilesDir("ZebraApp"), "autoLog"); // Working in API 30 i.e. Android 11 and higher
                 else
-                    exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/JobService"); // Working in API 29 i.e. Android 10 and lower
+                    exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/autoLog"); // Working in API 29 i.e. Android 10 and lower
                 if (!exportDir.exists()) {
                     if(!exportDir.mkdirs()){
                         Log.e(TAG, "Error in mkdirs" );
@@ -62,11 +63,11 @@ public class SaveCsvJobService extends JobService {
                     CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                     AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
 
-                    List<EventLogEntity> eventLogEntityList = db.eventLogDao().getAll();
-                    csvWrite.writeNext(new String[]{"id", "time_stamp", "event", "x", "y", "z"});
-                    for (EventLogEntity eventLogEntity : eventLogEntityList) {
+                    List<AccLogEntity> accLogEntities = db.accLogDao().getAll();
+                    csvWrite.writeNext(new String[]{"TS", "X", "Y", "Z"});
+                    for (AccLogEntity accLogEntity : accLogEntities) {
                         //Which column you want to export
-                        String[] arrStr = {String.valueOf(eventLogEntity.uid), eventLogEntity.time_stamp, eventLogEntity.event, String.valueOf(eventLogEntity.x), String.valueOf(eventLogEntity.y), String.valueOf(eventLogEntity.z)};
+                        String[] arrStr = {String.valueOf(accLogEntity.ts), String.valueOf(accLogEntity.x), String.valueOf(accLogEntity.y), String.valueOf(accLogEntity.z)};
                         csvWrite.writeNext(arrStr);
                     }
                     csvWrite.close();
@@ -74,7 +75,7 @@ public class SaveCsvJobService extends JobService {
                     /**
                      * DELETE OLD RECORDS
                      */
-                    db.eventLogDao().deleteOldRecord(System.currentTimeMillis());
+                    //db.eventLogDao().deleteOldRecord(System.currentTimeMillis());
                     Log.e(TAG, "Old records DELETED");
                 } catch (Exception sqlEx) {
                     Log.e(TAG, sqlEx.getMessage(), sqlEx);

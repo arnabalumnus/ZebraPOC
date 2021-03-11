@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
@@ -14,19 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.room.Room;
 
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.broadcastReceiver.PowerConnectionReceiver;
-import com.example.zebrapoc.db.AppDatabase;
-import com.example.zebrapoc.db.entity.EventLogEntity;
 import com.example.zebrapoc.service.EventTrackingService;
-import com.example.zebrapoc.utils.DateFormatter;
-import com.opencsv.CSVWriter;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.util.List;
+import com.example.zebrapoc.utils.ExportFile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     //region Export Data and save into SD card or Phone Storage
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
-            exportDataIntoCSVFile();
+            ExportFile.exportDataIntoCSVFile(this, "manualLog");
         }
     }
 
@@ -82,46 +73,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, JobActivity.class));
     }
 
-    public void exportDataIntoCSVFile() {
-        Runnable runnable = () -> {
-            File exportDir;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                exportDir = new File(getExternalFilesDir("Accelerometer"), "ZebraApp"); // Working in API 30 i.e. Android 11 and higher
-            else
-                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp"); // Working in API 29 i.e. Android 10 and lower
-            if (!exportDir.exists()) {
-                if(!exportDir.mkdirs()){
-                    Log.e(TAG, "Error in mkdirs" );
-                    return;
-                }
-            }
-
-            File file = new File(exportDir, DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
-            try {
-                if(!file.createNewFile()){
-                    Log.e(TAG, "Error in createNewFile" );
-                    return;
-                }
-                CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "database-name").build();
-
-                List<EventLogEntity> eventLogEntityList = db.eventLogDao().getAll();
-                csvWrite.writeNext(new String[]{"id", "time_stamp", "event", "x", "y", "z"});
-                for (EventLogEntity eventLogEntity : eventLogEntityList) {
-                    //Which column you want to export
-                    String[] arrStr = {String.valueOf(eventLogEntity.uid), eventLogEntity.time_stamp, eventLogEntity.event, String.valueOf(eventLogEntity.x), String.valueOf(eventLogEntity.y), String.valueOf(eventLogEntity.z)};
-                    csvWrite.writeNext(arrStr);
-                }
-                csvWrite.close();
-                Log.e("csv", "exportData: Data Exported");
-            } catch (Exception sqlEx) {
-                Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
-    }
 
     public boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -146,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
             //resume tasks needing this permission
-            exportDataIntoCSVFile();
+            ExportFile.exportDataIntoCSVFile(this, "manualLog");
         }
     }
     //endregion

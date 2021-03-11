@@ -196,7 +196,7 @@ public class EventTrackingService extends Service implements SensorEventListener
         if (db != null) {
             Runnable runnable = () -> {
                 db.eventLogDao().insert(new EventLogEntity(System.currentTimeMillis(), getTimeStamp(System.currentTimeMillis()), "No event", G_towards_X, G_towards_Y, G_towards_Z));
-                db.accLogDao().insert(new AccLogEntity(System.nanoTime(), G_towards_X, G_towards_Y, G_towards_Z));
+                db.accLogDao().insert(new AccLogEntity(System.currentTimeMillis(), G_towards_X, G_towards_Y, G_towards_Z));
             };
             Thread thread = new Thread(runnable);
             thread.start();
