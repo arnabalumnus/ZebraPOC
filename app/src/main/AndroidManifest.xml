@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_SERVICE" />
 
     <application
         android:name=".ZebraApp"
@@ -47,11 +48,16 @@
 
         <service
             android:name=".service.EventTrackingService"
+            android:exported="false"
             android:foregroundServiceType="dataSync"
             android:process=":dataSync" />
         <service
             android:name=".service.SaveCsvJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".service.LifeTimeService"
+            android:exported="false" />
 
     </application>
 

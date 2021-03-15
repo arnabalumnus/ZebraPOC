@@ -1,11 +1,14 @@
 package com.example.zebrapoc.ui.activity;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
@@ -17,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.broadcastReceiver.PowerConnectionReceiver;
 import com.example.zebrapoc.service.EventTrackingService;
+import com.example.zebrapoc.service.LifeTimeService;
 import com.example.zebrapoc.utils.ExportFile;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +55,18 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, EventTrackingService.class);
         serviceIntent.putExtra("inputExtra", "Accelerometer running");
         ContextCompat.startForegroundService(this, serviceIntent);
+    }
+
+    public void startLifeTimeService(View v) {
+        startService(new Intent(this, LifeTimeService.class));
+
+        Intent myIntent = new Intent(this, LifeTimeService.class);
+        myIntent.putExtra("ALARM", true);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, myIntent, 0);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        long firstTime = SystemClock.elapsedRealtime();
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 12 * 60 * 60 * 1000, pendingIntent);
     }
 
     public void stopService(View v) {
