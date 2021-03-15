@@ -6,7 +6,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.example.zebrapoc.db.entity.AccLogEntity;
-import com.example.zebrapoc.db.entity.EventLogEntity;
 
 import java.util.List;
 
@@ -25,6 +24,6 @@ public interface AccLogDao {
     @Query("Select count(*) from accelerometer_log;")
     long getCount();
 
-    @Query("Delete from event_log")
-    void deleteAll();
+    @Query("Delete from accelerometer_log where ts <:time_stamp")
+    void deleteAll(long time_stamp);
 }

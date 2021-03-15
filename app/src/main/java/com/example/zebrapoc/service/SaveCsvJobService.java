@@ -75,7 +75,8 @@ public class SaveCsvJobService extends JobService {
                     /**
                      * DELETE OLD RECORDS
                      */
-                    //db.eventLogDao().deleteOldRecord(System.currentTimeMillis());
+                    db.eventLogDao().deleteOldRecord(System.currentTimeMillis());
+                    db.accLogDao().deleteAll(System.currentTimeMillis());
                     Log.e(TAG, "Old records DELETED");
                 } catch (Exception sqlEx) {
                     Log.e(TAG, sqlEx.getMessage(), sqlEx);

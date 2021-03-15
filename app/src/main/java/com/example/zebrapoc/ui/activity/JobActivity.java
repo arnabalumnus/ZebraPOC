@@ -26,11 +26,11 @@ public class JobActivity extends AppCompatActivity {
     public void scheduleJob(View v) {
         ComponentName componentName = new ComponentName(this, SaveCsvJobService.class);
         JobInfo info = new JobInfo.Builder(123, componentName)
-                //.setRequiresCharging(true)
+                .setRequiresCharging(false)
                 //.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .setPersisted(true)
-                //.setRequiresDeviceIdle(true)
-                .setPeriodic(TimeSpan.FIFTEEN_MINUTES,0)
+                .setRequiresDeviceIdle(false)
+                .setPeriodic(TimeSpan.SIX_HOUR)
                 .build();
         JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         int resultCode = scheduler.schedule(info);
