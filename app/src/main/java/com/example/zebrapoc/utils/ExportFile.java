@@ -21,7 +21,7 @@ public class ExportFile {
     public static void exportDataIntoCSVFile(Context context, String exportType) {
         Runnable runnable = () -> {
             File exportDir;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 exportDir = new File(context.getExternalFilesDir("ZebraApp"), exportType); // Working in API 30 i.e. Android 11 and higher
             else
                 exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + exportType); // Working in API 29 i.e. Android 10 and lower
