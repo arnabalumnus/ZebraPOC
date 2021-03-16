@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -36,6 +37,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private static AppDatabase db;
+    private static SensorManager mSensorManager;
     //private int mStartId;
 
 
@@ -48,18 +50,20 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SensorManager mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         Sensor mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW);    //Value=1 , Rate=48~50/sec XT 50~51/sec
         //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM); //Value=2 , Rate=~15/sec XT 15/sec
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_HIGH);   //Value=3 , Rate=~15/sec , XT 5/sec
         if (db == null)
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-        Runnable runnable = () -> {
-            db.logDao().insert(new LogEntity("onStartCommand", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                db.logDao().insert(new LogEntity("onStartCommand", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+                return null;
+            }
+        }.execute();
         runAsForeground();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -103,14 +107,15 @@ public class LifeTimeService extends Service implements SensorEventListener {
         Log.w(TAG, "onSensorChanged: X:" + G_towards_X + " Y:" + G_towards_Y + " Z:" + G_towards_Z);
 
         if (db != null) {
-            Runnable runnable = () -> {
-                db.eventLogDao().insert(new EventLogEntity(System.currentTimeMillis(), getTimeStamp(System.currentTimeMillis()), "No event", G_towards_X, G_towards_Y, G_towards_Z));
-                db.accLogDao().insert(new AccLogEntity(System.currentTimeMillis(), G_towards_X, G_towards_Y, G_towards_Z));
-            };
-            Thread thread = new Thread(runnable);
-            thread.start();
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    db.eventLogDao().insert(new EventLogEntity(System.currentTimeMillis(), getTimeStamp(System.currentTimeMillis()), "No event", G_towards_X, G_towards_Y, G_towards_Z));
+                    db.accLogDao().insert(new AccLogEntity(System.currentTimeMillis(), G_towards_X, G_towards_Y, G_towards_Z));
+                    return null;
+                }
+            }.execute();
         }
-        System.gc();
     }
 
     @Override
@@ -120,22 +125,30 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     @Override
     public void onLowMemory() {
-        Runnable runnable = () -> {
-            db.logDao().insert(new LogEntity("onLowMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
+        try {
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    db.logDao().insert(new LogEntity("onLowMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+                    return null;
+                }
+            }.execute();
+        } catch (Exception e) {
+            Log.e(TAG, "onTrimMemory: " + e);
+        }
         super.onLowMemory();
     }
 
     @Override
     public void onTrimMemory(int level) {
         try {
-            Runnable runnable = () -> {
-                db.logDao().insert(new LogEntity("onTrimMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
-            };
-            Thread thread = new Thread(runnable);
-            thread.start();
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    db.logDao().insert(new LogEntity("onTrimMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+                    return null;
+                }
+            }.execute();
         } catch (Exception e) {
             Log.e(TAG, "onTrimMemory: " + e);
         }
@@ -149,11 +162,13 @@ public class LifeTimeService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         try {
-            Runnable runnable = () -> {
-                db.logDao().insert(new LogEntity("onDestroy", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
-            };
-            Thread thread = new Thread(runnable);
-            thread.start();
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    db.logDao().insert(new LogEntity("onDestroy", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+                    return null;
+                }
+            }.execute();
         } catch (Exception e) {
             Log.e(TAG, "onDestroy: " + e);
         }
