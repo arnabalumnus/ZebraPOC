@@ -25,7 +25,9 @@ import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.entity.AccLogEntity;
 import com.example.zebrapoc.db.entity.EventLogEntity;
+import com.example.zebrapoc.db.entity.LogEntity;
 import com.example.zebrapoc.ui.activity.MainActivity;
+import com.example.zebrapoc.utils.DateFormatter;
 
 import static com.example.zebrapoc.utils.DateFormatter.getTimeStamp;
 
@@ -52,7 +54,11 @@ public class LifeTimeService extends Service implements SensorEventListener {
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_HIGH);   //Value=3 , Rate=~15/sec , XT 5/sec
         if (db == null)
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-
+        Runnable runnable = () -> {
+            db.logDao().insert(new LogEntity("onStartCommand", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
         runAsForeground();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -76,6 +82,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
                 .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
                 .setNumber(0)
                 .setOngoing(true)
+                .setSubText("Accelerometer is running...")
                 .setColor(Color.parseColor("#00FF00"))
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setNotificationSilent()
@@ -102,10 +109,42 @@ public class LifeTimeService extends Service implements SensorEventListener {
             Thread thread = new Thread(runnable);
             thread.start();
         }
+        System.gc();
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    @Override
+    public void onLowMemory() {
+        Runnable runnable = () -> {
+            db.logDao().insert(new LogEntity("onLowMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        Runnable runnable = () -> {
+            db.logDao().insert(new LogEntity("onTrimMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+        super.onTrimMemory(level);
+    }
+
+    @Override
+    public void onDestroy() {
+        Runnable runnable = () -> {
+            db.logDao().insert(new LogEntity("onDestroy", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+        db.close();
+        super.onDestroy();
     }
 }
