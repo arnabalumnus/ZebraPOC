@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.broadcastReceiver.PowerConnectionReceiver;
+import com.example.zebrapoc.broadcastReceiver.ServiceStopReceiver;
 import com.example.zebrapoc.service.EventTrackingService;
 import com.example.zebrapoc.service.LifeTimeService;
 import com.example.zebrapoc.utils.ExportFile;
@@ -44,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
         iFilter.addAction(Intent.ACTION_BATTERY_OKAY);
         //registerReceiver(receiver, iFilter);
         //unregisterReceiver(receiver);
+
+        ServiceStopReceiver serviceStopReceiver = new ServiceStopReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.example.LifeTimeService.stopped");
+        registerReceiver(serviceStopReceiver, intentFilter);
     }
 
     public void goToAccelerometer(View view) {
@@ -64,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
         myIntent.putExtra("ALARM", true);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, myIntent, 0);
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        /*AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         long firstTime = SystemClock.elapsedRealtime();
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 5 * 60 * 1000, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 5 * 60 * 1000, pendingIntent);*/
     }
 
     public void stopService(View v) {

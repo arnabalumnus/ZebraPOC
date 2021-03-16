@@ -22,6 +22,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.room.Room;
 
 import com.example.zebrapoc.R;
+import com.example.zebrapoc.broadcastReceiver.ServiceStopReceiver;
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.entity.AccLogEntity;
 import com.example.zebrapoc.db.entity.EventLogEntity;
@@ -34,7 +35,7 @@ import static com.example.zebrapoc.utils.DateFormatter.getTimeStamp;
 public class LifeTimeService extends Service implements SensorEventListener {
 
     private final String TAG = this.getClass().getSimpleName();
-    private AppDatabase db;
+    private static AppDatabase db;
     //private int mStartId;
 
 
@@ -129,22 +130,38 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     @Override
     public void onTrimMemory(int level) {
-        Runnable runnable = () -> {
-            db.logDao().insert(new LogEntity("onTrimMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
+        try {
+            Runnable runnable = () -> {
+                db.logDao().insert(new LogEntity("onTrimMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+        } catch (Exception e) {
+            Log.e(TAG, "onTrimMemory: " + e);
+        }
+        Intent intent = new Intent(getApplicationContext(), ServiceStopReceiver.class);
+        intent.setAction("com.example.LifeTimeService.stopped");
+        intent.putExtra("method", "onTrimMemory()");
+        sendBroadcast(intent);
         super.onTrimMemory(level);
     }
 
     @Override
     public void onDestroy() {
-        Runnable runnable = () -> {
-            db.logDao().insert(new LogEntity("onDestroy", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
-        db.close();
+        try {
+            Runnable runnable = () -> {
+                db.logDao().insert(new LogEntity("onDestroy", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+        } catch (Exception e) {
+            Log.e(TAG, "onDestroy: " + e);
+        }
+        //db.close();
+        Intent intent = new Intent(getApplicationContext(), ServiceStopReceiver.class);
+        intent.setAction("com.example.LifeTimeService.stopped");
+        intent.putExtra("method", "onDestroy()");
+        sendBroadcast(intent);
         super.onDestroy();
     }
 }

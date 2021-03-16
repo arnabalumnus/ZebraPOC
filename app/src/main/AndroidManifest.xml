@@ -36,6 +36,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".broadcastReceiver.ServiceStopReceiver">
+            <intent-filter>
+                <action android:name="com.example.LifeTimeService.stopped" />
+            </intent-filter>
+        </receiver>
+
         <activity android:name=".ui.activity.AccelerometerActivity" />
         <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
