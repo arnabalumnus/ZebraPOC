@@ -23,6 +23,7 @@ import com.example.zebrapoc.utils.ExportFile;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    int frequency = 50; //Records per second from accelerometer
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +55,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void startService(View v) {
-
+        Intent intent = new Intent(this, ServiceActivity.class);
+        startActivity(intent);
     }
 
     public void startLifeTimeService(View v) {
-        startService(new Intent(this, LifeTimeService.class));
+        Intent intent = new Intent(this, LifeTimeService.class);
+        intent.putExtra("frequency", frequency);
+        startService(intent);
 
         Intent myIntent = new Intent(this, LifeTimeService.class);
         myIntent.putExtra("ALARM", true);

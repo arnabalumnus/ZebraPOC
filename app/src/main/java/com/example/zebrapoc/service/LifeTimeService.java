@@ -59,11 +59,16 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        int frequency = intent.getExtras().getInt("frequency", 5);
+        Log.d(TAG, "onStartCommand: frequency=" + frequency);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         Sensor mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW);    //Value=1 , Rate=48~50/sec XT 50~51/sec
-        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM); //Value=2 , Rate=~15/sec XT 15/sec
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_HIGH);   //Value=3 , Rate=~15/sec , XT 5/sec
+        if (frequency == 50)
+            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW);    //Value=1 , Rate=48~50/sec XT 50~51/sec
+        else if (frequency == 15)
+            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM); //Value=2 , Rate=~15/sec XT 15/sec
+        else if (frequency == 5)
+            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_HIGH);   //Value=3 , Rate=~15/sec , XT 5/sec
         if (db == null)
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
         new AsyncTask<Void, Void, Void>() {

@@ -37,6 +37,6 @@ public interface EventLogDao {
     @Query("select * from event_log order by uid desc limit 10;")
     List<EventLogEntity> getLatestTenLog();
 
-    //@Query("SELECT DISTINCT time_stamp, count(*) FROM event_log")
-    //List<String> selectDistinctRecord();
+    @Query("SELECT time_stamp, count(*) FROM event_log group by time_stamp")
+    List<String> selectDistinctRecord();
 }

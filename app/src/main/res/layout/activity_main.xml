@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:onClick="startService"
-        android:text="Start Service" />
+        android:text="Service" />
 
     <Button
         android:id="@+id/buttonExportData"
