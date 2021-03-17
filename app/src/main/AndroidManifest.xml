@@ -51,11 +51,11 @@
             </intent-filter>
         </activity>
 
-        <service
+        <!--<service
             android:name=".service.EventTrackingService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-            android:process=":dataSync" />
+            android:process=":dataSync" />-->
         <service
             android:name=".service.SaveCsvJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />

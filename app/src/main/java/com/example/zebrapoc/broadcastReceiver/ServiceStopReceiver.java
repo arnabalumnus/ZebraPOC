@@ -16,14 +16,15 @@ public class ServiceStopReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, " onReceive()");
 
         String method = intent.getExtras().getString("method");
-
         Toast.makeText(context, "Service Stopped " + method, Toast.LENGTH_LONG).show();
 
-        Log.d(TAG, "onReceive: ");
-        Intent serviceIntent = new Intent(context, EventTrackingService.class);
-        serviceIntent.putExtra("inputExtra", "arnab");
-        ContextCompat.startForegroundService(context, serviceIntent);
+        /**
+         Intent serviceIntent = new Intent(context, EventTrackingService.class);
+         serviceIntent.putExtra("inputExtra", "arnab");
+         ContextCompat.startForegroundService(context, serviceIntent);
+         */
     }
 }

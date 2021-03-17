@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -31,22 +32,30 @@ import com.example.zebrapoc.db.entity.LogEntity;
 import com.example.zebrapoc.ui.activity.MainActivity;
 import com.example.zebrapoc.utils.DateFormatter;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+
 import static com.example.zebrapoc.utils.DateFormatter.getTimeStamp;
 
 public class LifeTimeService extends Service implements SensorEventListener {
 
     private final String TAG = this.getClass().getSimpleName();
-    private static AppDatabase db;
-    private static SensorManager mSensorManager;
+    private SensorManager mSensorManager;
+    private AppDatabase db;
+    private EventLogEntity eventLogEntity;
+    private AccLogEntity accLogEntity;
     //private int mStartId;
 
+
+    public LifeTimeService() {
+        super();
+    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -64,6 +73,9 @@ public class LifeTimeService extends Service implements SensorEventListener {
                 return null;
             }
         }.execute();
+
+        eventLogEntity = new EventLogEntity();
+        accLogEntity = new AccLogEntity();
         runAsForeground();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -101,20 +113,36 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float G_towards_X = event.values[0];
-        float G_towards_Y = event.values[1];
-        float G_towards_Z = event.values[2];
-        Log.w(TAG, "onSensorChanged: X:" + G_towards_X + " Y:" + G_towards_Y + " Z:" + G_towards_Z);
+        try {
+            float G_towards_X = event.values[0];
+            float G_towards_Y = event.values[1];
+            float G_towards_Z = event.values[2];
+            Log.w(TAG, "onSensorChanged: X:" + G_towards_X + " Y:" + G_towards_Y + " Z:" + G_towards_Z);
 
-        if (db != null) {
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    db.eventLogDao().insert(new EventLogEntity(System.currentTimeMillis(), getTimeStamp(System.currentTimeMillis()), "No event", G_towards_X, G_towards_Y, G_towards_Z));
-                    db.accLogDao().insert(new AccLogEntity(System.currentTimeMillis(), G_towards_X, G_towards_Y, G_towards_Z));
-                    return null;
-                }
-            }.execute();
+            accLogEntity.setTs(System.currentTimeMillis());
+            accLogEntity.setX(G_towards_X);
+            accLogEntity.setY(G_towards_Y);
+            accLogEntity.setZ(G_towards_Z);
+
+            eventLogEntity.setUid(System.currentTimeMillis());
+            eventLogEntity.setTime_stamp(getTimeStamp(System.currentTimeMillis()));
+            eventLogEntity.setEvent("No event");
+            eventLogEntity.setX(G_towards_X);
+            eventLogEntity.setY(G_towards_Y);
+            eventLogEntity.setZ(G_towards_Z);
+
+            if (db != null) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        db.eventLogDao().insert(eventLogEntity);
+                        db.accLogDao().insert(accLogEntity);
+                        return null;
+                    }
+                }.execute();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "onSensorChanged: " + e);
         }
     }
 
@@ -178,5 +206,40 @@ public class LifeTimeService extends Service implements SensorEventListener {
         intent.putExtra("method", "onDestroy()");
         sendBroadcast(intent);
         super.onDestroy();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+    }
+
+    @Override
+    protected void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
+        super.dump(fd, writer, args);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
     }
 }

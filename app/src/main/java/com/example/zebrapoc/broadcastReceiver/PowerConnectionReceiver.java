@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
-
-import com.example.zebrapoc.service.EventTrackingService;
 import com.example.zebrapoc.utils.ExportFile;
 
 public class PowerConnectionReceiver extends BroadcastReceiver {

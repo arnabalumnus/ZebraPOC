@@ -22,10 +22,33 @@ public class AccLogEntity {
     @ColumnInfo(name = "Z")
     public float z;
 
+    public AccLogEntity() {
+    }
+
     public AccLogEntity(long ts, float x, float y, float z) {
         this.ts = ts;
         this.x = x;
         this.y = y;
+        this.z = z;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setTs(long ts) {
+        this.ts = ts;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float z) {
         this.z = z;
     }
 }

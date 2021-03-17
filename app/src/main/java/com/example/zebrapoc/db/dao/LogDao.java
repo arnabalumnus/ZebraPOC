@@ -17,4 +17,6 @@ public interface LogDao {
     @Insert
     void insert(LogEntity... logs);
 
+    @Query("Select count(*) from log;")
+    long getCount();
 }

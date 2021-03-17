@@ -7,6 +7,7 @@ import androidx.room.Query;
 
 import com.example.zebrapoc.db.entity.EventLogEntity;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 @Dao
@@ -36,13 +37,6 @@ public interface EventLogDao {
     @Query("select * from event_log order by uid desc limit 10;")
     List<EventLogEntity> getLatestTenLog();
 
-    //@Query("Select time_stamp, count(*) from event_log group by time_stamp;")
-    //Object getGroupOfRecord();
-
-    /*@Query("SELECT * FROM user WHERE uid IN (:userIds)")
-    List<User> loadAllByIds(int[] userIds);
-
-    @Query("SELECT * FROM user WHERE first_name LIKE :first AND " +
-            "last_name LIKE :last LIMIT 1")
-    User findByName(String first, String last);*/
+    //@Query("SELECT DISTINCT time_stamp, count(*) FROM event_log")
+    //List<String> selectDistinctRecord();
 }
