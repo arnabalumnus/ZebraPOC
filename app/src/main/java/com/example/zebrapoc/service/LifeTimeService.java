@@ -40,6 +40,9 @@ public class LifeTimeService extends Service implements SensorEventListener {
     //private EventLogEntity eventLogEntity;
     private AccLogEntity accLogEntity;
     //private int mStartId;
+    private float G_towards_X = 0;
+    private float G_towards_Y = 0;
+    private float G_towards_Z = 0;
 
 
     public LifeTimeService() {
@@ -116,9 +119,9 @@ public class LifeTimeService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         try {
-            float G_towards_X = event.values[0];
-            float G_towards_Y = event.values[1];
-            float G_towards_Z = event.values[2];
+            G_towards_X = event.values[0];
+            G_towards_Y = event.values[1];
+            G_towards_Z = event.values[2];
             //Log.w(TAG, "onSensorChanged: X:" + G_towards_X + " Y:" + G_towards_Y + " Z:" + G_towards_Z);
 
             accLogEntity.setTs(System.currentTimeMillis());

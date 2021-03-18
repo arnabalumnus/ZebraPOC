@@ -51,7 +51,7 @@ public class ServiceActivity extends AppCompatActivity {
     public void startLifeTimeService(View v) {
         Intent intent = new Intent(this, LifeTimeService.class);
         intent.putExtra("frequency", frequency);
-        startService(intent);
+        startForegroundService(intent);
 
         Intent myIntent = new Intent(this, LifeTimeService.class);
         myIntent.putExtra("ALARM", true);
