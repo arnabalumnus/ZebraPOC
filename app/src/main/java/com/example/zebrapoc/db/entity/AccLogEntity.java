@@ -25,13 +25,6 @@ public class AccLogEntity {
     public AccLogEntity() {
     }
 
-    public AccLogEntity(long ts, float x, float y, float z) {
-        this.ts = ts;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
     public void setId(long id) {
         this.id = id;
     }

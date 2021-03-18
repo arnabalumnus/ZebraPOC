@@ -1,6 +1,5 @@
 package com.example.zebrapoc.service;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -27,7 +26,6 @@ import com.example.zebrapoc.R;
 import com.example.zebrapoc.broadcastReceiver.ServiceStopReceiver;
 import com.example.zebrapoc.db.AppDatabase;
 import com.example.zebrapoc.db.entity.AccLogEntity;
-import com.example.zebrapoc.db.entity.EventLogEntity;
 import com.example.zebrapoc.db.entity.LogEntity;
 import com.example.zebrapoc.ui.activity.MainActivity;
 import com.example.zebrapoc.utils.DateFormatter;
@@ -35,14 +33,11 @@ import com.example.zebrapoc.utils.DateFormatter;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
-import static com.example.zebrapoc.utils.DateFormatter.getTimeStamp;
-
 public class LifeTimeService extends Service implements SensorEventListener {
 
     private final String TAG = this.getClass().getSimpleName();
-    private SensorManager mSensorManager;
     private AppDatabase db;
-    private EventLogEntity eventLogEntity;
+    //private EventLogEntity eventLogEntity;
     private AccLogEntity accLogEntity;
     //private int mStartId;
 
@@ -61,7 +56,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         int frequency = intent.getExtras().getInt("frequency", 5);
         Log.d(TAG, "onStartCommand: frequency=" + frequency);
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        SensorManager mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         Sensor mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (frequency == 50)
             mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW);    //Value=1 , Rate=48~50/sec XT 50~51/sec
@@ -79,10 +74,11 @@ public class LifeTimeService extends Service implements SensorEventListener {
             }
         }.execute();
 
-        eventLogEntity = new EventLogEntity();
+        //eventLogEntity = new EventLogEntity();
         accLogEntity = new AccLogEntity();
         runAsForeground();
-        return super.onStartCommand(intent, flags, startId);
+        //return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
     }
 
     private void runAsForeground() {
@@ -100,19 +96,20 @@ public class LifeTimeService extends Service implements SensorEventListener {
             mNotificationManager.createNotificationChannel(channel);
         }
 
-        Notification notification = new NotificationCompat.Builder(this, "secondary")
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, "secondary")
                 .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
                 .setNumber(0)
                 .setOngoing(true)
+                .setColorized(true)
+                .setColor(Color.parseColor("#085A0B"))
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setSubText("Accelerometer is running...")
-                .setColor(Color.parseColor("#00FF00"))
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setNotificationSilent()
                 .setContentTitle("Zebra")
                 .setContentText("Accelerometer is running...")
-                .setContentIntent(pendingIntent).build();
+                .setNotificationSilent()
+                .setContentIntent(pendingIntent);
 
-        startForeground(12345, notification);
+        startForeground(12345, notification.build());
         //ShortcutBadger.removeCount(this);
     }
 
@@ -122,25 +119,25 @@ public class LifeTimeService extends Service implements SensorEventListener {
             float G_towards_X = event.values[0];
             float G_towards_Y = event.values[1];
             float G_towards_Z = event.values[2];
-            Log.w(TAG, "onSensorChanged: X:" + G_towards_X + " Y:" + G_towards_Y + " Z:" + G_towards_Z);
+            //Log.w(TAG, "onSensorChanged: X:" + G_towards_X + " Y:" + G_towards_Y + " Z:" + G_towards_Z);
 
             accLogEntity.setTs(System.currentTimeMillis());
             accLogEntity.setX(G_towards_X);
             accLogEntity.setY(G_towards_Y);
             accLogEntity.setZ(G_towards_Z);
 
-            eventLogEntity.setUid(System.currentTimeMillis());
-            eventLogEntity.setTime_stamp(getTimeStamp(System.currentTimeMillis()));
-            eventLogEntity.setEvent("No event");
-            eventLogEntity.setX(G_towards_X);
-            eventLogEntity.setY(G_towards_Y);
-            eventLogEntity.setZ(G_towards_Z);
+            //eventLogEntity.setUid(System.currentTimeMillis());
+            //eventLogEntity.setTime_stamp(getTimeStamp(System.currentTimeMillis()));
+            //eventLogEntity.setEvent("No event");
+            //eventLogEntity.setX(G_towards_X);
+            //eventLogEntity.setY(G_towards_Y);
+            //eventLogEntity.setZ(G_towards_Z);
 
             if (db != null) {
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... voids) {
-                        db.eventLogDao().insert(eventLogEntity);
+                        //db.eventLogDao().insert(eventLogEntity);
                         db.accLogDao().insert(accLogEntity);
                         return null;
                     }
@@ -169,6 +166,10 @@ public class LifeTimeService extends Service implements SensorEventListener {
         } catch (Exception e) {
             Log.e(TAG, "onTrimMemory: " + e);
         }
+        Intent intent = new Intent(getApplicationContext(), ServiceStopReceiver.class);
+        intent.setAction("com.example.LifeTimeService.stopped");
+        intent.putExtra("method", "onLowMemory()");
+        sendBroadcast(intent);
         super.onLowMemory();
     }
 
@@ -178,7 +179,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
-                    db.logDao().insert(new LogEntity("onTrimMemory", DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+                    db.logDao().insert(new LogEntity("onTrimMemory level:" + level, DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
                     return null;
                 }
             }.execute();
@@ -187,7 +188,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
         }
         Intent intent = new Intent(getApplicationContext(), ServiceStopReceiver.class);
         intent.setAction("com.example.LifeTimeService.stopped");
-        intent.putExtra("method", "onTrimMemory()");
+        intent.putExtra("method", "onTrimMemory() Level: " + level);
         sendBroadcast(intent);
         super.onTrimMemory(level);
     }
