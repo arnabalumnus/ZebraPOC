@@ -81,7 +81,8 @@ public class LifeTimeService extends Service implements SensorEventListener {
         accLogEntity = new AccLogEntity();
         runAsForeground();
         //return super.onStartCommand(intent, flags, startId);
-        return START_NOT_STICKY;
+        //return START_NOT_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     private void runAsForeground() {
@@ -100,16 +101,17 @@ public class LifeTimeService extends Service implements SensorEventListener {
         }
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(this, "secondary")
-                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
+                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.notification_small))
                 .setNumber(0)
                 .setOngoing(true)
                 .setColorized(true)
                 .setColor(Color.parseColor("#085A0B"))
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_notification_small)
                 .setSubText("Accelerometer is running...")
                 .setContentTitle("Zebra")
                 .setContentText("Accelerometer is running...")
                 .setNotificationSilent()
+                .setOnlyAlertOnce(true)
                 .setContentIntent(pendingIntent);
 
         startForeground(12345, notification.build());
