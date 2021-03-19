@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
 }
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
@@ -11,11 +12,28 @@ android {
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0.6"
+        versionName "1.0.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Rename app-debug.apk
+        setProperty("archivesBaseName", "Zebra -v" + versionName)
     }
 
+    // Exclude java and kotlin file. Avoid compiling specified files
+    sourceSets {
+        //  Create kotlin folder with main, test, androidTest folder.
+        //  Add kotlin folder in srcCode
+        //main.java.srcDirs += "src/main/kotlin"
+        main {
+            java {
+                exclude '**/ExcludeClass.java'
+            }
+            kotlin {
+                exclude '**/MachineLearning.kt'
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -54,7 +72,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
     implementation group: 'com.opencsv', name: 'opencsv', version: '3.3'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
-
+}
+repositories {
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    mavenCentral()
 }
