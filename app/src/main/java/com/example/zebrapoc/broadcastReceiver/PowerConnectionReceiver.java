@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
+import com.example.zebrapoc.service.LifeTimeService;
 import com.example.zebrapoc.utils.ExportFile;
 
 public class PowerConnectionReceiver extends BroadcastReceiver {
@@ -17,16 +20,22 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
             Toast.makeText(context, "POWER CONNECTED", Toast.LENGTH_SHORT).show();
-            //Intent serviceIntent = new Intent(context, EventTrackingService.class);
-            //context.stopService(serviceIntent);
+
+            //region Stop service on power connect
+            Intent serviceIntent = new Intent(context, LifeTimeService.class);
+            context.stopService(serviceIntent);
+            //endregion
 
             ExportFile.exportDataIntoCSVFile(context, "onPowerConnected");
         }
         if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
             Toast.makeText(context, "POWER DISCONNECTED", Toast.LENGTH_SHORT).show();
-            //Intent serviceIntent = new Intent(context, EventTrackingService.class);
-            //serviceIntent.putExtra("inputExtra", "Accelerometer running");
-            //ContextCompat.startForegroundService(context, serviceIntent);
+
+            //region Start service on power disconnect
+            Intent serviceIntent = new Intent(context, LifeTimeService.class);
+            serviceIntent.putExtra("frequency", 5);
+            ContextCompat.startForegroundService(context, serviceIntent);
+            //endregion
         }
         if (intent.getAction().equals(Intent.ACTION_BATTERY_LOW)) {
             Toast.makeText(context, "BATTERY LOW", Toast.LENGTH_LONG).show();
