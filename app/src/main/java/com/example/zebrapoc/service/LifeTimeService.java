@@ -57,7 +57,6 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //this.mStartId = startId;
         int frequency = intent.getExtras().getInt("frequency", 5);
         Log.d(TAG, "onStartCommand: frequency=" + frequency);
         SensorManager mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -82,9 +81,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
         accLogEntity = new AccLogEntity();
         runAsForeground();
         //return super.onStartCommand(intent, flags, startId);
-        //return START_NOT_STICKY;
-        //return START_STICKY;
-        return START_REDELIVER_INTENT;
+        return START_NOT_STICKY;
     }
 
     private void runAsForeground() {
@@ -103,17 +100,16 @@ public class LifeTimeService extends Service implements SensorEventListener {
         }
 
         NotificationCompat.Builder notification = new NotificationCompat.Builder(this, "secondary")
-                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.notification_small))
+                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
                 .setNumber(0)
                 .setOngoing(true)
                 .setColorized(true)
                 .setColor(Color.parseColor("#085A0B"))
-                .setSmallIcon(R.drawable.ic_notification_small)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setSubText("Accelerometer is running...")
                 .setContentTitle("Zebra")
                 .setContentText("Accelerometer is running...")
-                .setSilent(true)
-                .setOnlyAlertOnce(true)
+                .setNotificationSilent()
                 .setContentIntent(pendingIntent);
 
         startForeground(12345, notification.build());
@@ -182,25 +178,11 @@ public class LifeTimeService extends Service implements SensorEventListener {
 
     @Override
     public void onTrimMemory(int level) {
-        String memory_info;
-        switch (level) {
-            case TRIM_MEMORY_RUNNING_CRITICAL:
-                memory_info = "TRIM_MEMORY_RUNNING_CRITICAL";
-                break;
-            case TRIM_MEMORY_RUNNING_LOW:
-                memory_info = "TRIM_MEMORY_RUNNING_LOW";
-                break;
-            case TRIM_MEMORY_RUNNING_MODERATE:
-                memory_info = "TRIM_MEMORY_RUNNING_MODERATE";
-                break;
-            default:
-                memory_info = "" + level;
-        }
         try {
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
-                    db.logDao().insert(new LogEntity("onTrimMemory level:" + memory_info, DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
+                    db.logDao().insert(new LogEntity("onTrimMemory level:" + level, DateFormatter.getTimeStampFileName(System.currentTimeMillis())));
                     return null;
                 }
             }.execute();
@@ -209,7 +191,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
         }
         Intent intent = new Intent(getApplicationContext(), ServiceStopReceiver.class);
         intent.setAction("com.example.LifeTimeService.stopped");
-        intent.putExtra("method", "onTrimMemory() Level: " + memory_info);
+        intent.putExtra("method", "onTrimMemory() Level: " + level);
         sendBroadcast(intent);
         super.onTrimMemory(level);
     }
