@@ -3,6 +3,7 @@ package com.example.zebrapoc.broadcastReceiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,7 +22,11 @@ public class BootReceiver extends BroadcastReceiver {
 
         Intent serviceIntent = new Intent(context, LifeTimeService.class);
         serviceIntent.putExtra("frequency", 5);
-        ContextCompat.startForegroundService(context, serviceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            ContextCompat.startForegroundService(context, serviceIntent);
+        else
+            context.startService(intent);
+
 
     }
 }

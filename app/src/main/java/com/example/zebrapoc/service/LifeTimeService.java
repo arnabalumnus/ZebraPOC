@@ -112,7 +112,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
                 .setSubText("Accelerometer is running...")
                 .setContentTitle("Zebra")
                 .setContentText("Accelerometer is running...")
-                .setNotificationSilent()
+                .setSilent(true)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(pendingIntent);
 

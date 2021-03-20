@@ -3,6 +3,7 @@ package com.example.zebrapoc.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -51,7 +52,10 @@ public class ServiceActivity extends AppCompatActivity {
     public void startLifeTimeService(View v) {
         Intent intent = new Intent(this, LifeTimeService.class);
         intent.putExtra("frequency", frequency);
-        startForegroundService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startForegroundService(intent);
+        else
+            startService(intent);
 
         Intent myIntent = new Intent(this, LifeTimeService.class);
         myIntent.putExtra("ALARM", true);
