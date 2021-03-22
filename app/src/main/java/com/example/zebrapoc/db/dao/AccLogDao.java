@@ -32,4 +32,7 @@ public interface AccLogDao {
 
     //@Query("SELECT DISTINCT TS, count(*) FROM accelerometer_log")
     //List<String> selectDistinctRecord();
+
+    //@Query("SELECT TS, count(*) FROM accelerometer_log group by TS")
+    //List<String> selectDistinctRecord();
 }
