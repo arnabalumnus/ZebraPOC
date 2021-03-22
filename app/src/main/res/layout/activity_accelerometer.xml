@@ -6,7 +6,13 @@
     tools:context=".ui.activity.AccelerometerActivity">
 
     <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart1"
+        android:id="@+id/chart_xyz"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart_tsv"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="300dp"/>
 
