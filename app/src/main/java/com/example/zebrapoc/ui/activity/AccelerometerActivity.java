@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,14 +32,11 @@ public class AccelerometerActivity extends AppCompatActivity implements SensorEv
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private LineChart xyzChart, tsvChart;
-    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accelerometer);
-
-        textView = findViewById(R.id.textView);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -307,13 +303,11 @@ public class AccelerometerActivity extends AppCompatActivity implements SensorEv
         addTSVEntry((float) TSV);
 
         if (Math.abs(G_towards_X) < G_CALIBRATION_FACTOR && Math.abs(G_towards_Y) < G_CALIBRATION_FACTOR && Math.abs(G_towards_Z) < G_CALIBRATION_FACTOR) {
-            Log.e(TAG, "It's a free fall");
-            textView.setText("It's a free fall");
+            Log.d(TAG, "It's a free fall");
         }
 
         if (Math.abs(G_towards_X) > THROW_CALIBRATION_FACTOR || Math.abs(G_towards_Y) > THROW_CALIBRATION_FACTOR || Math.abs(G_towards_Z) > THROW_CALIBRATION_FACTOR) {
-            Log.e(TAG, "It's a throw");
-            textView.setText("It's a throw");
+            Log.d(TAG, "It's a throw");
         }
     }
 

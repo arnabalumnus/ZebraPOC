@@ -3,6 +3,7 @@ package com.example.zebrapoc.broadcastReceiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.widget.Toast;
 
@@ -23,8 +24,8 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
             Toast.makeText(context, "POWER CONNECTED", Toast.LENGTH_SHORT).show();
 
             //region Stop service on power connect
-            /*Intent serviceIntent = new Intent(context, LifeTimeService.class);
-            context.stopService(serviceIntent);*/
+            Intent serviceIntent = new Intent(context, LifeTimeService.class);
+            context.stopService(serviceIntent);
             //endregion
 
             ExportFile.exportDataIntoCSVFile(context, "onPowerConnected");
@@ -33,12 +34,14 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
             Toast.makeText(context, "POWER DISCONNECTED", Toast.LENGTH_SHORT).show();
 
             //region Start service on power disconnect
-            /*Intent serviceIntent = new Intent(context, LifeTimeService.class);
-            serviceIntent.putExtra("frequency", 5);
+            SharedPreferences sp = context.getSharedPreferences("Zebra", Context.MODE_PRIVATE);
+            int frequency = sp.getInt("frequency", 5);
+            Intent serviceIntent = new Intent(context, LifeTimeService.class);
+            serviceIntent.putExtra("frequency", frequency);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 ContextCompat.startForegroundService(context, serviceIntent);
             else
-                context.startService(intent);*/
+                context.startService(intent);
 
             //endregion
         }

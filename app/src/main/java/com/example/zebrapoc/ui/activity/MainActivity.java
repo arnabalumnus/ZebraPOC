@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
             ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            Toast.makeText(this, "Data exported in 'ZebraApp/manualLog' folder", Toast.LENGTH_SHORT).show();
         }
     }
 

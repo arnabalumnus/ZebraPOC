@@ -105,7 +105,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
                 .setOngoing(true)
                 .setColorized(true)
                 .setColor(Color.parseColor("#085A0B"))
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_notification_small3)
                 .setSubText("Accelerometer is running...")
                 .setContentTitle("Zebra")
                 .setContentText("Accelerometer is running...")
