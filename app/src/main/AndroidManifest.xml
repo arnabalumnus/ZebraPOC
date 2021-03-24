@@ -16,9 +16,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Zebra">
+
+
+        <activity android:name=".ui.activity.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.activity.AccelerometerActivity" />
         <activity android:name=".ui.activity.ServiceActivity" />
-        <activity android:name=".ui.activity.JobActivity" />
         <activity android:name=".ui.activity.DatabaseActivity" />
+        <!--<activity android:name=".ui.activity.JobActivity" />-->
+
 
         <receiver android:name=".broadcastReceiver.PowerConnectionReceiver">
             <intent-filter>
@@ -37,35 +48,27 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".broadcastReceiver.ServiceStopReceiver">
+        <!--<receiver android:name=".broadcastReceiver.ServiceStopReceiver">
             <intent-filter>
-                <action android:name="com.example.LifeTimeService.stopped" />
+                <action android:name="com.alumnus.zebra.service.LifeTimeService.stopped" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
 
-        <activity android:name=".ui.activity.AccelerometerActivity" />
-        <activity android:name=".ui.activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <!--
-<service
+        <service
+            android:name=".service.LifeTimeService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            android:process=":dataCollect" />
+        <!--<service
             android:name=".service.EventTrackingService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-            android:process=":dataSync" />
-        -->
-        <service
+            android:process=":dataSync" />-->
+        <!--<service
             android:name=".service.SaveCsvJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".service.LifeTimeService"
-            android:foregroundServiceType="dataSync"
-            android:process=":dataCollect"
-            android:exported="false" />
+            android:permission="android.permission.BIND_JOB_SERVICE" />-->
+
     </application>
 
 </manifest>
