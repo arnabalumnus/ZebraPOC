@@ -1,4 +1,4 @@
-# ZebraPOC
+# Zebra Device Usage 
 
 ## Getting started
 This app is used for detecting Throw or Free fall of Android device using accelerometer. This whole process data collections from accelerometer is done in background. 
