@@ -17,7 +17,6 @@ import androidx.core.app.ActivityCompat;
 
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver;
-import com.alumnus.zebra.broadcastReceiver.ServiceStopReceiver;
 import com.alumnus.zebra.service.LifeTimeService;
 import com.alumnus.zebra.utils.ExportFile;
 
@@ -44,10 +43,10 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, iFilter);
         //unregisterReceiver(receiver);
 
-        ServiceStopReceiver serviceStopReceiver = new ServiceStopReceiver();
+        /*ServiceStopReceiver serviceStopReceiver = new ServiceStopReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.LifeTimeService.stopped");
-        registerReceiver(serviceStopReceiver, intentFilter);
+        registerReceiver(serviceStopReceiver, intentFilter);*/
     }
 
     public void goToAccelerometer(View view) {
@@ -93,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void navigateToJobActivity(View view) {
-        startActivity(new Intent(this, JobActivity.class));
+        //startActivity(new Intent(this, JobActivity.class));
     }
 
 
