@@ -9,9 +9,9 @@ Flow below steps to Install
 3. Next tap on `Open` button. 
 
 >Note: If app is not installed in this process then or else next step can be skipped
- ## Resolve debug apk installation problems
- 1. Allow app installation from unknown resource in settings.       
- 2. GooglePlayProtect also stops to install debug build. To fix that follow below steps.
+## Resolve debug apk installation problems
+1. Allow app installation from unknown resource in settings.       
+2. GooglePlayProtect also stops to install debug build. To fix that follow below steps.
     1. On your Android phone or tablet, open the Google Play Store app .
     2. Tap Menu Play Protect Settings .
     3.  Turn Scan apps with Play Protect on or off.
@@ -43,6 +43,8 @@ This screen is to just verify the accelerometer data recoding is happening in ba
 1. Get all event
 2. Last timestamp
 
-### Extras
-1. Service will stop on Power connect.
-2. Service will start on Power disconnect and Reboot.
+## Extras
+This are some info about accelerometer data collecting service.
+1. This service will stop on Power connect.
+2. And service will start again on Power disconnect or Reboot device.
+3. Accelerometer data will be exported on Power connect in `ZebraApp/onPowerConnect` folder.
