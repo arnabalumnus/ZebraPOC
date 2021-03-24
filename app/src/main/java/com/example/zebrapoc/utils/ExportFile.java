@@ -20,6 +20,7 @@ public class ExportFile {
 
     public static void exportDataIntoCSVFile(Context context, String exportType) {
         Runnable runnable = () -> {
+            long delete_upto_time_stamp = System.currentTimeMillis();
             File exportDir;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
                 exportDir = new File(context.getExternalFilesDir("ZebraApp"), exportType); // Working in API 30 i.e. Android 11 and higher
@@ -51,6 +52,8 @@ public class ExportFile {
                 }
                 csvWrite.close();
                 Log.e("csv", "exportData: Data Exported");
+                Thread.sleep(1000);
+                db.accLogDao().deleteAll(delete_upto_time_stamp);
             } catch (Exception sqlEx) {
                 Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
             }

@@ -3,11 +3,14 @@ package com.example.zebrapoc.broadcastReceiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
-import com.example.zebrapoc.service.EventTrackingService;
+import com.example.zebrapoc.service.LifeTimeService;
+import com.example.zebrapoc.utils.ExportFile;
 
 public class PowerConnectionReceiver extends BroadcastReceiver {
 
@@ -19,14 +22,28 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
             Toast.makeText(context, "POWER CONNECTED", Toast.LENGTH_SHORT).show();
-            Intent serviceIntent = new Intent(context, EventTrackingService.class);
+
+            //region Stop service on power connect
+            Intent serviceIntent = new Intent(context, LifeTimeService.class);
             context.stopService(serviceIntent);
+            //endregion
+
+            ExportFile.exportDataIntoCSVFile(context, "onPowerConnected");
         }
         if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
             Toast.makeText(context, "POWER DISCONNECTED", Toast.LENGTH_SHORT).show();
-            Intent serviceIntent = new Intent(context, EventTrackingService.class);
-            serviceIntent.putExtra("inputExtra", "Accelerometer running");
-            ContextCompat.startForegroundService(context, serviceIntent);
+
+            //region Start service on power disconnect
+            SharedPreferences sp = context.getSharedPreferences("Zebra", Context.MODE_PRIVATE);
+            int frequency = sp.getInt("frequency", 5);
+            Intent serviceIntent = new Intent(context, LifeTimeService.class);
+            serviceIntent.putExtra("frequency", frequency);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                ContextCompat.startForegroundService(context, serviceIntent);
+            else
+                context.startService(intent);
+
+            //endregion
         }
         if (intent.getAction().equals(Intent.ACTION_BATTERY_LOW)) {
             Toast.makeText(context, "BATTERY LOW", Toast.LENGTH_LONG).show();

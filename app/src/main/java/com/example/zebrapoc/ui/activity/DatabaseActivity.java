@@ -10,57 +10,81 @@ import androidx.room.Room;
 
 import com.example.zebrapoc.R;
 import com.example.zebrapoc.db.AppDatabase;
+import com.example.zebrapoc.utils.DateFormatter;
 
 public class DatabaseActivity extends AppCompatActivity {
 
     private static final String TAG = "DatabaseActivity";
-    TextView tv_db_record_count;
+    TextView tv_db_record_count_event_table, tv_db_record_count_acc_table, tv_db_record_count_log_table;
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_database);
 
-        tv_db_record_count = findViewById(R.id.tv_db_record_count);
+        tv_db_record_count_event_table = findViewById(R.id.tv_db_record_count_event_table);
+        tv_db_record_count_acc_table = findViewById(R.id.tv_db_record_count_acc_table);
+        tv_db_record_count_log_table = findViewById(R.id.tv_db_record_count_log_table);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+    }
 
     public void getAllEvent(View view) {
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
         Runnable runnable = () -> db.eventLogDao().getAll();
         Thread thread = new Thread(runnable);
         thread.start();
     }
 
     public void getTotalCount(View view) {
-        /*AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").build();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                long count = db.eventLogDao().getCount();
-                //Toast.makeText(DatabaseActivity.this, "Count: " + count, Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "run: count:" + count);
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();*/
         new DBTask().execute();
     }
 
-    class DBTask extends AsyncTask<Void, Void, Long> {
+    class DBTask extends AsyncTask<Void, Void, Long[]> {
 
         @Override
-        protected Long doInBackground(Void... voids) {
-            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-            long count = db.eventLogDao().getCount();
+        protected Long[] doInBackground(Void... voids) {
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+            Long[] count = {0L, 0L, 0L};
+            long eventCount = db.eventLogDao().getCount();
+            long accCount = db.accLogDao().getCount();
+            long logCount = db.logDao().getCount();
+            count[0] = eventCount;
+            count[1] = accCount;
+            count[2] = logCount;
             return count;
         }
 
         @Override
-        protected void onPostExecute(Long count) {
+        protected void onPostExecute(Long[] count) {
             super.onPostExecute(count);
-            tv_db_record_count.setText("Count: " + count);
+            tv_db_record_count_event_table.setText("Event Count: " + count[0]);
+            tv_db_record_count_acc_table.setText("Acc Count: " + count[1]);
+            tv_db_record_count_log_table.setText("Log Count: " + count[2]);
         }
+    }
+
+    class FetchTimeStampDBTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+            long[] firstLastRecordTime= db.accLogDao().getLastRecordTime();
+            return "Last: " + DateFormatter.getTimeStamp(firstLastRecordTime[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            tv_db_record_count_event_table.setText(s);
+        }
+    }
+
+    public void getLastTimeStamp(View v) {
+        new FetchTimeStampDBTask().execute();
     }
 }

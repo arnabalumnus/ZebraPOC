@@ -26,4 +26,13 @@ public interface AccLogDao {
 
     @Query("Delete from accelerometer_log where ts <:time_stamp")
     void deleteAll(long time_stamp);
+
+    @Query("Select MAX(TS), MIN(TS) from accelerometer_log;")
+    long[] getLastRecordTime();
+
+    //@Query("SELECT DISTINCT TS, count(*) FROM accelerometer_log")
+    //List<String> selectDistinctRecord();
+
+    //@Query("SELECT TS, count(*) FROM accelerometer_log group by TS")
+    //List<String> selectDistinctRecord();
 }

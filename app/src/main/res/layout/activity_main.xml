@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:onClick="startService"
-        android:text="Start Service" />
+        android:text="Service" />
 
     <Button
         android:id="@+id/buttonExportData"
@@ -57,7 +57,17 @@
         android:layout_height="wrap_content"
         android:onClick="navigateToJobActivity"
         android:text="Job Service for save CSV file"
-        android:textAllCaps="false" />
+        android:textAllCaps="false"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/buttonLifeTimeService"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="startLifeTimeService"
+        android:text="Start Lifetime service"
+        android:textAllCaps="false"
+        android:visibility="gone" />
 
 
 </LinearLayout>

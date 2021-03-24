@@ -5,13 +5,17 @@ import androidx.room.RoomDatabase;
 
 import com.example.zebrapoc.db.dao.AccLogDao;
 import com.example.zebrapoc.db.dao.EventLogDao;
+import com.example.zebrapoc.db.dao.LogDao;
 import com.example.zebrapoc.db.entity.AccLogEntity;
 import com.example.zebrapoc.db.entity.EventLogEntity;
+import com.example.zebrapoc.db.entity.LogEntity;
 
-@Database(entities = {EventLogEntity.class, AccLogEntity.class}, version = 1)
+@Database(entities = {EventLogEntity.class, AccLogEntity.class, LogEntity.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract EventLogDao eventLogDao();
 
     public abstract AccLogDao accLogDao();
+
+    public abstract LogDao logDao();
 }
