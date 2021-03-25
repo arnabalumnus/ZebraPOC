@@ -20,6 +20,8 @@ import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver;
 import com.alumnus.zebra.service.LifeTimeService;
 import com.alumnus.zebra.utils.ExportFile;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -79,6 +81,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void deleteFile(View v){
+        String path = "/storage/emulated/0/ZebraApp/manualLog/2021, Mar-25 Time-13 27 16.csv";
+        File fileDelete = new File(path);
+        if (fileDelete.exists()) {
+            if (fileDelete.delete()) {
+               // System.out.println("file Deleted :" + uri.getPath());
+            } else {
+               // System.out.println("file not Deleted :" + uri.getPath());
+            }
+        }
+    }
+
     public void navigateToDatabase(View view) {
         startActivity(new Intent(this, DatabaseActivity.class));
     }
@@ -87,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
             ExportFile.exportDataIntoCSVFile(this, "manualLog");
-            Toast.makeText(this, "Data exported in 'ZebraApp/manualLog' folder", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Data exported in 'ZebraApp/manualLog' folder", Toast.LENGTH_SHORT).show();
         }
     }
 

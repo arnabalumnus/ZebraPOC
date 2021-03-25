@@ -11,6 +11,7 @@ import androidx.room.Room;
 
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.AccLogEntity;
+import com.alumnus.zebra.db.entity.CsvFileLogEntity;
 import com.opencsv.CSVWriter;
 
 import java.io.File;
@@ -20,6 +21,10 @@ import java.util.List;
 public class ExportFile {
     private static final String TAG = "ExportFile";
 
+    /**
+     * @param context    context required for file saving
+     * @param exportType folder name will be create based on this params (1. manualLog, 2. autoLog, 3. onPowerConnect)
+     */
     public static void exportDataIntoCSVFile(Context context, String exportType) {
         Runnable runnable = () -> {
             long delete_upto_time_stamp = System.currentTimeMillis();
@@ -27,7 +32,7 @@ public class ExportFile {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) // Save file inside root/Android/data/com.alumnus.zebra/files/ZebraApp
                 exportDir = new File(context.getExternalFilesDir("ZebraApp"), exportType); // Working in API 30 i.e. Android 11 and higher
             else // Saves file inside root/ZebraApp
-                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + exportType); // Working in API 29 i.e. Android 10 and lower
+                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + "manualLog"); // Working in API 29 i.e. Android 10 and lower
             if (!exportDir.exists()) {
                 if (!exportDir.mkdirs()) {
                     Log.e(TAG, "Error in mkdirs");
@@ -46,6 +51,7 @@ public class ExportFile {
                     Log.e(TAG, "Error in createNewFile");
                     return;
                 }
+                db.csvFileLogDao().insert(new CsvFileLogEntity(file.getName(), accLogEntities.size()));
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                 csvWrite.writeNext(new String[]{"TS", "X", "Y", "Z"});
                 for (AccLogEntity accLogEntity : accLogEntities) {
@@ -67,6 +73,9 @@ public class ExportFile {
                                 Log.v(TAG, "onScanCompleted: Uri: " + uri);
                             }
                         });
+                if (db.csvFileLogDao().getTotalRecordOfAllCSVFile() > 18000 && db.csvFileLogDao().getCSVFileCount() > 2) {//432000
+                    DeleteFile.deleteFile(context, exportType);
+                }
             } catch (Exception sqlEx) {
                 Log.e(TAG, sqlEx.getMessage(), sqlEx);
             }
