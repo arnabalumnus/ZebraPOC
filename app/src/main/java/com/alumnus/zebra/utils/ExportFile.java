@@ -1,6 +1,8 @@
 package com.alumnus.zebra.utils;
 
 import android.content.Context;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -54,6 +56,14 @@ public class ExportFile {
                 Log.e("csv", "exportData: Data Exported");
                 Thread.sleep(1000);
                 db.accLogDao().deleteAll(delete_upto_time_stamp);
+                MediaScannerConnection.scanFile(context, new String[]{file.toString()}, null,
+                        new MediaScannerConnection.OnScanCompletedListener() {
+                            @Override
+                            public void onScanCompleted(String path, Uri uri) {
+                                Log.d(TAG, "onScanCompleted: path: " + path);
+                                Log.d(TAG, "onScanCompleted: Uri: " + uri);
+                            }
+                        });
             } catch (Exception sqlEx) {
                 Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
             }
