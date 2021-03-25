@@ -24,9 +24,9 @@ public class ExportFile {
         Runnable runnable = () -> {
             long delete_upto_time_stamp = System.currentTimeMillis();
             File exportDir;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) // Save file inside root/Android/data/com.alumnus.zebra/files/ZebraApp
                 exportDir = new File(context.getExternalFilesDir("ZebraApp"), exportType); // Working in API 30 i.e. Android 11 and higher
-            else
+            else // Saves file inside root/ZebraApp
                 exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + exportType); // Working in API 29 i.e. Android 10 and lower
             if (!exportDir.exists()) {
                 if (!exportDir.mkdirs()) {
@@ -34,7 +34,12 @@ public class ExportFile {
                     return;
                 }
             }
-
+            AppDatabase db = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "database-name").build();
+            List<AccLogEntity> accLogEntities = db.accLogDao().getAll();
+            if (accLogEntities.size() == 0) {
+                Log.w(TAG, "No data available in database");
+                return;
+            }
             File file = new File(exportDir, DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
             try {
                 if (!file.createNewFile()) {
@@ -42,10 +47,6 @@ public class ExportFile {
                     return;
                 }
                 CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                AppDatabase db = Room.databaseBuilder(context.getApplicationContext(),
-                        AppDatabase.class, "database-name").build();
-
-                List<AccLogEntity> accLogEntities = db.accLogDao().getAll();
                 csvWrite.writeNext(new String[]{"TS", "X", "Y", "Z"});
                 for (AccLogEntity accLogEntity : accLogEntities) {
                     //Which column you want to export
@@ -53,19 +54,21 @@ public class ExportFile {
                     csvWrite.writeNext(arrStr);
                 }
                 csvWrite.close();
-                Log.e("csv", "exportData: Data Exported");
-                Thread.sleep(1000);
+                Log.d(TAG, "Data Exported");
+                Thread.sleep(300);
                 db.accLogDao().deleteAll(delete_upto_time_stamp);
-                MediaScannerConnection.scanFile(context, new String[]{file.toString()}, null,
+                MediaScannerConnection.scanFile(context,
+                        new String[]{file.toString()},
+                        null,
                         new MediaScannerConnection.OnScanCompletedListener() {
                             @Override
                             public void onScanCompleted(String path, Uri uri) {
-                                Log.d(TAG, "onScanCompleted: path: " + path);
-                                Log.d(TAG, "onScanCompleted: Uri: " + uri);
+                                Log.i(TAG, "onScanCompleted: path: " + path);
+                                Log.v(TAG, "onScanCompleted: Uri: " + uri);
                             }
                         });
             } catch (Exception sqlEx) {
-                Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+                Log.e(TAG, sqlEx.getMessage(), sqlEx);
             }
         };
         Thread thread = new Thread(runnable);
