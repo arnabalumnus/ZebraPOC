@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -81,14 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void deleteFile(View v){
+    public void deleteFile(View v) {
         String path = "/storage/emulated/0/ZebraApp/manualLog/2021, Mar-25 Time-13 27 16.csv";
         File fileDelete = new File(path);
         if (fileDelete.exists()) {
             if (fileDelete.delete()) {
-               // System.out.println("file Deleted :" + uri.getPath());
+                // System.out.println("file Deleted :" + uri.getPath());
             } else {
-               // System.out.println("file not Deleted :" + uri.getPath());
+                // System.out.println("file not Deleted :" + uri.getPath());
             }
         }
     }
