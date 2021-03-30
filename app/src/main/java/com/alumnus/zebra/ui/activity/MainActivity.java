@@ -2,24 +2,30 @@ package com.alumnus.zebra.ui.activity;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver;
 import com.alumnus.zebra.service.LifeTimeService;
+import com.alumnus.zebra.utils.AutoStart;
 import com.alumnus.zebra.utils.ExportFile;
 
 import java.io.File;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.LifeTimeService.stopped");
         registerReceiver(serviceStopReceiver, intentFilter);*/
+
+        AutoStart.addAutoStartup(this);
     }
 
     public void goToAccelerometer(View view) {
