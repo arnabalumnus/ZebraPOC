@@ -22,7 +22,6 @@ import androidx.room.Room;
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.AccLogEntity;
-import com.alumnus.zebra.ui.activity.MainActivity;
 
 public class LifeTimeService extends Service implements SensorEventListener {
 
@@ -58,7 +57,7 @@ public class LifeTimeService extends Service implements SensorEventListener {
     }
 
     private void runAsForeground() {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, this.getClass());
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);

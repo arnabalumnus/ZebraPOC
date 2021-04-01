@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,8 +19,9 @@ import com.alumnus.zebra.R;
 import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver;
 import com.alumnus.zebra.service.LifeTimeService;
 import com.alumnus.zebra.utils.AutoStart;
-import com.alumnus.zebra.utils.BatteryOptimizationSettings;
+import com.alumnus.zebra.utils.Constant;
 import com.alumnus.zebra.utils.ExportFile;
+import com.judemanutd.autostarter.AutoStartPermissionHelper;
 
 import java.io.File;
 
@@ -27,13 +29,23 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     int frequency = 50; //Records per second from accelerometer
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        isStoragePermissionGranted();
+        sp = getSharedPreferences(Constant.SP, MODE_PRIVATE);
+        if (isStoragePermissionGranted()) {
+            if (!sp.getBoolean(Constant.isAutoStartPermissionGranted, false)) {
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean(Constant.isAutoStartPermissionGranted, true);
+                editor.apply();
+                AutoStart.addAutoStartup(this);
+                //or using com.github.judemanutd:autostarter:1.0.9
+                //AutoStartPermissionHelper.getInstance().getAutoStartPermission(this);
+            }
+        }
 
         PowerConnectionReceiver receiver = new PowerConnectionReceiver();
 
@@ -51,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction("com.example.LifeTimeService.stopped");
         registerReceiver(serviceStopReceiver, intentFilter);*/
 
-        AutoStart.addAutoStartup(this);
-        BatteryOptimizationSettings.allowMorePower(this);
+        //AutoStart.addAutoStartup(this);
+        //BatteryOptimizationSettings.allowMorePower(this);
     }
 
     public void goToAccelerometer(View view) {
@@ -138,6 +150,15 @@ public class MainActivity extends AppCompatActivity {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
             //resume tasks needing this permission
             ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            if (!sp.getBoolean(Constant.isAutoStartPermissionGranted, false)) {
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean(Constant.isAutoStartPermissionGranted, true);
+                editor.apply();
+
+                AutoStart.addAutoStartup(this);
+                //or using com.github.judemanutd:autostarter:1.0.9
+                //AutoStartPermissionHelper.getInstance().getAutoStartPermission(this);
+            }
         }
     }
     //endregion
