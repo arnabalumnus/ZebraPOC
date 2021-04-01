@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class DetectPlusNoise {
 
-    ArrayList<DetectedEvent> detectedEvents;
-    ArrayList<NoiseZone> noiseZones;
+   public ArrayList<DetectedEvent> detectedEvents;
+   public ArrayList<NoiseZone> noiseZones;
 
     public DetectPlusNoise(ArrayList<DetectedEvent> detectedEvents, ArrayList<NoiseZone> noiseZones) {
         this.detectedEvents = detectedEvents;

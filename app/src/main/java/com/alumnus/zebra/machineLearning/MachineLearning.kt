@@ -1,6 +1,6 @@
 package com.alumnus.zebra.machineLearning
 
-import com.alumnus.zebra.db.entity.AccLogEntity
+import com.alumnus.zebra.pojo.AccelerationData
 
 
 const val EVENT_IMPACT = 1
@@ -53,7 +53,7 @@ class MachineLearning {
      *  @param xyzList
      *  @return
      */
-    fun CalculateTSV(xyzList: ArrayList<AccLogEntity>) {
+    fun CalculateTSV(xyzList: ArrayList<AccelerationData>): DetectPlusNoise {
         val TS = ArrayList<Long>()
         val TSV = ArrayList<Double>()
         val dTSV = ArrayList<Double>()
@@ -62,10 +62,10 @@ class MachineLearning {
             TSV.add(Math.sqrt(xyz.x * xyz.x.toDouble()) + xyz.y * xyz.y + xyz.z * xyz.z)
         }
         dTSV.add(0.0)
-        for (i in 1..TSV.size) {
+        for (i in 1..TSV.size - 1) {
             dTSV.add(TSV[i] - TSV[i - 1])
         }
-        detectEvents(TS, TSV, dTSV)
+        return detectEvents(TS, TSV, dTSV)
     }
 
     /**
@@ -91,7 +91,7 @@ class MachineLearning {
         var impactType: Int
         var maxDtsv: Double
         var areaUnderCurve: Double
-        for (i in 0..numberOfSamples) {
+        for (i in 0..numberOfSamples - 1) {
             var currentTsv = tsvDataset[i]
             // Update max / min TSV values if required
             if (maxTsv >= 0) {
@@ -243,6 +243,7 @@ class MachineLearning {
                 }
             }
         }
+        println("Completed")
         return DetectPlusNoise(detectedEvents, noiseZones)
     }
 

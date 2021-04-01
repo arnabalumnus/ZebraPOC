@@ -5,13 +5,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alumnus.zebra.R;
+import com.alumnus.zebra.machineLearning.DetectPlusNoise;
+import com.alumnus.zebra.machineLearning.MachineLearning;
 import com.alumnus.zebra.pojo.Acceleration;
+import com.alumnus.zebra.pojo.AccelerationData;
 import com.alumnus.zebra.ui.adapter.AccelerationDataAdapter;
 
 import java.io.BufferedReader;
@@ -26,6 +30,7 @@ import java.util.ArrayList;
 public class CsvExplorerActivity extends AppCompatActivity {
 
     private ArrayList<Acceleration> accelerations = new ArrayList<>();
+    private ArrayList<AccelerationData> accelerationsDataList = new ArrayList<>();
     private AccelerationDataAdapter accelerationDataAdapter;
     private RecyclerView rv_acceleration_data;
 
@@ -33,7 +38,7 @@ public class CsvExplorerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_csv_explorer);
 
@@ -49,7 +54,7 @@ public class CsvExplorerActivity extends AppCompatActivity {
         Uri uri = getIntent().getData();
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
-            readWeatherData(inputStream);                  // If you need to read the whole file row by row
+            readCSVData(inputStream);                  // If you need to read the whole file row by row
             //readWeatherDataByColumn();        // If you need to read specific column row by row
 
             accelerationDataAdapter = new AccelerationDataAdapter(accelerations);
@@ -91,7 +96,7 @@ public class CsvExplorerActivity extends AppCompatActivity {
     /**
      * @param is
      */
-    private void readWeatherData(InputStream is) {
+    private void readCSVData(InputStream is) {
         // Read the raw csv file
 
         // Reads text from character-input stream, buffering characters for efficient reading
@@ -103,35 +108,35 @@ public class CsvExplorerActivity extends AppCompatActivity {
         // Initialization
         try {
             // Step over headers
-            //reader.readLine();
-
+            String header = reader.readLine();
+            String[] headertokens = header.split(",");
+            // Read the data
+            Acceleration acceleration1 = new Acceleration(headertokens[0].replace("\"", ""),
+                    headertokens[1].replace("\"", ""),
+                    headertokens[2].replace("\"", ""),
+                    headertokens[3].replace("\"", ""));
+            accelerations.add(acceleration1);
             // If buffer is not empty
             while ((line = reader.readLine()) != null) {
                 Log.d("MyActivity", "Line: " + line);
                 // use comma as separator columns of CSV
                 String[] tokens = line.split(",");
                 // Read the data
-
-               /* AccLogEntity accLogEntity = new AccLogEntity();
-                // Setters
-                accLogEntity.setTs(Long.parseLong(tokens[0]));
-                accLogEntity.setX(Float.parseFloat(tokens[1]));
-                accLogEntity.setY(Float.parseFloat(tokens[2]));
-                accLogEntity.setZ(Float.parseFloat(tokens[3]));
-
-                // Adding object to a class
-                accLogEntities.add(accLogEntity);
-
-                // Log the object
-                Log.d("My Activity", "Just created: " + accLogEntity);*/
-
                 Acceleration acceleration = new Acceleration(tokens[0].replace("\"", ""),
                         tokens[1].replace("\"", ""),
                         tokens[2].replace("\"", ""),
                         tokens[3].replace("\"", ""));
                 accelerations.add(acceleration);
+                AccelerationData accelerationData = new AccelerationData(Long.parseLong(tokens[0].replace("\"", "")),
+                        Float.parseFloat(tokens[1].replace("\"", "")),
+                        Float.parseFloat(tokens[2].replace("\"", "")),
+                        Float.parseFloat(tokens[3].replace("\"", "")));
+                accelerationsDataList.add(accelerationData);
             }
+            DetectPlusNoise detectPlusNoise = new MachineLearning().CalculateTSV(accelerationsDataList);
+            Toast.makeText(this, "No of Events: " + detectPlusNoise.detectedEvents.size() + " No of Noise: " + detectPlusNoise.noiseZones.size(),Toast.LENGTH_SHORT).show();
 
+            detectPlusNoise.noiseZones.size();
         } catch (IOException e) {
             // Logs error with priority level
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
