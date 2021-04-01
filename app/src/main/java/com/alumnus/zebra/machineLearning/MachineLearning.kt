@@ -76,7 +76,7 @@ class MachineLearning {
      *
      * @return
      */
-    fun detectEvents(ts: ArrayList<Long>, tsvDataset: ArrayList<Double>, dtsvDataset: ArrayList<Double>):DetectPlusNoise {
+    fun detectEvents(ts: ArrayList<Long>, tsvDataset: ArrayList<Double>, dtsvDataset: ArrayList<Double>): DetectPlusNoise {
         var noiseZones: ArrayList<NoiseZone> = ArrayList()
         var detectedEvents = arrayListOf<DetectedEvent>()
         val numberOfSamples = ts.size
@@ -139,7 +139,7 @@ class MachineLearning {
                         impactType = TYPE_IMPACT_HARD
                     } else {
                         // Otherwise, it might be force impartion or impact
-                        areaUnderCurve =0.0// simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
+                        areaUnderCurve = 0.0// simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
                         //print("Area under curve:", areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
                             // Not actually an impact, just external application of force
@@ -203,7 +203,9 @@ class MachineLearning {
                         // If the DTSV is too high, it is an impact
                         impactType = TYPE_IMPACT_HARD
                     } else {
-                        areaUnderCurve = 0.0//simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
+                        //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
+                        areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 200)
+
                         //print("Area under curve:", areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
                             // Not actually an impact, just external application of force
