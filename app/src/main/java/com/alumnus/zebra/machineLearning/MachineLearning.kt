@@ -1,5 +1,6 @@
 package com.alumnus.zebra.machineLearning
 
+import android.util.Log
 import com.alumnus.zebra.pojo.AccelerationData
 
 
@@ -44,6 +45,7 @@ const val FORCE_AREA_MIN = 600
 const val EVENT_GAP_MIN = 30
 
 class MachineLearning {
+    private val TAG = "MachineLearning"
 
     /**
      *  3. Initialize algorithm parameters
@@ -59,7 +61,7 @@ class MachineLearning {
         val dTSV = ArrayList<Double>()
         for (xyz in xyzList) {
             TS.add(xyz.ts)
-            TSV.add(Math.sqrt(xyz.x * xyz.x.toDouble()) + xyz.y * xyz.y + xyz.z * xyz.z)
+            TSV.add(Math.sqrt((xyz.x.toDouble() * xyz.x) + (xyz.y * xyz.y) + (xyz.z * xyz.z)))
         }
         dTSV.add(0.0)
         for (i in 1..TSV.size - 1) {
@@ -77,8 +79,8 @@ class MachineLearning {
      * @return
      */
     fun detectEvents(ts: ArrayList<Long>, tsvDataset: ArrayList<Double>, dtsvDataset: ArrayList<Double>): DetectPlusNoise {
-        var noiseZones: ArrayList<NoiseZone> = ArrayList()
-        var detectedEvents = arrayListOf<DetectedEvent>()
+        val noiseZones: ArrayList<NoiseZone> = ArrayList()
+        val detectedEvents = arrayListOf<DetectedEvent>()
         val numberOfSamples = ts.size
 
         var maxTsv = -1.0
@@ -92,7 +94,7 @@ class MachineLearning {
         var maxDtsv: Double
         var areaUnderCurve: Double
         for (i in 0..numberOfSamples - 1) {
-            var currentTsv = tsvDataset[i]
+            val currentTsv = tsvDataset[i]
             // Update max / min TSV values if required
             if (maxTsv >= 0) {
                 if (maxTsv < currentTsv) {
@@ -139,7 +141,8 @@ class MachineLearning {
                         impactType = TYPE_IMPACT_HARD
                     } else {
                         // Otherwise, it might be force impartion or impact
-                        areaUnderCurve = 0.0// simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
+                        //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
+                        areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 1)
                         //print("Area under curve:", areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
                             // Not actually an impact, just external application of force
@@ -204,7 +207,7 @@ class MachineLearning {
                         impactType = TYPE_IMPACT_HARD
                     } else {
                         //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
-                        areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 200)
+                        areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 1)
 
                         //print("Area under curve:", areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
@@ -243,7 +246,10 @@ class MachineLearning {
                 }
             }
         }
-        println("Completed")
+        Log.d(TAG, "Completed")
+        for (i in 0..detectedEvents.size - 1) {
+            Log.e(TAG, "" + detectedEvents[i].toString())
+        }
         return DetectPlusNoise(detectedEvents, noiseZones)
     }
 

@@ -519,7 +519,8 @@ def detectEvents (tsDataset, tsvDataset, dtsvDataset):
                 detectedEvents.append([EVENT_FREEFALL, freefallStart, i, minTsv, spinDetected])
                 freefallStart = -1
                 minTsv = -1
-    
+    print("Detect Event Count: "+str(len(detectedEvents)))
+    print("Noise Count: " +str(len(noiseZones)))
     return detectedEvents, noiseZones
 
 """

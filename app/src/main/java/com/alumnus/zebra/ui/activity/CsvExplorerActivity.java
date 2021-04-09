@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 public class CsvExplorerActivity extends AppCompatActivity {
 
+    private static final String TAG = "CsvExplorerActivity";
     private ArrayList<Acceleration> accelerations = new ArrayList<>();
     private ArrayList<AccelerationData> accelerationsDataList = new ArrayList<>();
     private AccelerationDataAdapter accelerationDataAdapter;
@@ -118,7 +119,7 @@ public class CsvExplorerActivity extends AppCompatActivity {
             accelerations.add(acceleration1);
             // If buffer is not empty
             while ((line = reader.readLine()) != null) {
-                Log.d("MyActivity", "Line: " + line);
+                Log.d(TAG, "Line: " + line);
                 // use comma as separator columns of CSV
                 String[] tokens = line.split(",");
                 // Read the data

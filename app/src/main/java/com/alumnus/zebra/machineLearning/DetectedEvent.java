@@ -1,37 +1,47 @@
 package com.alumnus.zebra.machineLearning;
 
 public class DetectedEvent {
-    int EVENT_FREEFALL;
-    int freefallStart;
-    int i;
-    double maxTsv;
+    int event_type; //EVENT (FREE FALL OR EVENT IMPACT) enum
+    int eventStart;
+    int count;
+
     double minTsv;
     boolean spinDetected;
+
+    double maxTsv;
+    double dTsv;
     int impactType;
 
-    public DetectedEvent(int EVENT_FREEFALL, int freefallStart, int i, double minTsv, boolean spinDetected) {
-        this.EVENT_FREEFALL = EVENT_FREEFALL;
-        this.freefallStart = freefallStart;
-        this.i = i;
+    //EVENT FREE FALL
+    public DetectedEvent(int event_type, int eventStart, int count, double minTsv, boolean spinDetected) {
+        this.event_type = event_type;
+        this.eventStart = eventStart;
+        this.count = count;
         this.minTsv = minTsv;
         this.spinDetected = spinDetected;
     }
 
-    public DetectedEvent(int EVENT_FREEFALL, int freefallStart, int i, double maxTsv, double minTsv, boolean spinDetected) {
-        this.EVENT_FREEFALL = EVENT_FREEFALL;
-        this.freefallStart = freefallStart;
-        this.i = i;
+    //EVENT IMPACT
+    public DetectedEvent(int event_type, int eventStart, int count, double maxTsv, double dTsv, int impactType) {
+        this.event_type = event_type;
+        this.eventStart = eventStart;
+        this.count = count;
         this.maxTsv = maxTsv;
-        this.minTsv = minTsv;
-        this.spinDetected = spinDetected;
-    }
-
-    public DetectedEvent(int EVENT_FREEFALL, int freefallStart, int i, double maxTsv, double minTsv, int impactType) {
-        this.EVENT_FREEFALL = EVENT_FREEFALL;
-        this.freefallStart = freefallStart;
-        this.i = i;
-        this.maxTsv = maxTsv;
-        this.minTsv = minTsv;
+        this.dTsv = dTsv;
         this.impactType = impactType;
+    }
+
+    @Override
+    public String toString() {
+        return "DetectedEvent{" +
+                "event_type=" + event_type +
+                ", eventStart=" + eventStart +
+                ", count=" + count +
+                ", minTsv=" + minTsv +
+                ", spinDetected=" + spinDetected +
+                ", maxTsv=" + maxTsv +
+                ", dTsv=" + dTsv +
+                ", impactType=" + impactType +
+                '}';
     }
 }
