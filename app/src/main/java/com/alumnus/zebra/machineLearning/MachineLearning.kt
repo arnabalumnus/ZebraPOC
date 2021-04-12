@@ -236,13 +236,13 @@ class MachineLearning {
                     }
                     impactStart = -1
                     maxTsv = -1.0
-                    // Finalize stuff if this marks the end of a freefall event
-                    if (freefallStart > 0) {
-                        spinDetected = detectSpin(tsvDataset, freefallStart, i)
-                        detectedEvents.add(DetectedEvent(EVENT_FREEFALL, freefallStart, i, minTsv, spinDetected))
-                        freefallStart = -1
-                        minTsv = -1.0
-                    }
+                }
+                // Finalize stuff if this marks the end of a freefall event
+                if (freefallStart > 0) {
+                    spinDetected = detectSpin(tsvDataset, freefallStart, i)
+                    detectedEvents.add(DetectedEvent(EVENT_FREEFALL, freefallStart, i, minTsv, spinDetected))
+                    freefallStart = -1
+                    minTsv = -1.0
                 }
             }
         }
