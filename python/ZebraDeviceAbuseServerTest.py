@@ -26,6 +26,7 @@ filterOn = False
 #######################
 import pandas as pd
 import os
+import shutil
 import math
 import copy
 import re
@@ -970,8 +971,8 @@ if (prefallFound):
         #svm_classifier = joblib.load('//home//romit//Workspace//Zebra//DeviceAbuse//POC2//prefallClassifier_svm.pkl')
         #rf_classifier = joblib.load('//home//romit//Workspace//Zebra//DeviceAbuse//POC2//prefallClassifier_rf.pkl')
         try:
-            svm_classifier = joblib.load(modelPath + '/prefallClassifier_svm.pkl')
-            rf_classifier = joblib.load(modelPath + '/prefallClassifier_rf.pkl')
+            svm_classifier = joblib.load('./prefallClassifier_svm.pkl')
+            rf_classifier = joblib.load('./prefallClassifier_rf.pkl')
         except IOError:
             print ("File error! Could not load prefall models!")
             print ("CWD: ", os.getcwd());
@@ -1002,8 +1003,8 @@ if (preimpactFound):
             #svm_classifier = joblib.load('//home//romit//Workspace//Zebra//DeviceAbuse//POC2//preimpactClassifier_svm.pkl')
             #rf_classifier = joblib.load('//home//romit//Workspace//Zebra//DeviceAbuse//POC2//preimpactClassifier_rf.pkl')
             try:
-                svm_classifier = joblib.load(modelPath + '/preimpactClassifier_svm.pkl')
-                rf_classifier = joblib.load(modelPath + '/preimpactClassifier_rf.pkl')
+                svm_classifier = joblib.load('./preimpactClassifier_svm.pkl')
+                rf_classifier = joblib.load('./preimpactClassifier_rf.pkl')
             except IOError:
                 print ("File error! Could not load prefall models!")
                 print ("CWD: ", os.getcwd());
@@ -1040,7 +1041,8 @@ print(getpass.getuser())
 
 # 5.0 Create output/folder
 try: 
-    os.mkdir(os.path.join("./","output"))
+    if not os.path.exists(os.path.join("./","output")):
+        os.mkdir(os.path.join("./","output"))
 except OSError as error: 
     print(error)  
 # Directory 
@@ -1050,6 +1052,9 @@ parent_dir = "./"
 # Path 
 path = os.path.join(parent_dir, directory) 
 try:
+    if os.path.exists(path):
+	    # Delete folder and containing files
+	    shutil.rmtree(path)
     os.mkdir(path) 
 except OSError as error: 
     print(error)      
@@ -1230,7 +1235,7 @@ text_file.write(impactSummary)
 text_file.close()
 
 #copyfile('//home//romit//Workspace//Zebra//DeviceAbuse//POC2//'+imageFileName,filename+'-type.png')
-copyfile(imageFileName,filename+'-type.png')
+copyfile(imageFileName,'output/'+filename+'/'+filename+'-type.png')
 
 if (debugMode):
     # In debug mode, show the graphs in addition to generating the image files
