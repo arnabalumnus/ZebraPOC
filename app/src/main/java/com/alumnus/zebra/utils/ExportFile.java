@@ -29,10 +29,10 @@ public class ExportFile {
         Runnable runnable = () -> {
             long delete_upto_time_stamp = System.currentTimeMillis();
             File exportDir;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) // Save file inside root/Android/data/com.alumnus.zebra/files/ZebraApp
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) // Saves file inside root/ZebraApp
+                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + exportType); // Working in API 29 i.e. Android 10 and lower
+            else // Save file inside root/Android/data/com.alumnus.zebra/files/ZebraApp
                 exportDir = new File(context.getExternalFilesDir("ZebraApp"), exportType); // Working in API 30 i.e. Android 11 and higher
-            else // Saves file inside root/ZebraApp
-                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + "manualLog"); // Working in API 29 i.e. Android 10 and lower
             if (!exportDir.exists()) {
                 if (!exportDir.mkdirs()) {
                     Log.e(TAG, "Error in mkdirs");

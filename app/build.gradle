@@ -3,6 +3,8 @@ plugins {
 }
 apply plugin: 'kotlin-android'
 
+apply plugin: 'kotlin-android-extensions'
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -12,7 +14,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "2.0.7"
+        versionName "2.0.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -79,6 +81,10 @@ dependencies {
 
     //https://github.com/judemanutd/AutoStarter
     implementation 'com.github.judemanutd:autostarter:1.0.9'
+
+    // https://mvnrepository.com/artifact/net.razorvine/pyrolite
+    //implementation group: 'net.razorvine', name: 'run', version: '4.4'
+
 }
 repositories {
     maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
