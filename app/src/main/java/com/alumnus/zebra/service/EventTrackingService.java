@@ -20,7 +20,6 @@ import androidx.room.Room;
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.EventLogEntity;
-import com.alumnus.zebra.ui.activity.MainActivity;
 import com.alumnus.zebra.utils.TimeSpan;
 
 import java.io.FileDescriptor;
@@ -84,7 +83,7 @@ public class EventTrackingService extends Service implements SensorEventListener
         //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM); //Value=2 , Rate=~15/sec
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_HIGH);   //Value=3 , Rate=~15/sec
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, this.getClass());
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
 

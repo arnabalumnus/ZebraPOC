@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.alumnus.zebra">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:name=".ZebraApp"
@@ -16,8 +18,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Zebra">
+        <activity
+            android:name=".ui.activity.CsvExplorerActivity"
+            android:theme="@style/Theme.NoActionBar">
+            <intent-filter
+                android:scheme="http"
+                tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
 
+                <category android:name="android.intent.category.DEFAULT" />
 
+                <data android:mimeType="text/csv" />
+                <data android:mimeType="text/comma-separated-values" />
+                <!--<data android:mimeType="application/pdf" />-->
+            </intent-filter>
+        </activity>
         <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,29 +61,23 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
-        <!--<receiver android:name=".broadcastReceiver.ServiceStopReceiver">
+        <!--
+    <receiver android:name=".broadcastReceiver.ServiceStopReceiver">
             <intent-filter>
                 <action android:name="com.alumnus.zebra.service.LifeTimeService.stopped" />
             </intent-filter>
-        </receiver>-->
-
-
+        </receiver>
+        -->
         <service
             android:name=".service.LifeTimeService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
             android:process=":dataCollect" />
-        <!--<service
-            android:name=".service.EventTrackingService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync"
-            android:process=":dataSync" />-->
-        <!--<service
-            android:name=".service.SaveCsvJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />-->
-
     </application>
 
 </manifest>

@@ -4,12 +4,12 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,19 +18,34 @@ import androidx.core.app.ActivityCompat;
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver;
 import com.alumnus.zebra.service.LifeTimeService;
+import com.alumnus.zebra.utils.AutoStart;
+import com.alumnus.zebra.utils.Constant;
 import com.alumnus.zebra.utils.ExportFile;
+import com.judemanutd.autostarter.AutoStartPermissionHelper;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     int frequency = 50; //Records per second from accelerometer
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        isStoragePermissionGranted();
+        sp = getSharedPreferences(Constant.SP, MODE_PRIVATE);
+        if (isStoragePermissionGranted()) {
+            if (!sp.getBoolean(Constant.isAutoStartPermissionGranted, false)) {
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean(Constant.isAutoStartPermissionGranted, true);
+                editor.apply();
+                AutoStart.addAutoStartup(this);
+                //or using com.github.judemanutd:autostarter:1.0.9
+                //AutoStartPermissionHelper.getInstance().getAutoStartPermission(this);
+            }
+        }
 
         PowerConnectionReceiver receiver = new PowerConnectionReceiver();
 
@@ -47,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.LifeTimeService.stopped");
         registerReceiver(serviceStopReceiver, intentFilter);*/
+
+        //AutoStart.addAutoStartup(this);
+        //BatteryOptimizationSettings.allowMorePower(this);
     }
 
     public void goToAccelerometer(View view) {
@@ -79,6 +97,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void deleteFile(View v) {
+        String path = "/storage/emulated/0/ZebraApp/manualLog/2021, Mar-25 Time-13 27 16.csv";
+        File fileDelete = new File(path);
+        if (fileDelete.exists()) {
+            if (fileDelete.delete()) {
+                // System.out.println("file Deleted :" + uri.getPath());
+            } else {
+                // System.out.println("file not Deleted :" + uri.getPath());
+            }
+        }
+    }
+
     public void navigateToDatabase(View view) {
         startActivity(new Intent(this, DatabaseActivity.class));
     }
@@ -87,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
             ExportFile.exportDataIntoCSVFile(this, "manualLog");
-            Toast.makeText(this, "Data exported in 'ZebraApp/manualLog' folder", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Data exported in 'ZebraApp/manualLog' folder", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,6 +150,15 @@ public class MainActivity extends AppCompatActivity {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
             //resume tasks needing this permission
             ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            if (!sp.getBoolean(Constant.isAutoStartPermissionGranted, false)) {
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean(Constant.isAutoStartPermissionGranted, true);
+                editor.apply();
+
+                AutoStart.addAutoStartup(this);
+                //or using com.github.judemanutd:autostarter:1.0.9
+                //AutoStartPermissionHelper.getInstance().getAutoStartPermission(this);
+            }
         }
     }
     //endregion

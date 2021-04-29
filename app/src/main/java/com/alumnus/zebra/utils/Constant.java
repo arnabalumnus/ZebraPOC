@@ -12,5 +12,8 @@ public class Constant {
      */
     public static final float THROW_CALIBRATION_FACTOR = 18.81F; //value need to decrease gradually to be more accurate about a free fall
 
+    public static final String SP = "ZebraSp";
+    public static final String isAutoStartPermissionGranted = "isAutoStartPermissionGranted";
+
 
 }
