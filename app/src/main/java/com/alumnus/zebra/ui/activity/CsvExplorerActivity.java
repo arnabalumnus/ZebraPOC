@@ -134,7 +134,7 @@ public class CsvExplorerActivity extends AppCompatActivity {
                 accelerationsDataList.add(accelerationData);
             }
             String result = new MachineLearning().
-                    CalculateTSV(accelerationsDataList,null);
+                    CalculateTSV(accelerationsDataList,this,null);
             Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
             //Toast.makeText(this, "No of Events: " + detectPlusNoise.detectedEvents.size() + " No of Noise: " + detectPlusNoise.noiseZones.size(), Toast.LENGTH_SHORT).show();
 

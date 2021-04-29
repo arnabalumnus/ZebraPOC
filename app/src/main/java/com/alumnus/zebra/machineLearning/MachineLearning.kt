@@ -1,5 +1,8 @@
 package com.alumnus.zebra.machineLearning
 
+import android.content.Context
+import android.os.Build
+import android.os.Environment
 import android.util.Log
 import com.alumnus.zebra.BuildConfig
 import com.alumnus.zebra.pojo.AccelerationData
@@ -65,8 +68,9 @@ class MachineLearning {
      *  @return
      */
     private lateinit var mFileName: String
+    private lateinit var context: Context
 
-    fun CalculateTSV(xyzList: ArrayList<AccelerationData>, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
+    fun CalculateTSV(xyzList: ArrayList<AccelerationData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
         val TS = ArrayList<Long>()
         val TSV = ArrayList<Double>()
         val dTSV = ArrayList<Double>()
@@ -78,6 +82,7 @@ class MachineLearning {
         for (i in 1..TSV.size - 1) {
             dTSV.add(TSV[i] - TSV[i - 1])
         }
+        this.context = context
         if (fileName == null)
             mFileName = DateFormatter.getTimeStampFileName(System.currentTimeMillis())
         else
@@ -425,8 +430,12 @@ class MachineLearning {
      *
      */
     fun appendLog(text: String?) {
+        // var logFile: File
+        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            File(Environment.getExternalStorageDirectory(), "ZebraApp/log-$mFileName.txt")
+        else
+            File(context.getExternalFilesDir("ZebraApp"), "log-$mFileName.txt")
 
-        val logFile = File("sdcard/log-$mFileName.txt")
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile()

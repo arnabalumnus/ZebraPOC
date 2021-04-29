@@ -39,7 +39,7 @@ public class ExportFile {
         Runnable runnable = () -> {
             long delete_upto_time_stamp = System.currentTimeMillis();
             File exportDir;
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) // Saves file inside root/ZebraApp
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) // Saves file inside root/ZebraApp
                 exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + exportType); // Working in API 29 i.e. Android 10 and lower
             else // Save file inside root/Android/data/com.alumnus.zebra/files/ZebraApp
                 exportDir = new File(context.getExternalFilesDir("ZebraApp"), exportType); // Working in API 30 i.e. Android 11 and higher
@@ -82,8 +82,10 @@ public class ExportFile {
                                 Log.i(TAG, "onScanCompleted: path: " + path);
                                 Log.v(TAG, "onScanCompleted: Uri: " + uri);
                                 try {
+                                    //TODO have issue in next line with Android >= Q or R .
+                                    // When ever files saving into com.alumnus.zebra folder
                                     InputStream inputStream = context.getContentResolver().openInputStream(uri);
-                                    readCSVData(inputStream);                  // If you need to read the whole file row by row
+                                    readCSVData(inputStream,context);                  // If you need to read the whole file row by row
 
 
                                 } catch (FileNotFoundException e) {
@@ -105,7 +107,7 @@ public class ExportFile {
     /**
      * @param is
      */
-    private static void readCSVData(InputStream is) {
+    private static void readCSVData(InputStream is,Context context) {
         // Read the raw csv file
 
         // Reads text from character-input stream, buffering characters for efficient reading
@@ -143,7 +145,7 @@ public class ExportFile {
                         Float.parseFloat(tokens[3].replace("\"", "")));
                 accelerationsDataList.add(accelerationData);
             }
-            String result = new MachineLearning().CalculateTSV(accelerationsDataList, null);
+            String result = new MachineLearning().CalculateTSV(accelerationsDataList, context,null);
 
 
             //detectPlusNoise.noiseZones.size();
