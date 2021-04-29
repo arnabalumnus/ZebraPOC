@@ -116,26 +116,26 @@ impactTypes = [
     ]
 
 imageTypes = [
-    ["FFXP","DAFall.png"],
-    ["FFXM","DAFall.png"],
-    ["FFYP","DAFall.png"],
-    ["FFYM","DAFall.png"],
-    ["FFZP","DAFall.png"],
-    ["FFZM","DAFall.png"],
-    ["HFXP","DATableFall.png"],
-    ["HFXM","DATableFall.png"],
-    ["HFYP","DATableFall.png"],
-    ["HFYM","DATableFall.png"],
-    ["HFZP","DATableFall.png"],
-    ["HFZM","DATableFall.png"],
-    ["OTXX","DAOThrow.png"],
-    ["UTXX","DAUThrow.png"],
-    ["PFXX","DAPocketSlip.png"],
-    ["PPXX","DAPocketSlip.png"],
-    ["TCXX","DAThrowCatch.png"],
-    ["DSXX","DADeskSlam.png"],
-    ["WSXX","DAWallSlam.png"],
-    ["FSXX","DAFloorSlam.png"]
+    ["FFXP","img/DAFall.png"],
+    ["FFXM","img/DAFall.png"],
+    ["FFYP","img/DAFall.png"],
+    ["FFYM","img/DAFall.png"],
+    ["FFZP","img/DAFall.png"],
+    ["FFZM","img/DAFall.png"],
+    ["HFXP","img/DATableFall.png"],
+    ["HFXM","img/DATableFall.png"],
+    ["HFYP","img/DATableFall.png"],
+    ["HFYM","img/DATableFall.png"],
+    ["HFZP","img/DATableFall.png"],
+    ["HFZM","img/DATableFall.png"],
+    ["OTXX","img/DAOThrow.png"],
+    ["UTXX","img/DAUThrow.png"],
+    ["PFXX","img/DAPocketSlip.png"],
+    ["PPXX","img/DAPocketSlip.png"],
+    ["TCXX","img/DAThrowCatch.png"],
+    ["DSXX","img/DADeskSlam.png"],
+    ["WSXX","img/DAWallSlam.png"],
+    ["FSXX","img/DAFloorSlam.png"]
     ]
 
 #######################
@@ -687,7 +687,7 @@ def detectType(eventList, fallNum, impactNum, fallType, impactTypes):
     result = "The device"
     firstFall = True
     firstImpact = True
-    imageFileName = "Unknown.png"
+    imageFileName = "img/Unknown.png"
 
     if (fallNum + impactNum == 0):
         result = result + " did not suffer any major abuse"
@@ -1026,6 +1026,8 @@ else:
 # Final analysis. Bring everything together
 freefallSummary, impactSummary, finalSummary, imageFileName = detectType(filteredEvents, numberOfSignificantFalls, numberOfSignificantImpacts, fallPred, impactPred)
 print("Final summary:")
+print("|__  | |\ |  /\  |       /__` |  |  |\/|  |\/|  /\  |__) \ / .");
+print("|    | | \| /~~\ |___    .__/ \__/  |  |  |  | /~~\ |  \  |  .");
 print(finalSummary)
 print("Fall summary:")
 print(freefallSummary)

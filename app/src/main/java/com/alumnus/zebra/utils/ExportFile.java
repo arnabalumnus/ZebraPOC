@@ -12,10 +12,20 @@ import androidx.room.Room;
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.AccLogEntity;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
+import com.alumnus.zebra.machineLearning.MachineLearning;
+import com.alumnus.zebra.pojo.Acceleration;
+import com.alumnus.zebra.pojo.AccelerationData;
 import com.opencsv.CSVWriter;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExportFile {
@@ -71,6 +81,14 @@ public class ExportFile {
                             public void onScanCompleted(String path, Uri uri) {
                                 Log.i(TAG, "onScanCompleted: path: " + path);
                                 Log.v(TAG, "onScanCompleted: Uri: " + uri);
+                                try {
+                                    InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                                    readCSVData(inputStream);                  // If you need to read the whole file row by row
+
+
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                 if (db.csvFileLogDao().getTotalRecordOfAllCSVFile() > 18000 && db.csvFileLogDao().getCSVFileCount() > 2) {//432000
@@ -82,5 +100,59 @@ public class ExportFile {
         };
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    /**
+     * @param is
+     */
+    private static void readCSVData(InputStream is) {
+        // Read the raw csv file
+
+        // Reads text from character-input stream, buffering characters for efficient reading
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        ArrayList<Acceleration> accelerations = new ArrayList<>();
+        ArrayList<AccelerationData> accelerationsDataList = new ArrayList<>();
+        // Initialization
+        String line = "";
+
+        // Initialization
+        try {
+            // Step over headers
+            String header = reader.readLine();
+            String[] headertokens = header.split(",");
+            // Read the data
+            Acceleration acceleration1 = new Acceleration(headertokens[0].replace("\"", ""),
+                    headertokens[1].replace("\"", ""),
+                    headertokens[2].replace("\"", ""),
+                    headertokens[3].replace("\"", ""));
+            accelerations.add(acceleration1);
+            // If buffer is not empty
+            while ((line = reader.readLine()) != null) {
+                Log.d(TAG, "Line: " + line);
+                // use comma as separator columns of CSV
+                String[] tokens = line.split(",");
+                // Read the data
+                Acceleration acceleration = new Acceleration(tokens[0].replace("\"", ""),
+                        tokens[1].replace("\"", ""),
+                        tokens[2].replace("\"", ""),
+                        tokens[3].replace("\"", ""));
+                accelerations.add(acceleration);
+                AccelerationData accelerationData = new AccelerationData(Long.parseLong(tokens[0].replace("\"", "")),
+                        Float.parseFloat(tokens[1].replace("\"", "")),
+                        Float.parseFloat(tokens[2].replace("\"", "")),
+                        Float.parseFloat(tokens[3].replace("\"", "")));
+                accelerationsDataList.add(accelerationData);
+            }
+            String result = new MachineLearning().CalculateTSV(accelerationsDataList, null);
+
+
+            //detectPlusNoise.noiseZones.size();
+        } catch (IOException e) {
+            // Logs error with priority level
+            Log.wtf("MyActivity", "Error reading data file on line" + line, e);
+
+            // Prints throwable details
+            e.printStackTrace();
+        }
     }
 }

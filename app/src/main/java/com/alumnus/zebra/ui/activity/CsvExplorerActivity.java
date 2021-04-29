@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alumnus.zebra.R;
-import com.alumnus.zebra.machineLearning.DetectPlusNoise;
 import com.alumnus.zebra.machineLearning.MachineLearning;
 import com.alumnus.zebra.pojo.Acceleration;
 import com.alumnus.zebra.pojo.AccelerationData;
@@ -134,10 +133,12 @@ public class CsvExplorerActivity extends AppCompatActivity {
                         Float.parseFloat(tokens[3].replace("\"", "")));
                 accelerationsDataList.add(accelerationData);
             }
-            DetectPlusNoise detectPlusNoise = new MachineLearning().CalculateTSV(accelerationsDataList);
-            Toast.makeText(this, "No of Events: " + detectPlusNoise.detectedEvents.size() + " No of Noise: " + detectPlusNoise.noiseZones.size(),Toast.LENGTH_SHORT).show();
+            String result = new MachineLearning().
+                    CalculateTSV(accelerationsDataList,null);
+            Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "No of Events: " + detectPlusNoise.detectedEvents.size() + " No of Noise: " + detectPlusNoise.noiseZones.size(), Toast.LENGTH_SHORT).show();
 
-            detectPlusNoise.noiseZones.size();
+            //detectPlusNoise.noiseZones.size();
         } catch (IOException e) {
             // Logs error with priority level
             Log.wtf("MyActivity", "Error reading data file on line" + line, e);
