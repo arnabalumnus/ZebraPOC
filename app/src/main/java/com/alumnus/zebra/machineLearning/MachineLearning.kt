@@ -69,6 +69,8 @@ class MachineLearning {
      */
     private lateinit var mFileName: String
     private lateinit var context: Context
+    private lateinit var xyzList: ArrayList<AccelerationData>
+    private lateinit var TSV: ArrayList<Double>
 
     // fun name suggested startEventAnalysis()
     fun CalculateTSV(xyzList: ArrayList<AccelerationData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
@@ -88,6 +90,8 @@ class MachineLearning {
             mFileName = DateFormatter.getTimeStampFileName(System.currentTimeMillis())
         else
             mFileName = fileName
+        this.xyzList = xyzList
+        this.TSV = TSV
         return finalizeDetection(TS, TSV, dTSV)
         //return detectEvents(TS, TSV, dTSV)
     }
@@ -411,8 +415,9 @@ class MachineLearning {
                 }
                 appendLog("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
                 print("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
-                //appendLog("Impact direction =", detectImpactDirection(tsvResampled, xResampled, yResampled, zResampled, event.eventStart, event.count))
-                //print("Impact direction =", detectImpactDirection(tsvResampled, xResampled, yResampled, zResampled, event[1], event[2]))
+
+                appendLog(detectImpactDirection(TSV, event.eventStart, event.count - 1))
+                //print("${detectImpactDirection(TSV, event.eventStart, event.count - 1)}")
             } else {
                 appendLog("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])} ms")
                 print("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])} ms")
@@ -428,15 +433,25 @@ class MachineLearning {
 
 
     /**
-     *
+     * Create logs folder and write log files
      */
     fun appendLog(text: String?) {
         // var logFile: File
-        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-            File(Environment.getExternalStorageDirectory(), "ZebraApp/log-$mFileName.txt")
+        val logDir: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            File(Environment.getExternalStorageDirectory(), "ZebraApp/logs")
         else
-            File(context.getExternalFilesDir("ZebraApp"), "log-$mFileName.txt")
+            File(context.getExternalFilesDir("ZebraApp"),"logs")
 
+        if (!logDir.exists()) {
+            if (!logDir.mkdirs()) {
+                Log.e(TAG, "Error in mkdirs")
+                return
+            }
+        }
+        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            File(Environment.getExternalStorageDirectory(), "ZebraApp/logs/log-$mFileName.txt")
+        else
+            File(context.getExternalFilesDir("ZebraApp/logs"), "log-$mFileName.txt")
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile()
@@ -461,12 +476,12 @@ class MachineLearning {
      * TODO detectImpactDirection
      * Required xyz
      */
-    /*fun detectImpactDirection(tsvDataset: Double, xDataset: Float, yDataset: Float, zDataset: Float, start: Int, end: Int) {
-        var xComponent = 0
-        var yComponent = 0
-        var zComponent = 0
+    fun detectImpactDirection(tsvDataset: ArrayList<Double>, start: Int, end: Int): String {
+        var xComponent = 0L
+        var yComponent = 0L
+        var zComponent = 0L
 
-        var maxTsv = -1
+        var maxTsv = -1.0
         var maxI = -1
 
         for (i in start..end) {
@@ -477,23 +492,24 @@ class MachineLearning {
         }
 
         if (maxI >= 0) {
-
-            //# Values
-            xComponent = Math.round((xDataset[maxI] * xDataset[maxI] * 100) / (tsvDataset[maxI] * tsvDataset[maxI]), 2)
-            yComponent = Math.round((yDataset[maxI] * yDataset[maxI] * 100) / (tsvDataset[maxI] * tsvDataset[maxI]), 2)
-            zComponent = Math.round((zDataset[maxI] * zDataset[maxI] * 100) / (tsvDataset[maxI] * tsvDataset[maxI]), 2)
+            // Values
+            xComponent = Math.round((xyzList.get(maxI).x * xyzList.get(maxI).x * 100) / (tsvDataset.get(maxI) * tsvDataset.get(maxI)))
+            yComponent = Math.round((xyzList.get(maxI).y * xyzList.get(maxI).y * 100) / (tsvDataset.get(maxI) * tsvDataset.get(maxI)))
+            zComponent = Math.round((xyzList.get(maxI).z * xyzList.get(maxI).z * 100) / (tsvDataset.get(maxI) * tsvDataset.get(maxI)))
 
             //# Signs
-            if (xDataset[maxI] < 0)
+            if (xyzList.get(maxI).x < 0) {
                 xComponent = -xComponent
+            }
 
-            if (yDataset[maxI] < 0)
+            if (xyzList.get(maxI).y < 0) {
                 yComponent = -yComponent
+            }
 
-            if (zDataset[maxI] < 0)
+            if (xyzList.get(maxI).z < 0) {
                 zComponent = -zComponent
+            }
         }
-        return [xComponent, yComponent, zComponent]
-    }*/
-
+        return "Impact direction = [$xComponent, $yComponent, $zComponent]"
+    }
 }

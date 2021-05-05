@@ -38,13 +38,15 @@ public class ExportFile {
      * @param exportType folder name will be create based on this params (1. manualLog, 2. autoLog, 3. onPowerConnect)
      */
     public static void exportDataIntoCSVFile(Context context, String exportType) {
+        exportType = "data";
+        String finalExportType = exportType;
         Runnable runnable = () -> {
             long delete_upto_time_stamp = System.currentTimeMillis();
             File exportDir;
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) // Saves file inside root/ZebraApp
-                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + exportType); // Working in API 29 i.e. Android 10 and lower
+                exportDir = new File(Environment.getExternalStorageDirectory(), "ZebraApp/" + finalExportType); // Working in API 29 i.e. Android 10 and lower
             else // Save file inside root/Android/data/com.alumnus.zebra/files/ZebraApp
-                exportDir = new File(context.getExternalFilesDir("ZebraApp"), exportType); // Working in API 30 i.e. Android 11 and higher
+                exportDir = new File(context.getExternalFilesDir("ZebraApp"), finalExportType); // Working in API 30 i.e. Android 11 and higher
             if (!exportDir.exists()) {
                 if (!exportDir.mkdirs()) {
                     Log.e(TAG, "Error in mkdirs");
@@ -96,7 +98,7 @@ public class ExportFile {
                             }
                         });
                 if (db.csvFileLogDao().getTotalRecordOfAllCSVFile() > 18000 && db.csvFileLogDao().getCSVFileCount() > 2) {//432000
-                    DeleteFile.deleteFile(context, exportType);
+                    DeleteFile.deleteFile(context, finalExportType);
                 }
             } catch (Exception sqlEx) {
                 Log.e(TAG, sqlEx.getMessage(), sqlEx);
