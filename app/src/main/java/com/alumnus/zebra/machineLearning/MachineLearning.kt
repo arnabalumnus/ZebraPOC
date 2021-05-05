@@ -70,6 +70,7 @@ class MachineLearning {
     private lateinit var mFileName: String
     private lateinit var context: Context
 
+    // fun name suggested startEventAnalysis()
     fun CalculateTSV(xyzList: ArrayList<AccelerationData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
         val TS = ArrayList<Long>()
         val TSV = ArrayList<Double>()

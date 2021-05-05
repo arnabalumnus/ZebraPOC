@@ -1,4 +1,4 @@
-package com.alumnus.zebra.utils
+package com.alumnus.zebra.machineLearning.utils
 
 /**
  * @author Arnab Kundu

@@ -13,6 +13,8 @@ import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.AccLogEntity;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
 import com.alumnus.zebra.machineLearning.MachineLearning;
+import com.alumnus.zebra.machineLearning.utils.Calculator;
+import com.alumnus.zebra.machineLearning.utils.DataAnalyzer;
 import com.alumnus.zebra.pojo.Acceleration;
 import com.alumnus.zebra.pojo.AccelerationData;
 import com.opencsv.CSVWriter;
@@ -85,7 +87,7 @@ public class ExportFile {
                                     //TODO have issue in next line with Android >= Q or R .
                                     // When ever files saving into com.alumnus.zebra folder
                                     InputStream inputStream = context.getContentResolver().openInputStream(uri);
-                                    readCSVData(inputStream,context);                  // If you need to read the whole file row by row
+                                    readCSVData(inputStream, context);                  // If you need to read the whole file row by row
 
 
                                 } catch (FileNotFoundException e) {
@@ -107,7 +109,7 @@ public class ExportFile {
     /**
      * @param is
      */
-    private static void readCSVData(InputStream is,Context context) {
+    private static void readCSVData(InputStream is, Context context) {
         // Read the raw csv file
 
         // Reads text from character-input stream, buffering characters for efficient reading
@@ -146,7 +148,14 @@ public class ExportFile {
                 accelerationsDataList.add(accelerationData);
             }
             String result = new MachineLearning().CalculateTSV(accelerationsDataList, context,null);
-
+            //New approach
+            /*ArrayList<Double> tsvList = new ArrayList<>();
+            for (AccelerationData accelerationsData : accelerationsDataList) {
+                tsvList.add(Calculator.INSTANCE.calculateTSV(accelerationsData.x, accelerationsData.y, accelerationsData.z));
+            }
+            if (DataAnalyzer.INSTANCE.hasEvent(tsvList)) {
+                String result = new MachineLearning().CalculateTSV(accelerationsDataList, context, null);
+            }*/
 
             //detectPlusNoise.noiseZones.size();
         } catch (IOException e) {
