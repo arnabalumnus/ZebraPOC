@@ -1,16 +1,11 @@
 package com.alumnus.zebra.machineLearning
 
 import android.content.Context
-import android.os.Build
-import android.os.Environment
 import android.util.Log
 import com.alumnus.zebra.BuildConfig
+import com.alumnus.zebra.machineLearning.utils.LogFileGenerator.appendLog
 import com.alumnus.zebra.pojo.AccelerationData
 import com.alumnus.zebra.utils.DateFormatter
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
 
 
 const val EVENT_IMPACT = 1
@@ -169,7 +164,7 @@ class MachineLearning {
                         // Otherwise, it might be force impartion or impact
                         //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
                         areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 1)
-                        appendLog("Area under curve:" + areaUnderCurve)
+                        appendLog(context, mFileName, "Area under curve:" + areaUnderCurve)
                         print("Area under curve:" + areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
                             // Not actually an impact, just external application of force
@@ -236,7 +231,7 @@ class MachineLearning {
                         //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
                         areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 1)
 
-                        appendLog("Area under curve: " + areaUnderCurve)
+                        appendLog(context, mFileName, "Area under curve: " + areaUnderCurve)
                         print("Area under curve: " + areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
                             // Not actually an impact, just external application of force
@@ -309,14 +304,14 @@ class MachineLearning {
         val detectPlusNoise: DetectPlusNoise = detectEvents(ts, tsvDataset, dtsvDataset)
         val events: ArrayList<DetectedEvent> = detectPlusNoise.detectedEvents
         val noises: ArrayList<NoiseZone> = detectPlusNoise.noiseZones
-        appendLog("Detected events:")
+        appendLog(context, mFileName, "Detected events:")
         print("Detected events:")
         parseEvents(detectPlusNoise.detectedEvents, ts)
 
-        appendLog("Noise zones:")
+        appendLog(context, mFileName, "Noise zones:")
         print("Noise zones:")
         for (noiseZone in noises) {
-            appendLog(noiseZone.toString())
+            appendLog(context, mFileName, noiseZone.toString())
             print(noiseZone)
         }
 
@@ -368,11 +363,11 @@ class MachineLearning {
                 lastEventEnded = event.count
             }
         }
-        appendLog("Significant freefall events: $numberOfSignificantFalls")
+        appendLog(context, mFileName, "Significant freefall events: $numberOfSignificantFalls")
         print("Significant freefall events: $numberOfSignificantFalls")
-        appendLog("Significant impact events: $numberOfSignificantImpacts")
+        appendLog(context, mFileName, "Significant impact events: $numberOfSignificantImpacts")
         print("Significant impact events: $numberOfSignificantImpacts")
-        appendLog("Force impartions: $numberOfForces")
+        appendLog(context, mFileName, "Force impartions: $numberOfForces")
         print("Force impartions: $numberOfForces")
 
         return "Significant freefall events: $numberOfSignificantFalls , Significant impact events: $numberOfSignificantImpacts ,Force impartions: $numberOfForces"
@@ -387,7 +382,7 @@ class MachineLearning {
         var impactType: String
         if (BuildConfig.DEBUG) {
             for (event in eventList) {
-                appendLog(event.toString())
+                appendLog(context, mFileName, event.toString())
                 print(event)
             }
         }
@@ -399,7 +394,7 @@ class MachineLearning {
                 } else {
                     spinResult = "No"
                 }
-                appendLog("After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataset[event.count] - tsDataset[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataset[event.count] - tsDataset[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
+                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataset[event.count] - tsDataset[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataset[event.count] - tsDataset[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
                 print("After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataset[event.count] - tsDataset[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataset[event.count] - tsDataset[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
             } else if (event.event_type == EVENT_IMPACT) {
                 if (event.impactType == TYPE_IMPACT_HARD) {
@@ -413,13 +408,13 @@ class MachineLearning {
                 } else {
                     impactType = "Negligible"
                 }
-                appendLog("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
+                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
                 print("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
 
-                appendLog(detectImpactDirection(TSV, event.eventStart, event.count - 1))
+                appendLog(context, mFileName, detectImpactDirection(TSV, event.eventStart, event.count - 1))
                 //print("${detectImpactDirection(TSV, event.eventStart, event.count - 1)}")
             } else {
-                appendLog("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])} ms")
+                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])} ms")
                 print("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])} ms")
             }
             lastEvent = event.count - 1
@@ -431,46 +426,6 @@ class MachineLearning {
         return Math.round((3.28 * (9.81 * (durarion / 1000) * (durarion / 1000)) / 2) * 1.225).toDouble()
     }
 
-
-    /**
-     * Create logs folder and write log files
-     */
-    fun appendLog(text: String?) {
-        // var logFile: File
-        val logDir: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-            File(Environment.getExternalStorageDirectory(), "ZebraApp/logs")
-        else
-            File(context.getExternalFilesDir("ZebraApp"),"logs")
-
-        if (!logDir.exists()) {
-            if (!logDir.mkdirs()) {
-                Log.e(TAG, "Error in mkdirs")
-                return
-            }
-        }
-        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-            File(Environment.getExternalStorageDirectory(), "ZebraApp/logs/log-$mFileName.txt")
-        else
-            File(context.getExternalFilesDir("ZebraApp/logs"), "log-$mFileName.txt")
-        if (!logFile.exists()) {
-            try {
-                logFile.createNewFile()
-            } catch (e: IOException) {
-                // TODO Auto-generated catch block
-                e.printStackTrace()
-            }
-        }
-        try {
-            //BufferedWriter for performance, true to set append to file flag
-            val buf = BufferedWriter(FileWriter(logFile, true))
-            buf.append(text)
-            buf.newLine()
-            buf.close()
-        } catch (e: IOException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        }
-    }
 
     /**
      * TODO detectImpactDirection

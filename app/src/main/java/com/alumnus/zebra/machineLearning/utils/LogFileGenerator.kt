@@ -8,21 +8,38 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
+/**
+ * @author Arnab Kundu
+ */
 object LogFileGenerator {
 
-
+    /**
+     * Create logs folder and write log files
+     */
     fun appendLog(context: Context, mFileName: String, text: String) {
-        // var logFile: File
-        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
-            File(Environment.getExternalStorageDirectory(), "ZebraApp/log-$mFileName.txt")
+        val logFolder: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            File(Environment.getExternalStorageDirectory(), "ZebraApp/logs")
         else
-            File(context.getExternalFilesDir("ZebraApp"), "log-$mFileName.txt")
+            File(context.getExternalFilesDir("ZebraApp"), "logs")
+
+        if (!logFolder.exists()) {
+            try {
+                logFolder.mkdirs()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+
+        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            File(Environment.getExternalStorageDirectory(), "ZebraApp/logs/log-$mFileName.txt")
+        else
+            File(context.getExternalFilesDir("ZebraApp"), "logs/log-$mFileName.txt")
 
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile()
             } catch (e: IOException) {
-                // TODO Auto-generated catch block
                 e.printStackTrace()
             }
         }
@@ -33,7 +50,6 @@ object LogFileGenerator {
             buf.newLine()
             buf.close()
         } catch (e: IOException) {
-            // TODO Auto-generated catch block
             e.printStackTrace()
         }
     }
