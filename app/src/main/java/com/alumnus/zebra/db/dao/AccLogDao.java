@@ -3,6 +3,7 @@ package com.alumnus.zebra.db.dao;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
@@ -16,7 +17,7 @@ public interface AccLogDao {
     @Query("SELECT * FROM accelerometer_log")
     List<AccLogEntity> getAll();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(AccLogEntity... accelerometer_log);
 
     @Delete

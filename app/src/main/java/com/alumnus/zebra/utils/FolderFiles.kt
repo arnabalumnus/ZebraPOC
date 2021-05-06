@@ -13,6 +13,7 @@ import java.io.IOException
 
 object FolderFiles {
 
+    private const val TAG = "FolderFiles"
     const val PARENT_DIRECTORY_NAME = "ZebraApp"
 
     /**
@@ -106,5 +107,28 @@ object FolderFiles {
             }
         }
         return logFile
+    }
+
+
+    //private const val FILE_PATH_PREFIX = "/storage/emulated/0/ZebraApp/"
+
+    /**
+     * Generic function to delete a file
+     * @param context
+     * @param folderName
+     * @param fileNameWithExtension
+     * @return Boolean
+     */
+    fun deleteFile(context: Context?, folderName: String, fileName: String, fileExtension: String): Boolean {
+
+        val file: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+            File(Environment.getExternalStorageDirectory(), "$PARENT_DIRECTORY_NAME/$folderName/$fileName$fileExtension")
+        else
+            File(context?.getExternalFilesDir(PARENT_DIRECTORY_NAME), "$folderName/$fileName$fileExtension")
+
+        if (file.exists()) {
+            return file.delete()
+        }
+        return false
     }
 }

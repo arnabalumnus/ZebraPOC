@@ -5,10 +5,12 @@ import android.media.MediaScannerConnection
 import android.util.Log
 import androidx.room.Room
 import com.alumnus.zebra.db.AppDatabase
+import com.alumnus.zebra.db.entity.CsvFileLogEntity
 import com.alumnus.zebra.machineLearning.MachineLearning
 import com.alumnus.zebra.pojo.AccelerationData
 import com.alumnus.zebra.utils.Constant
 import com.alumnus.zebra.utils.DateFormatter
+import com.alumnus.zebra.utils.FolderFiles
 import com.alumnus.zebra.utils.FolderFiles.createFile
 import com.alumnus.zebra.utils.FolderFiles.createFolder
 import com.opencsv.CSVWriter
@@ -41,6 +43,7 @@ object ExportFiles {
                         accelerationsDataList.add(AccelerationData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
                     }
                     exportCSVFile(context, accelerationsDataList, chunkFileName)
+                    deleteOldCSVFile(context);
                     exportLogFile(context, accelerationsDataList, chunkFileName)
 
                 } catch (sqlEx: Exception) {
@@ -52,6 +55,7 @@ object ExportFiles {
         Thread(runnable).start()
     }
 
+
     /**
      * Exports data csv file
      * @param context Context Needed to access DB & External Storage
@@ -59,6 +63,11 @@ object ExportFiles {
      * @param fileName CSV fileName
      */
     private fun exportCSVFile(context: Context, accelerationsDataList: ArrayList<AccelerationData>, fileName: String) {
+
+        //region Store exported .csv file name in DB table. For delete it.
+        val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
+        db.csvFileLogDao().insert(CsvFileLogEntity(fileName, Constant.DATA_CHUNK_SIZE.toLong()))
+        //endregion
 
         createFolder(context, "csvData")
 
@@ -80,6 +89,28 @@ object ExportFiles {
         }
     }
 
+
+    /**
+     * Delete old .csv file to keep the device storage clean.
+     * Unless it will fill with large amount of unwanted csv files
+     * @param context
+     */
+    private fun deleteOldCSVFile(context: Context) {
+        val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
+        if (db.csvFileLogDao().csvFileCount > 10) {
+            val fileName = db.csvFileLogDao().oldestCSVFile
+            val isDeleteSuccessful = FolderFiles.deleteFile(context = context, folderName = "csvData", fileName = fileName, fileExtension = ".csv")
+            if (isDeleteSuccessful)
+                db.csvFileLogDao().deleteCSVRecord(fileName)
+            else {
+                // In false condition also delete the DB record.
+                // Because that file not available in the device.
+                db.csvFileLogDao().deleteCSVRecord(fileName)
+            }
+        }
+    }
+
+
     /**
      *  Data Analysis & Exports log file
      * @param context Context Needed to access DB & External Storage
@@ -89,6 +120,7 @@ object ExportFiles {
     private fun exportLogFile(context: Context, accelerationsDataList: ArrayList<AccelerationData>, fileName: String) {
         MachineLearning().CalculateTSV(accelerationsDataList, context, fileName)
     }
+
 
     /**
      * Generate fileName according to starting data row TimeStamp

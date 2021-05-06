@@ -2,9 +2,10 @@ package com.alumnus.zebra.db.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "accelerometer_log")
+@Entity(tableName = "accelerometer_log", indices = {@Index(value = {"TS"}, unique = true)})
 public class AccLogEntity {
 
     @PrimaryKey(autoGenerate = true)
