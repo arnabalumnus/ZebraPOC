@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver;
+import com.alumnus.zebra.machineLearning.utils.ExportFiles;
 import com.alumnus.zebra.service.LifeTimeService;
 import com.alumnus.zebra.utils.AutoStart;
 import com.alumnus.zebra.utils.Constant;
@@ -116,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
     //region Export Data and save into SD card or Phone Storage
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
-            ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            //ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            ExportFiles.INSTANCE.prepareDataChunk(this);
             //Toast.makeText(this, "Data exported in 'ZebraApp/manualLog' folder", Toast.LENGTH_SHORT).show();
         }
     }
@@ -149,7 +151,8 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
             //resume tasks needing this permission
-            ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            //ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            ExportFiles.INSTANCE.prepareDataChunk(this);
             if (!sp.getBoolean(Constant.isAutoStartPermissionGranted, false)) {
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean(Constant.isAutoStartPermissionGranted, true);

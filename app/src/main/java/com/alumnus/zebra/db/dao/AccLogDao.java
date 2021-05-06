@@ -62,4 +62,7 @@ public interface AccLogDao {
 
     //@Query("SELECT TS, count(*) FROM accelerometer_log group by TS")
     //List<String> selectDistinctRecord();
+
+    @Query("SELECT TS FROM accelerometer_log limit 1")
+    long getStartingTimeStamp();
 }

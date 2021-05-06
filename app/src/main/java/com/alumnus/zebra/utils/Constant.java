@@ -15,5 +15,5 @@ public class Constant {
     public static final String SP = "ZebraSp";
     public static final String isAutoStartPermissionGranted = "isAutoStartPermissionGranted";
 
-
+    public static final int DATA_CHUNK_SIZE = 5 * 60;
 }

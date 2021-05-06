@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class ExportFile {
     private static final String TAG = "ExportFile";
 
@@ -54,54 +55,56 @@ public class ExportFile {
                 }
             }
             AppDatabase db = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "database-name").build();
-            List<AccLogEntity> accLogEntities = db.accLogDao().getAll();
-            if (accLogEntities.size() == 0) {
-                Log.w(TAG, "No data available in database");
-                return;
-            }
-            File file = new File(exportDir, DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
-            try {
-                if (!file.createNewFile()) {
-                    Log.e(TAG, "Error in createNewFile");
+            while (db.accLogDao().getCount() > Constant.DATA_CHUNK_SIZE) {
+                List<AccLogEntity> accLogEntities = db.accLogDao().getAll();
+                if (accLogEntities.size() == 0) {
+                    Log.w(TAG, "No data available in database");
                     return;
                 }
-                db.csvFileLogDao().insert(new CsvFileLogEntity(file.getName(), accLogEntities.size()));
-                CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
-                csvWrite.writeNext(new String[]{"TS", "X", "Y", "Z"});
-                for (AccLogEntity accLogEntity : accLogEntities) {
-                    //Which column you want to export
-                    String[] arrStr = {String.valueOf(accLogEntity.ts), String.valueOf(accLogEntity.x), String.valueOf(accLogEntity.y), String.valueOf(accLogEntity.z)};
-                    csvWrite.writeNext(arrStr);
-                }
-                csvWrite.close();
-                Log.d(TAG, "Data Exported");
-                Thread.sleep(300);
-                db.accLogDao().deleteAll(delete_upto_time_stamp);
-                MediaScannerConnection.scanFile(context,
-                        new String[]{file.toString()},
-                        null,
-                        new MediaScannerConnection.OnScanCompletedListener() {
-                            @Override
-                            public void onScanCompleted(String path, Uri uri) {
-                                Log.i(TAG, "onScanCompleted: path: " + path);
-                                Log.v(TAG, "onScanCompleted: Uri: " + uri);
-                                try {
-                                    //TODO have issue in next line with Android >= Q or R .
-                                    // When ever files saving into com.alumnus.zebra folder
-                                    InputStream inputStream = context.getContentResolver().openInputStream(uri);
-                                    readCSVData(inputStream, context);                  // If you need to read the whole file row by row
+                File file = new File(exportDir, DateFormatter.getTimeStampFileName(System.currentTimeMillis()) + ".csv");
+                try {
+                    if (!file.createNewFile()) {
+                        Log.e(TAG, "Error in createNewFile");
+                        return;
+                    }
+                    db.csvFileLogDao().insert(new CsvFileLogEntity(file.getName(), accLogEntities.size()));
+                    CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+                    csvWrite.writeNext(new String[]{"TS", "X", "Y", "Z"});
+                    for (AccLogEntity accLogEntity : accLogEntities) {
+                        //Which column you want to export
+                        String[] arrStr = {String.valueOf(accLogEntity.ts), String.valueOf(accLogEntity.x), String.valueOf(accLogEntity.y), String.valueOf(accLogEntity.z)};
+                        csvWrite.writeNext(arrStr);
+                    }
+                    csvWrite.close();
+                    Log.d(TAG, "Data Exported");
+                    Thread.sleep(300);
+                    db.accLogDao().deleteAll(delete_upto_time_stamp);
+                    MediaScannerConnection.scanFile(context,
+                            new String[]{file.toString()},
+                            null,
+                            new MediaScannerConnection.OnScanCompletedListener() {
+                                @Override
+                                public void onScanCompleted(String path, Uri uri) {
+                                    Log.i(TAG, "onScanCompleted: path: " + path);
+                                    Log.v(TAG, "onScanCompleted: Uri: " + uri);
+                                    try {
+                                        //TODO have issue in next line with Android >= Q or R .
+                                        // When ever files saving into com.alumnus.zebra folder
+                                        InputStream inputStream = context.getContentResolver().openInputStream(uri);
+                                        readCSVData(inputStream, context);                  // If you need to read the whole file row by row
 
 
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
-                        });
-                if (db.csvFileLogDao().getTotalRecordOfAllCSVFile() > 18000 && db.csvFileLogDao().getCSVFileCount() > 2) {//432000
-                    DeleteFile.deleteFile(context, finalExportType);
+                            });
+                    if (db.csvFileLogDao().getTotalRecordOfAllCSVFile() > 18000 && db.csvFileLogDao().getCSVFileCount() > 2) {//432000
+                        DeleteFile.deleteFile(context, finalExportType);
+                    }
+                } catch (Exception sqlEx) {
+                    Log.e(TAG, sqlEx.getMessage(), sqlEx);
                 }
-            } catch (Exception sqlEx) {
-                Log.e(TAG, sqlEx.getMessage(), sqlEx);
             }
         };
         Thread thread = new Thread(runnable);

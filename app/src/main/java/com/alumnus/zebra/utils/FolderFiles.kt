@@ -8,7 +8,8 @@ import java.io.IOException
 
 /**
  * @author Arnab Kundu
-@param context Context required for API level R */
+ * @param context Context required for API level R
+ */
 
 object FolderFiles {
 
@@ -43,20 +44,21 @@ object FolderFiles {
      * @param fileName
      * @param fileExtension
      */
-    fun createFile(context: Context? = null, folderName: String, fileName: String, fileExtension: String) {
+    fun createFile(context: Context? = null, folderName: String, fileName: String, fileExtension: String): File {
 
-        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+        val file: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
             File(Environment.getExternalStorageDirectory(), "$PARENT_DIRECTORY_NAME/$folderName/$fileName.$fileExtension")
         else
             File(context?.getExternalFilesDir(PARENT_DIRECTORY_NAME), "$folderName/$fileName.$fileExtension")
 
-        if (!logFile.exists()) {
+        if (!file.exists()) {
             try {
-                logFile.createNewFile()
+                file.createNewFile()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
+        return file
     }
 
     /**
@@ -65,20 +67,21 @@ object FolderFiles {
      * @param folderName
      * @param fileName
      */
-    fun createTextFile(context: Context? = null, folderName: String, fileName: String) {
+    fun createTextFile(context: Context? = null, folderName: String, fileName: String): File {
 
-        val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+        val textFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
             File(Environment.getExternalStorageDirectory(), "$PARENT_DIRECTORY_NAME/$folderName/$fileName.txt")
         else
             File(context?.getExternalFilesDir(PARENT_DIRECTORY_NAME), "$folderName/$fileName.txt")
 
-        if (!logFile.exists()) {
+        if (!textFile.exists()) {
             try {
-                logFile.createNewFile()
+                textFile.createNewFile()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
+        return textFile
     }
 
 
@@ -88,7 +91,7 @@ object FolderFiles {
      * @param folderName
      * @param fileName
      */
-    fun createLogFile(context: Context? = null, folderName: String, fileName: String) {
+    fun createLogFile(context: Context? = null, folderName: String, fileName: String): File {
 
         val logFile: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
             File(Environment.getExternalStorageDirectory(), "$PARENT_DIRECTORY_NAME/$folderName/log-$fileName.txt")
@@ -102,5 +105,6 @@ object FolderFiles {
                 e.printStackTrace()
             }
         }
+        return logFile
     }
 }
