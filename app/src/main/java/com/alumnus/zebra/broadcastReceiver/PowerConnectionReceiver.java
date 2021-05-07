@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import com.alumnus.zebra.machineLearning.utils.ExportFiles;
 import com.alumnus.zebra.service.LifeTimeService;
-import com.alumnus.zebra.utils.ExportFile;
 
 public class PowerConnectionReceiver extends BroadcastReceiver {
 
@@ -26,7 +25,6 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
             context.stopService(serviceIntent);*/
             //endregion
 
-            //ExportFile.exportDataIntoCSVFile(context, "onPowerConnected");
             ExportFiles.INSTANCE.prepareDataChunk(context);
         }
         if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {

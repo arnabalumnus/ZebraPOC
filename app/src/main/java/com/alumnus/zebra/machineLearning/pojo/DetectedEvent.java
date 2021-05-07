@@ -1,16 +1,16 @@
-package com.alumnus.zebra.machineLearning;
+package com.alumnus.zebra.machineLearning.pojo;
 
 public class DetectedEvent {
-    int event_type; //EVENT (FREE FALL OR EVENT IMPACT) enum
-    int eventStart;
-    int count;
+    public int event_type; //EVENT (FREE FALL OR EVENT IMPACT) enum
+    public int eventStart;
+    public int count;
 
-    double minTsv;
-    boolean spinDetected;
+    public double minTsv;
+    public boolean spinDetected;
 
-    double maxTsv;
-    double dTsv;
-    int impactType;
+    public double maxTsv;
+    public double dTsv;
+    public int impactType;
 
     //EVENT FREE FALL
     public DetectedEvent(int event_type, int eventStart, int count, double minTsv, boolean spinDetected) {

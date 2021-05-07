@@ -37,12 +37,6 @@ public class DatabaseActivity extends AppCompatActivity {
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
     }
 
-    public void getAllEvent(View view) {
-        Runnable runnable = () -> db.eventLogDao().getAll();
-        Thread thread = new Thread(runnable);
-        thread.start();
-    }
-
     public void getTotalCount(View view) {
         new DBTask().execute();
     }

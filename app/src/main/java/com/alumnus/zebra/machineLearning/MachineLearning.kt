@@ -3,7 +3,11 @@ package com.alumnus.zebra.machineLearning
 import android.content.Context
 import android.util.Log
 import com.alumnus.zebra.BuildConfig
+import com.alumnus.zebra.machineLearning.pojo.DetectPlusNoise
+import com.alumnus.zebra.machineLearning.pojo.DetectedEvent
+import com.alumnus.zebra.machineLearning.pojo.NoiseZone
 import com.alumnus.zebra.machineLearning.utils.LogFileGenerator.appendLog
+import com.alumnus.zebra.machineLearning.utils.SimpsonsRule
 import com.alumnus.zebra.pojo.AccelerationData
 import com.alumnus.zebra.utils.DateFormatter
 

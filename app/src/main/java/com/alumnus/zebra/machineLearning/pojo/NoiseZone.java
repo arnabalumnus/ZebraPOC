@@ -1,11 +1,11 @@
-package com.alumnus.zebra.machineLearning;
+package com.alumnus.zebra.machineLearning.pojo;
 
 import org.jetbrains.annotations.NotNull;
 
 public class NoiseZone {
 
-    int noiseStart;
-    int i;
+    public int noiseStart;
+    public int i;
 
     public NoiseZone(int noiseStart, int i) {
         this.noiseStart = noiseStart;

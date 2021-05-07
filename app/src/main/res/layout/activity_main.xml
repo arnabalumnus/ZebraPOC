@@ -6,14 +6,14 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.activity.MainActivity"
+    tools:ignore="HardcodedText">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:text="Zebra POC"
-        android:textSize="24dp"
+        android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -24,7 +24,6 @@
         android:id="@+id/buttonAccelerometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:onClick="goToAccelerometer"
         android:text="ACCELEROMETER" />
 
@@ -32,7 +31,6 @@
         android:id="@+id/buttonStartService"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:onClick="startService"
         android:text="Service" />
 
@@ -40,7 +38,6 @@
         android:id="@+id/buttonExportData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:onClick="exportDataButton"
         android:text="Export Data" />
 

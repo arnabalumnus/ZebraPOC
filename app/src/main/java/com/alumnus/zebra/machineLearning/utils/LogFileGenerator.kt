@@ -10,6 +10,7 @@ import java.io.IOException
 
 /**
  * @author Arnab Kundu
+ * TODO use FolderFiles.createLogFile()
  */
 object LogFileGenerator {
 

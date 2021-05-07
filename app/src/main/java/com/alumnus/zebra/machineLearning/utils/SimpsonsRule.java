@@ -1,4 +1,4 @@
-package com.alumnus.zebra.machineLearning;
+package com.alumnus.zebra.machineLearning.utils;
 
 import java.util.ArrayList;
 
