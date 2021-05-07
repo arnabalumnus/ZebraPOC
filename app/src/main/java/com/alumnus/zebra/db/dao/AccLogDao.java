@@ -29,8 +29,11 @@ public interface AccLogDao {
     @Query("Delete from accelerometer_log where ts <:time_stamp")
     void deleteAll(long time_stamp);
 
-    @Query("Select MAX(TS), MIN(TS) from accelerometer_log;")
-    long[] getLastRecordTime();
+    @Query("SELECT TS FROM accelerometer_log limit 1")
+    long getStartingTimeStamp();
+
+    @Query("Select MAX(TS) from accelerometer_log;")
+    long getLastRecordTime();
 
 
     //region Get data and clear the same from DB
@@ -58,12 +61,4 @@ public interface AccLogDao {
     void deleteChunk(int chunk_size);
     //endregion
 
-    //@Query("SELECT DISTINCT TS, count(*) FROM accelerometer_log")
-    //List<String> selectDistinctRecord();
-
-    //@Query("SELECT TS, count(*) FROM accelerometer_log group by TS")
-    //List<String> selectDistinctRecord();
-
-    @Query("SELECT TS FROM accelerometer_log limit 1")
-    long getStartingTimeStamp();
 }

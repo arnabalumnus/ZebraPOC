@@ -32,7 +32,15 @@ object ExportFiles {
             while (db.accLogDao().count > Constant.DATA_CHUNK_SIZE) {
                 val chunkFileName = generateChunkFileName(context)
 
-                val accLogEntities = db.accLogDao().processDataChunk(Constant.DATA_CHUNK_SIZE)
+                // TODO decide
+                //  1st process (drawbacks got Database is locked)
+                /*val accLogEntities = db.accLogDao().processDataChunk(Constant.DATA_CHUNK_SIZE)*/
+
+                // TODO or the
+                //  2nd process
+                val accLogEntities = db.accLogDao().getDataChunk(Constant.DATA_CHUNK_SIZE)
+                db.accLogDao().deleteChunk(Constant.DATA_CHUNK_SIZE)
+
                 if (accLogEntities.size == 0) {
                     Log.w(TAG, "No data available in database")
                     return@Runnable
@@ -97,7 +105,7 @@ object ExportFiles {
      */
     private fun deleteOldCSVFile(context: Context) {
         val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
-        if (db.csvFileLogDao().csvFileCount > 10) {
+        if (db.csvFileLogDao().csvFileCount > Constant.RETAIN_NUMBER_OF_CSV_FILE) {
             val fileName = db.csvFileLogDao().oldestCSVFile
             val isDeleteSuccessful = FolderFiles.deleteFile(context = context, folderName = "csvData", fileName = fileName, fileExtension = ".csv")
             if (isDeleteSuccessful)

@@ -15,5 +15,6 @@ public class Constant {
     public static final String SP = "ZebraSp";
     public static final String isAutoStartPermissionGranted = "isAutoStartPermissionGranted";
 
-    public static final int DATA_CHUNK_SIZE = 5 * 60;
+    public static final int DATA_CHUNK_SIZE = 100000;
+    public static final int RETAIN_NUMBER_OF_CSV_FILE = 10;
 }

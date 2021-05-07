@@ -44,6 +44,10 @@ public class DatabaseActivity extends AppCompatActivity {
         new DBTask().execute();
     }
 
+    public void getLastTimeStamp(View v) {
+        new FetchTimeStampDBTask().execute();
+    }
+
     class DBTask extends AsyncTask<Void, Void, Long[]> {
 
         @Override
@@ -73,8 +77,10 @@ public class DatabaseActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-            long[] firstLastRecordTime= db.accLogDao().getLastRecordTime();
-            return "Last: " + DateFormatter.getTimeStamp(firstLastRecordTime[0]);
+            long startingTimeStamp = db.accLogDao().getStartingTimeStamp();
+            long lastRecordTime = db.accLogDao().getLastRecordTime();
+            return "Starting timestamp: " + DateFormatter.getTimeStamp(startingTimeStamp) +
+                    "\nLast timestamp: " + DateFormatter.getTimeStamp(lastRecordTime);
         }
 
         @Override
@@ -82,9 +88,5 @@ public class DatabaseActivity extends AppCompatActivity {
             super.onPostExecute(s);
             tv_db_record_count_event_table.setText(s);
         }
-    }
-
-    public void getLastTimeStamp(View v) {
-        new FetchTimeStampDBTask().execute();
     }
 }
