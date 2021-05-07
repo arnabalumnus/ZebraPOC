@@ -10,7 +10,10 @@ import androidx.room.Room;
 
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.db.AppDatabase;
+import com.alumnus.zebra.db.entity.CsvFileLogEntity;
 import com.alumnus.zebra.utils.DateFormatter;
+
+import java.util.List;
 
 public class DatabaseActivity extends AppCompatActivity {
 
@@ -25,7 +28,6 @@ public class DatabaseActivity extends AppCompatActivity {
 
         tv_db_record_count_event_table = findViewById(R.id.tv_db_record_count_event_table);
         tv_db_record_count_acc_table = findViewById(R.id.tv_db_record_count_acc_table);
-        tv_db_record_count_log_table = findViewById(R.id.tv_db_record_count_log_table);
     }
 
     @Override
@@ -48,27 +50,27 @@ public class DatabaseActivity extends AppCompatActivity {
         new FetchTimeStampDBTask().execute();
     }
 
-    class DBTask extends AsyncTask<Void, Void, Long[]> {
+    class DBTask extends AsyncTask<Void, Void, Long> {
 
         @Override
-        protected Long[] doInBackground(Void... voids) {
+        protected Long doInBackground(Void... voids) {
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-            Long[] count = {0L, 0L, 0L};
-            long eventCount = db.eventLogDao().getCount();
+
             long accCount = db.accLogDao().getCount();
-            long logCount = db.logDao().getCount();
-            count[0] = eventCount;
-            count[1] = accCount;
-            count[2] = logCount;
-            return count;
+
+            /*List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
+            int stride = listOfCsv.size() / 3;
+            for (int row = 0; row < listOfCsv.size() / 3; row++) {
+                System.out.println(String.format("%20s %20s %12s", listOfCsv.get(row),
+                        listOfCsv.get(row + stride), listOfCsv.get(row + stride * 2)));
+            }*/
+            return accCount;
         }
 
         @Override
-        protected void onPostExecute(Long[] count) {
+        protected void onPostExecute(Long count) {
             super.onPostExecute(count);
-            tv_db_record_count_event_table.setText("Event Count: " + count[0]);
-            tv_db_record_count_acc_table.setText("Acc Count: " + count[1]);
-            tv_db_record_count_log_table.setText("Log Count: " + count[2]);
+            tv_db_record_count_acc_table.setText("Accelerometer table row count: " + count);
         }
     }
 

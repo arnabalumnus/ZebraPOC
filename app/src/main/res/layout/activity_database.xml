@@ -11,11 +11,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="getTotalCount"
-        android:text="Get All Event"
+        android:text="Accelerometer table row count"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tv_db_record_count_acc_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Accelerometer table row count:"
+        app:layout_constraintBottom_toTopOf="@+id/buttonGetAllEvent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_time_stamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="getLastTimeStamp"
+        android:text="Time Stamp"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonGetAllEvent" />
 
     <TextView
         android:id="@+id/tv_db_record_count_event_table"
@@ -23,38 +46,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="Count:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_db_record_count_acc_table"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="40dp"
-        android:text="Count:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_db_record_count_log_table"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="60dp"
-        android:text="Count:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/buttonLastTimeStamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="getLastTimeStamp"
-        android:text="LastTimeStamp"
+        android:text="Time stamp:"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonGetAllEvent" />
+        app:layout_constraintTop_toBottomOf="@id/btn_time_stamp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
