@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.service.LifeTimeService;
+import com.alumnus.zebra.utils.Constant;
 
 public class ServiceActivity extends AppCompatActivity {
 
@@ -28,12 +29,23 @@ public class ServiceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service);
 
-        sp = getSharedPreferences("Zebra", MODE_PRIVATE);
+        sp = getSharedPreferences(Constant.SP, MODE_PRIVATE);
         int freqId = sp.getInt("frequencyId", 0);
 
         RadioGroup frequency_radio_group = findViewById(R.id.frequency_radio_group);
         if (freqId != 0) {
             frequency_radio_group.check(freqId);
+            switch (frequency_radio_group.getCheckedRadioButtonId()) {
+                case R.id.low_freq:
+                    frequency = 5;
+                    break;
+                case R.id.mid_freq:
+                    frequency = 15;
+                    break;
+                case R.id.high_freq:
+                    frequency = 50;
+                    break;
+            }
         } else {
             Toast.makeText(this, "Frequency not selected", Toast.LENGTH_SHORT).show();
         }
