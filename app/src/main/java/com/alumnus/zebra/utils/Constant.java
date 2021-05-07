@@ -16,11 +16,11 @@ public class Constant {
     public static final String isAutoStartPermissionGranted = "isAutoStartPermissionGranted";
 
     /**
-     * @DATA_CHUNK_SIZE of 150000 approximately makes
+     * @DATA_CHUNK_SIZE of 130000 approximately makes
      * 5MB size of .csv file
      * &
-     * 50 mints of data @50Hz(50 records/sec)
+     * 43 mints of data @50Hz(50 records/sec)
      */
-    public static final int DATA_CHUNK_SIZE = 150000;
+    public static final int DATA_CHUNK_SIZE = 130000;
     public static final int RETAIN_NUMBER_OF_CSV_FILE = 10;
 }

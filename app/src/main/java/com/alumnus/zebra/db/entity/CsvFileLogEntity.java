@@ -2,10 +2,11 @@ package com.alumnus.zebra.db.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.Insert;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "csv_file_log")
+@Entity(tableName = "csv_file_log", indices = {@Index(value = {"file_name"}, unique = true)})
 public class CsvFileLogEntity {
 
     @PrimaryKey(autoGenerate = true)
