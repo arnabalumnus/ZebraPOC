@@ -31,6 +31,7 @@ object ExportFiles {
         val runnable = Runnable {
             val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
 
+            //try {
             while (db.accLogDao().count > Constant.DATA_CHUNK_SIZE) {
                 val chunkFileName = generateChunkFileName(context)
 
@@ -41,26 +42,26 @@ object ExportFiles {
                 // TODO or the
                 //  2nd process
                 val accLogEntities = db.accLogDao().getDataChunk(Constant.DATA_CHUNK_SIZE)
-                db.accLogDao().deleteChunk(Constant.DATA_CHUNK_SIZE)
+                db.accLogDao().deleteChunk(Constant.DATA_CHUNK_SIZE) // comment this line to stop clearing DB after Exporting csv file
 
                 if (accLogEntities.size == 0) {
                     Log.w(TAG, "No data available in database")
                     return@Runnable
                 }
-                try {
-                    val accelerationsDataList: ArrayList<AccelerationData> = ArrayList()
-                    for (accLogEntity in accLogEntities) {
-                        accelerationsDataList.add(AccelerationData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
-                    }
-                    exportCSVFile(context, accelerationsDataList, chunkFileName)
-                    deleteOldCSVFile(context);
-                    exportLogFile(context, accelerationsDataList, chunkFileName)
 
-                } catch (sqlEx: Exception) {
-                    // Data table may have some unexpected values
-                    Log.e(TAG, sqlEx.message, sqlEx)
+                val accelerationsDataList: ArrayList<AccelerationData> = ArrayList()
+                for (accLogEntity in accLogEntities) {
+                    accelerationsDataList.add(AccelerationData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
                 }
+                exportCSVFile(context, accelerationsDataList, chunkFileName)
+                deleteOldCSVFile(context);
+                exportLogFile(context, accelerationsDataList, chunkFileName)
+
             }
+            /*} catch (sqlEx: Exception) {
+                // Data table may have some unexpected values
+                Log.e(TAG, sqlEx.message, sqlEx)
+            }*/
         }
         Thread(runnable).start()
     }
