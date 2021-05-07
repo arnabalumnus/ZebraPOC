@@ -52,6 +52,34 @@ Based on power connect event device starts exporting `accelerometer_log` table d
 * DateFormatter
 * TimeSpan Enum
 
-## Pending plans or TODOl̥
+## Pending plans or TODO
 * For delete old record in csv.
 * Detect Event using Machine Learning in Android in background.
+
+
+## Device File Explorer
+```
+parent/root
+├── data
+|   └── com.alumnus.zebra
+|           ├── cache
+|           ├── code_cache
+|           ├── database
+|           |       └── database-name
+|           └── shared_prefs
+|                   ├── Zebra.xml
+|                   └── ZebraSp.xml
+├── ...
+|
+└── sdCard
+       ├── Android
+       |    ├── data 
+       |    ├── media
+       |    └── obb
+       |
+       ├── ...
+       |
+       └── ZebraApp
+               ├── csvData
+               └── logs
+```
