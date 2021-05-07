@@ -11,6 +11,8 @@ import com.alumnus.zebra.db.entity.AccLogEntity;
 
 import java.util.List;
 
+import kotlin.jvm.Synchronized;
+
 @Dao
 public interface AccLogDao {
 
@@ -47,6 +49,7 @@ public interface AccLogDao {
      * AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
      * List<AccLogEntity> accLogEntities = db.accLogDao().processDataChunk(10);
      */
+    @Synchronized
     @Transaction()
     default List<AccLogEntity> processDataChunk(int data_chunk_size) {
         List<AccLogEntity> data = getDataChunk(data_chunk_size);
@@ -54,9 +57,11 @@ public interface AccLogDao {
         return data;
     }
 
+    @Synchronized
     @Query("SELECT * FROM accelerometer_log ORDER BY TS ASC limit :chunk_size")
     List<AccLogEntity> getDataChunk(int chunk_size);
 
+    @Synchronized
     @Query("DELETE FROM accelerometer_log WHERE id <=(SELECT id FROM accelerometer_log LIMIT 1 OFFSET :chunk_size-1)")
     void deleteChunk(int chunk_size);
     //endregion

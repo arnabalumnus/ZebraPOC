@@ -26,9 +26,11 @@ object ExportFiles {
      * Should be run in a background thread always
      * @param context Context Needed to access DB & External Storage
      */
+    @Synchronized
     fun prepareDataChunk(context: Context) {
         val runnable = Runnable {
             val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
+
             while (db.accLogDao().count > Constant.DATA_CHUNK_SIZE) {
                 val chunkFileName = generateChunkFileName(context)
 

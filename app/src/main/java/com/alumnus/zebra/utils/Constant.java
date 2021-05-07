@@ -15,6 +15,12 @@ public class Constant {
     public static final String SP = "ZebraSp";
     public static final String isAutoStartPermissionGranted = "isAutoStartPermissionGranted";
 
-    public static final int DATA_CHUNK_SIZE = 100000;
+    /**
+     * @DATA_CHUNK_SIZE of 150000 approximately makes
+     * 5MB size of .csv file
+     * &
+     * 50 mints of data @50Hz(50 records/sec)
+     */
+    public static final int DATA_CHUNK_SIZE = 150000;
     public static final int RETAIN_NUMBER_OF_CSV_FILE = 10;
 }
