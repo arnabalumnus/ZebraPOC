@@ -58,6 +58,7 @@ Based on power connect event device starts exporting `accelerometer_log` table d
 
 
 ## Device File Explorer
+#### Android 8.0(Oreo) to Android 10(Q), API 26-29
 ```
 parent/root
 ├── data
@@ -82,4 +83,43 @@ parent/root
        └── ZebraApp
                ├── csvData
                └── logs
+```
+#### Android 11(R), API 30
+```
+parent/root
+├── data
+|     ├── ...
+|     └── data
+|           └── com.alumnus.zebra
+|                   ├── cache
+|                   ├── code_cache
+|                   ├── database
+|                   |       └── database-name
+|                   └── shared_prefs
+|                           ├── Zebra.xml
+|                           └── ZebraSp.xml
+├── ...
+|
+└── sdCard
+       ├── Alerms
+       ├── Android
+       |    ├── data 
+       |    |     ├── ...
+       |    |     └── com.alumnus.Zebra
+       |    |               └── files
+       |    |                     └── ZebraApp
+       |    |                           ├── csvData
+       |    |                           └── logs
+       |    |
+       |    ├── media
+       |    └── obb
+       |
+       ├── DCIM
+       ├── Documents
+       ├── Download
+       ├── Movies
+       ├── Music
+       ├── Notifications
+       ├── Pictures
+       └── Ringtones
 ```
