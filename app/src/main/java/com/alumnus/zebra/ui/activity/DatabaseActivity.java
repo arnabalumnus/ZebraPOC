@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -48,6 +49,7 @@ public class DatabaseActivity extends AppCompatActivity {
 
     public void getLastTimeStamp(View v) {
         new FetchTimeStampDBTask().execute();
+        new CsvFileDBTask().execute();
     }
 
     class DBTask extends AsyncTask<Void, Void, Long> {
@@ -57,13 +59,6 @@ public class DatabaseActivity extends AppCompatActivity {
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
 
             long accCount = db.accLogDao().getCount();
-
-            /*List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
-            int stride = listOfCsv.size() / 3;
-            for (int row = 0; row < listOfCsv.size() / 3; row++) {
-                System.out.println(String.format("%20s %20s %12s", listOfCsv.get(row),
-                        listOfCsv.get(row + stride), listOfCsv.get(row + stride * 2)));
-            }*/
             return accCount;
         }
 
@@ -89,6 +84,30 @@ public class DatabaseActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             tv_db_record_count_event_table.setText(s);
+        }
+    }
+
+    class CsvFileDBTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("| FileName                                  |  rows |\n");
+            stringBuilder.append("|-----------------------------------------------|---------|\n");
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+            List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
+            for (int row = 0; row < listOfCsv.size() / 3; row++) {
+                stringBuilder.append(String.format("| %20s | %5s |\n", listOfCsv.get(row).file_name, listOfCsv.get(row).count));
+                //System.out.println(String.format("%12s | %20s | %12s", listOfCsv.get(row).id, listOfCsv.get(row).file_name, listOfCsv.get(row).count));
+            }
+            System.out.println(stringBuilder.toString());
+            return stringBuilder.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(DatabaseActivity.this, s, Toast.LENGTH_LONG).show();
         }
     }
 }
