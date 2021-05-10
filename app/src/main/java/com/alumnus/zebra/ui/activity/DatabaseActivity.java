@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -11,6 +12,7 @@ import androidx.room.Room;
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
+import com.alumnus.zebra.utils.Constant;
 import com.alumnus.zebra.utils.DateFormatter;
 
 import java.util.List;
@@ -47,6 +49,7 @@ public class DatabaseActivity extends AppCompatActivity {
 
     public void getCsvListTable(View view) {
         new CsvFileDBTask().execute();
+        Toast.makeText(this, "Chunk size: " + Constant.DATA_CHUNK_SIZE + "\nRetain files count: " + Constant.RETAIN_NUMBER_OF_CSV_FILE, Toast.LENGTH_SHORT).show();
     }
 
     class DBTask extends AsyncTask<Void, Void, Long> {

@@ -21,6 +21,6 @@ public class Constant {
      * &
      * 43 mints of data @50Hz(50 records/sec)
      */
-    public static final int DATA_CHUNK_SIZE = 130000;
-    public static final int RETAIN_NUMBER_OF_CSV_FILE = 10;
+    public static final int DATA_CHUNK_SIZE = 20000;
+    public static final int RETAIN_NUMBER_OF_CSV_FILE = 100;
 }
