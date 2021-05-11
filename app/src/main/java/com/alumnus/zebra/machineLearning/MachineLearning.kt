@@ -56,22 +56,26 @@ const val EVENT_GAP_MIN = 30
 //var prefallData
 
 class MachineLearning {
-    private val TAG = "MachineLearning"
+    private val TAG = "DataAnalysis"
 
-    /**
-     *  3. Initialize algorithm parameters
-     *  3.1. TSV
-     *  3.2. DTSV
-     *
-     *  @param xyzList
-     *  @return
-     */
     private lateinit var mFileName: String
     private lateinit var context: Context
     private lateinit var xyzList: ArrayList<AccelerationNumericData>
     private lateinit var TSV: ArrayList<Double>
 
-    // fun name suggested startEventAnalysis()
+    // fun name suggested startEventAnalysis() Total Sum Vector
+    /**
+     * Starts the long process of event analysis.
+     * 1. Calculate TSV (Total Sum Vector)
+     * 2. Calculate DTSV (Deference between constitutive two TSV value)
+     * 3. And call finalizeDetection() // TODO change method name
+     *
+     * @param xyzList       List of xyz axis value of accelerometer
+     * @param context       Context contains android background information. Needed to create file.
+     * @param fileName      File will generate with provided filename
+     * @return finalizeDetection()
+     */
+    // TODO change method name
     fun CalculateTSV(xyzList: ArrayList<AccelerationNumericData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
         val TS = ArrayList<Long>()
         val TSV = ArrayList<Double>()
@@ -95,15 +99,16 @@ class MachineLearning {
         //return detectEvents(TS, TSV, dTSV)
     }
 
+
     /**
+     * Detect Events and Noise on provided data set and Returns combine object of Event & Noise
      *
-     * @param ts
-     * @param tsvDataset
-     * @param dtsvDataset
-     *
-     * @return
+     * @param ts            List of Timestamp
+     * @param tsvDataSet    List of TSV data set
+     * @param dtsvDataSet   List of DTSV data set
+     * @return Event & Noise object
      */
-    fun detectEvents(ts: ArrayList<Long>, tsvDataset: ArrayList<Double>, dtsvDataset: ArrayList<Double>): DetectPlusNoise {
+    private fun detectEvents(ts: ArrayList<Long>, tsvDataSet: ArrayList<Double>, dtsvDataSet: ArrayList<Double>): DetectPlusNoise {
         val noiseZones: ArrayList<NoiseZone> = ArrayList()
         val detectedEvents = arrayListOf<DetectedEvent>()
         val numberOfSamples = ts.size
@@ -119,7 +124,7 @@ class MachineLearning {
         var maxDtsv: Double
         var areaUnderCurve: Double
         for (i in 0..numberOfSamples - 1) {
-            val currentTsv = tsvDataset[i]
+            val currentTsv = tsvDataSet[i]
             // Update max / min TSV values if required
             if (maxTsv >= 0) {
                 if (maxTsv < currentTsv) {
@@ -137,7 +142,7 @@ class MachineLearning {
                 }
                 // Finalize stuff if this marks the end of a freefall event
                 if (freefallStart > 0) {
-                    spinDetected = detectSpin(tsvDataset, freefallStart, i)
+                    spinDetected = detectSpin(tsvDataSet, freefallStart, i)
                     detectedEvents.add(DetectedEvent(EVENT_FREEFALL, freefallStart, i, minTsv, spinDetected))
                     freefallStart = -1
                     minTsv = -1.0
@@ -157,8 +162,8 @@ class MachineLearning {
                     // Look at DTSV to determine type
                     var maxDtsv = -1.0
                     for (j in impactStart..i) {
-                        if (maxDtsv < dtsvDataset[j]) {
-                            maxDtsv = dtsvDataset[j]
+                        if (maxDtsv < dtsvDataSet[j]) {
+                            maxDtsv = dtsvDataSet[j]
                         }
                     }
                     if (maxDtsv >= DTSV_IMPACT_HIGH) {
@@ -167,7 +172,7 @@ class MachineLearning {
                     } else {
                         // Otherwise, it might be force impartion or impact
                         //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
-                        areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 1)
+                        areaUnderCurve = SimpsonsRule.integrate(tsvDataSet, impactStart, i, 1)
                         appendLog(context, mFileName, "Area under curve:" + areaUnderCurve)
                         print("Area under curve:" + areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
@@ -224,8 +229,8 @@ class MachineLearning {
                     // Look at DTSV to determine type
                     maxDtsv = -1.0
                     for (j in impactStart..i) {
-                        if (maxDtsv < dtsvDataset[j]) {
-                            maxDtsv = dtsvDataset[j]
+                        if (maxDtsv < dtsvDataSet[j]) {
+                            maxDtsv = dtsvDataSet[j]
                         }
                     }
                     if (maxDtsv >= DTSV_IMPACT_HIGH) {
@@ -233,7 +238,7 @@ class MachineLearning {
                         impactType = TYPE_IMPACT_HARD
                     } else {
                         //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
-                        areaUnderCurve = SimpsonsRule.integrate(tsvDataset, impactStart, i, 1)
+                        areaUnderCurve = SimpsonsRule.integrate(tsvDataSet, impactStart, i, 1)
 
                         appendLog(context, mFileName, "Area under curve: " + areaUnderCurve)
                         print("Area under curve: " + areaUnderCurve)
@@ -266,7 +271,7 @@ class MachineLearning {
                 }
                 // Finalize stuff if this marks the end of a freefall event
                 if (freefallStart > 0) {
-                    spinDetected = detectSpin(tsvDataset, freefallStart, i)
+                    spinDetected = detectSpin(tsvDataSet, freefallStart, i)
                     detectedEvents.add(DetectedEvent(EVENT_FREEFALL, freefallStart, i, minTsv, spinDetected))
                     freefallStart = -1
                     minTsv = -1.0
@@ -280,18 +285,19 @@ class MachineLearning {
         return DetectPlusNoise(detectedEvents, noiseZones)
     }
 
+
     /**
-     * Input:
-     *  (1: list) TSV dataset
-     *  (2: int) Freefall start index
-     *  (3: int) Freefall end index
-     * Output:
-     *  (1: Bool) True if spin detected, False otherwise
+     *  Detect whether device spinning at the point of impact event
+     *
+     *  @param tsvDataSet   List of TSV data set
+     *  @param start        Free fall start index
+     *  @param end          Free fall end index
+     *  @return             True if spin detected, False otherwise
      */
-    fun detectSpin(tsvDataset: ArrayList<Double>, start: Int, end: Int): Boolean {
+    private fun detectSpin(tsvDataSet: ArrayList<Double>, start: Int, end: Int): Boolean {
         var detected = false
         for (i in start..end) {
-            if (tsvDataset[i] >= TSV_FREEFALL_SPIN) {
+            if (tsvDataSet[i] >= TSV_FREEFALL_SPIN) {
                 detected = true
                 break
             }
@@ -301,11 +307,16 @@ class MachineLearning {
 
 
     /**
-     * Summarize event detection process
+     * Collate all events and noise zones
+     *
+     * @param ts
+     * @param tsvDataSet
+     * @param dtsvDataSet
+     * @return
      */
-    private fun finalizeDetection(ts: ArrayList<Long>, tsvDataset: ArrayList<Double>, dtsvDataset: ArrayList<Double>): String {
+    private fun finalizeDetection(ts: ArrayList<Long>, tsvDataSet: ArrayList<Double>, dtsvDataSet: ArrayList<Double>): String {
 
-        val detectPlusNoise: DetectPlusNoise = detectEvents(ts, tsvDataset, dtsvDataset)
+        val detectPlusNoise: DetectPlusNoise = detectEvents(ts, tsvDataSet, dtsvDataSet)
         val events: ArrayList<DetectedEvent> = detectPlusNoise.detectedEvents
         val noises: ArrayList<NoiseZone> = detectPlusNoise.noiseZones
         appendLog(context, mFileName, "Detected events:")
@@ -379,9 +390,12 @@ class MachineLearning {
 
 
     /**
-     * Parse Events
+     * Parse Events and generate logs according to event data
+     *
+     * @param eventList     List of Detected events
+     * @param tsDataSet     List of Timestamp data set
      */
-    fun parseEvents(eventList: ArrayList<DetectedEvent>, tsDataset: ArrayList<Long>) {
+    private fun parseEvents(eventList: ArrayList<DetectedEvent>, tsDataSet: ArrayList<Long>) {
         var spinResult: String
         var impactType: String
         if (BuildConfig.DEBUG) {
@@ -398,8 +412,8 @@ class MachineLearning {
                 } else {
                     spinResult = "No"
                 }
-                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataset[event.count] - tsDataset[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataset[event.count] - tsDataset[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
-                print("After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataset[event.count] - tsDataset[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataset[event.count] - tsDataset[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
+                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataSet[event.count] - tsDataSet[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataSet[event.count] - tsDataSet[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
+                print("After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataSet[event.count] - tsDataSet[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataSet[event.count] - tsDataSet[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
             } else if (event.event_type == EVENT_IMPACT) {
                 if (event.impactType == TYPE_IMPACT_HARD) {
                     impactType = "Severe"
@@ -412,30 +426,40 @@ class MachineLearning {
                 } else {
                     impactType = "Negligible"
                 }
-                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
-                print("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
+                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
+                print("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
 
                 appendLog(context, mFileName, detectImpactDirection(TSV, event.eventStart, event.count - 1))
                 //print("${detectImpactDirection(TSV, event.eventStart, event.count - 1)}")
             } else {
-                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])} ms")
-                print("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataset[event.count] - tsDataset[event.eventStart])} ms")
+                appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])} ms")
+                print("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])} ms")
             }
             lastEvent = event.count - 1
         }
         return
     }
 
-    fun estimateDistance(durarion: Double): Double {
-        return Math.round((3.28 * (9.81 * (durarion / 1000) * (durarion / 1000)) / 2) * 1.225).toDouble()
+
+    /**
+     * Estimate distance of a free fall event
+     * @param duration
+     */
+    private fun estimateDistance(duration: Double): Double {
+        return Math.round((3.28 * (9.81 * (duration / 1000) * (duration / 1000)) / 2) * 1.225).toDouble()
     }
 
 
     /**
-     * TODO detectImpactDirection
-     * Required xyz
+     * Impact direction of the specified event between start and end point
+     *
+     * @param tsvDataSet    List of TSV data set calculated from x,y & z axis value
+     * @param start         Event starting point
+     * @param end           Event ending point
+     * @return              Returns Impact direction of the event to log into logfile
      */
-    fun detectImpactDirection(tsvDataset: ArrayList<Double>, start: Int, end: Int): String {
+    // TODO Required xyz as params
+    private fun detectImpactDirection(tsvDataSet: ArrayList<Double>, start: Int, end: Int): String {
         var xComponent = 0L
         var yComponent = 0L
         var zComponent = 0L
@@ -444,17 +468,17 @@ class MachineLearning {
         var maxI = -1
 
         for (i in start..end) {
-            if (tsvDataset.get(i) > maxTsv) {
-                maxTsv = tsvDataset.get(i)
+            if (tsvDataSet.get(i) > maxTsv) {
+                maxTsv = tsvDataSet.get(i)
                 maxI = i
             }
         }
 
         if (maxI >= 0) {
             // Values
-            xComponent = Math.round((xyzList.get(maxI).x * xyzList.get(maxI).x * 100) / (tsvDataset.get(maxI) * tsvDataset.get(maxI)))
-            yComponent = Math.round((xyzList.get(maxI).y * xyzList.get(maxI).y * 100) / (tsvDataset.get(maxI) * tsvDataset.get(maxI)))
-            zComponent = Math.round((xyzList.get(maxI).z * xyzList.get(maxI).z * 100) / (tsvDataset.get(maxI) * tsvDataset.get(maxI)))
+            xComponent = Math.round((xyzList.get(maxI).x * xyzList.get(maxI).x * 100) / (tsvDataSet.get(maxI) * tsvDataSet.get(maxI)))
+            yComponent = Math.round((xyzList.get(maxI).y * xyzList.get(maxI).y * 100) / (tsvDataSet.get(maxI) * tsvDataSet.get(maxI)))
+            zComponent = Math.round((xyzList.get(maxI).z * xyzList.get(maxI).z * 100) / (tsvDataSet.get(maxI) * tsvDataSet.get(maxI)))
 
             //# Signs
             if (xyzList.get(maxI).x < 0) {
