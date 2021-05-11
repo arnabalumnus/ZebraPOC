@@ -1,8 +1,10 @@
 package com.alumnus.zebra.machineLearning.utils
 
+
 /**
  * @author Arnab Kundu
  */
+@Deprecated(message = "Created to top level data filtering to avoid processing the huge dataSet. Not using as of now to avoid skipping impact data.")
 object DataAnalyzer {
 
     const val FREE_FALL = 0.0

@@ -1,5 +1,6 @@
 package com.alumnus.zebra.pojo
 
+
 /**
  * Data class for Acceleration
  * Contains acceleration Numeric values

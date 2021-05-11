@@ -13,6 +13,11 @@ import com.alumnus.zebra.utils.DateFormatter
 import com.alumnus.zebra.utils.FolderFiles
 import com.alumnus.zebra.utils.FolderFiles.createFolder
 
+
+/**
+ * Handles all file write and delete operations
+ * @author Arnab Kundu
+ */
 object ExportFiles {
 
     private const val TAG = "ExportFiles"

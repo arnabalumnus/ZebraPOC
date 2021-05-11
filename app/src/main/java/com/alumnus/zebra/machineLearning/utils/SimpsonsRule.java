@@ -2,6 +2,11 @@ package com.alumnus.zebra.machineLearning.utils;
 
 import java.util.ArrayList;
 
+
+/**
+ * Simpson's rule is one of the numerical methods which is used to evaluate the definite integral.
+ * Here it's calculating area under the curve.
+ */
 public class SimpsonsRule {
 
     /**********************************************************************
