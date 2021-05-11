@@ -25,15 +25,13 @@ object CsvFileOperator {
         /* Reads text from character-input stream, buffering characters for efficient reading */
         val reader = BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8))
         val accelerations = ArrayList<AccelerationStringData>()
-        var line = ""
 
         try {
+            var line = reader.readLine()
             // If buffer is not empty
-            while (reader.readLine().also { line = it } != null) {
-
+            while (line != null) {
                 // use comma as separator columns of CSV
                 val tokens = line.split(",").toTypedArray()
-                // Read the data
 
                 /* Acceleration String data collection */
                 val acceleration = AccelerationStringData(
@@ -42,9 +40,10 @@ object CsvFileOperator {
                         tokens[2].replace("\"", ""),
                         tokens[3].replace("\"", ""))
                 accelerations.add(acceleration)
+                line = reader.readLine()
             }
         } catch (e: IOException) {
-            Log.e(TAG, "Error on line: $line")
+            Log.e(TAG, "Error in reading line: $e")
         }
         return accelerations
     }
@@ -53,9 +52,10 @@ object CsvFileOperator {
     /**
      * Write data into a .csv file
      *
-     * @param context
-     * @param dataList
-     * @param fileName
+     * @param context Context needed for folder/file creation
+     * @param dataList ArrayList of AccelerationNumericData
+     * @param folderName Name of destination folder
+     * @param fileName Name of file to be created to write data
      */
     fun writeCsvFile(context: Context, dataList: ArrayList<AccelerationNumericData>, folderName: String, fileName: String) {
 
