@@ -15,6 +15,7 @@ import com.alumnus.zebra.R;
 import com.alumnus.zebra.pojo.AccelerationNumericData;
 import com.alumnus.zebra.pojo.AccelerationStringData;
 import com.alumnus.zebra.ui.adapter.AccelerationDataAdapter;
+import com.alumnus.zebra.utils.CsvFileOperator;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -56,12 +57,13 @@ public class CsvExplorerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Uri uri = getIntent().getData();
-        try {
-            // Convert received intent data into InputStream.
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            readCSVData(inputStream);                  // Read the whole file row by row
 
+        Uri uri = getIntent().getData();                                                // Get File data from Intent
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);        // Convert received intent data into InputStream.
+            readCSVData(inputStream);                                                   // Read the whole file row by row
+
+            //accelerations = CsvFileOperator.INSTANCE.readCsvFile(inputStream);        //TODO
             accelerationDataAdapter = new AccelerationDataAdapter(accelerations);
             rv_acceleration_data.setAdapter(accelerationDataAdapter);
 

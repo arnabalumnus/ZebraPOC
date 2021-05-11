@@ -19,7 +19,7 @@ import com.alumnus.zebra.utils.Constant;
 
 
 /**
- * Helps to Starts service with specified frequency
+ * Helps to Starts background service to record accelerometer data with specified frequency
  *
  * @author Arnab Kundu
  */

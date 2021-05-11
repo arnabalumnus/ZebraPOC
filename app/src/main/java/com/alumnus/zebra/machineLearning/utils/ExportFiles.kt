@@ -1,7 +1,6 @@
 package com.alumnus.zebra.machineLearning.utils
 
 import android.content.Context
-import android.media.MediaScannerConnection
 import android.util.Log
 import androidx.room.Room
 import com.alumnus.zebra.db.AppDatabase
@@ -9,12 +8,10 @@ import com.alumnus.zebra.db.entity.CsvFileLogEntity
 import com.alumnus.zebra.machineLearning.MachineLearning
 import com.alumnus.zebra.pojo.AccelerationNumericData
 import com.alumnus.zebra.utils.Constant
+import com.alumnus.zebra.utils.CsvFileOperator
 import com.alumnus.zebra.utils.DateFormatter
 import com.alumnus.zebra.utils.FolderFiles
-import com.alumnus.zebra.utils.FolderFiles.createFile
 import com.alumnus.zebra.utils.FolderFiles.createFolder
-import com.opencsv.CSVWriter
-import java.io.FileWriter
 
 object ExportFiles {
 
@@ -75,29 +72,17 @@ object ExportFiles {
      */
     private fun exportCSVFile(context: Context, accelerationsDataList: ArrayList<AccelerationNumericData>, fileName: String) {
 
-        //region Store exported .csv file name in DB table. For delete it.
+        // Create Database object
         val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
-        db.csvFileLogDao().insert(CsvFileLogEntity(fileName, Constant.DATA_CHUNK_SIZE.toLong()))
-        //endregion
 
+        // Store exported .csv filename into DB, To delete saved .csv file later (for storage cleanup)
+        db.csvFileLogDao().insert(CsvFileLogEntity(fileName, Constant.DATA_CHUNK_SIZE.toLong()))
+
+        // Create folder
         createFolder(context, "csvData")
 
-        val file = createFile(context, "csvData", fileName, "csv")
-
-        try {
-            val csvWrite = CSVWriter(FileWriter(file))
-            csvWrite.writeNext(arrayOf("TS", "X", "Y", "Z"))
-            for (data in accelerationsDataList) {
-                val arrStr = arrayOf(data.ts.toString(), data.x.toString(), data.y.toString(), data.z.toString())
-                csvWrite.writeNext(arrStr)
-            }
-            csvWrite.close()
-            MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null) { path, uri ->
-
-            }
-        } catch (sqlEx: Exception) {
-            Log.e(TAG, sqlEx.message, sqlEx)
-        }
+        // Create CSV file and write arrayList data into file
+        CsvFileOperator.writeCsvFile(context, accelerationsDataList, "csvData", fileName)
     }
 
 

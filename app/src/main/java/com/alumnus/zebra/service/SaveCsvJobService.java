@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * https://codinginflow.com/tutorials/android/jobscheduler
  */
-
+@Deprecated
 public class SaveCsvJobService extends JobService {
     private static final String TAG = "SaveCsvJobService";
     private boolean jobCancelled = false;
