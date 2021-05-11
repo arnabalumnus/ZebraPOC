@@ -26,6 +26,14 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import static com.alumnus.zebra.utils.Constant.G_CALIBRATION_FACTOR;
 import static com.alumnus.zebra.utils.Constant.THROW_CALIBRATION_FACTOR;
 
+
+/**
+ * Contains Graph x2
+ * 1st graph contains current x,y & z axis values of device accelerometer
+ * 2nd graph contains calculated TSV value from x,y & z axis value
+ *
+ * @author Arnab Kundu
+ */
 public class AccelerometerActivity extends AppCompatActivity implements SensorEventListener, OnChartValueSelectedListener {
 
     private final String TAG = this.getClass().getSimpleName();

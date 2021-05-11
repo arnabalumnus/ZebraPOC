@@ -13,10 +13,8 @@ import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.AccLogEntity;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
 import com.alumnus.zebra.machineLearning.MachineLearning;
-import com.alumnus.zebra.machineLearning.utils.Calculator;
-import com.alumnus.zebra.machineLearning.utils.DataAnalyzer;
-import com.alumnus.zebra.pojo.Acceleration;
-import com.alumnus.zebra.pojo.AccelerationData;
+import com.alumnus.zebra.pojo.AccelerationStringData;
+import com.alumnus.zebra.pojo.AccelerationNumericData;
 import com.opencsv.CSVWriter;
 
 import java.io.BufferedReader;
@@ -119,8 +117,8 @@ public class ExportFile {
 
         // Reads text from character-input stream, buffering characters for efficient reading
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-        ArrayList<Acceleration> accelerations = new ArrayList<>();
-        ArrayList<AccelerationData> accelerationsDataList = new ArrayList<>();
+        ArrayList<AccelerationStringData> accelerations = new ArrayList<>();
+        ArrayList<AccelerationNumericData> accelerationsDataList = new ArrayList<>();
         // Initialization
         String line = "";
 
@@ -130,7 +128,7 @@ public class ExportFile {
             String header = reader.readLine();
             String[] headertokens = header.split(",");
             // Read the data
-            Acceleration acceleration1 = new Acceleration(headertokens[0].replace("\"", ""),
+            AccelerationStringData acceleration1 = new AccelerationStringData(headertokens[0].replace("\"", ""),
                     headertokens[1].replace("\"", ""),
                     headertokens[2].replace("\"", ""),
                     headertokens[3].replace("\"", ""));
@@ -141,12 +139,12 @@ public class ExportFile {
                 // use comma as separator columns of CSV
                 String[] tokens = line.split(",");
                 // Read the data
-                Acceleration acceleration = new Acceleration(tokens[0].replace("\"", ""),
+                AccelerationStringData acceleration = new AccelerationStringData(tokens[0].replace("\"", ""),
                         tokens[1].replace("\"", ""),
                         tokens[2].replace("\"", ""),
                         tokens[3].replace("\"", ""));
                 accelerations.add(acceleration);
-                AccelerationData accelerationData = new AccelerationData(Long.parseLong(tokens[0].replace("\"", "")),
+                AccelerationNumericData accelerationData = new AccelerationNumericData(Long.parseLong(tokens[0].replace("\"", "")),
                         Float.parseFloat(tokens[1].replace("\"", "")),
                         Float.parseFloat(tokens[2].replace("\"", "")),
                         Float.parseFloat(tokens[3].replace("\"", "")));

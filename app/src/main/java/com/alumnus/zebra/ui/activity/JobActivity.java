@@ -13,6 +13,13 @@ import com.alumnus.zebra.R;
 import com.alumnus.zebra.service.SaveCsvJobService;
 import com.alumnus.zebra.utils.TimeSpan;
 
+
+/**
+ * Starts a JobService using JobScheduler ("Not using currently")
+ *
+ * @author Arnab Kundu
+ */
+@Deprecated
 public class JobActivity extends AppCompatActivity {
 
     private static final String TAG = "JobActivity";

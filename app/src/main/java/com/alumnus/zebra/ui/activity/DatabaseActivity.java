@@ -17,6 +17,14 @@ import com.alumnus.zebra.utils.DateFormatter;
 
 import java.util.List;
 
+
+/**
+ * Contains info about available data in Database accLog table
+ * &
+ * Exported .csv files available in storage @ZebraApp folder
+ *
+ * @author Arnab Kundu
+ */
 public class DatabaseActivity extends AppCompatActivity {
 
     private static final String TAG = "DatabaseActivity";

@@ -17,6 +17,12 @@ import com.alumnus.zebra.R;
 import com.alumnus.zebra.service.LifeTimeService;
 import com.alumnus.zebra.utils.Constant;
 
+
+/**
+ * Helps to Starts service with specified frequency
+ *
+ * @author Arnab Kundu
+ */
 public class ServiceActivity extends AppCompatActivity {
 
     private static final String TAG = "ServiceActivity";

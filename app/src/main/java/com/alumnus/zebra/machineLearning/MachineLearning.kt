@@ -8,7 +8,7 @@ import com.alumnus.zebra.machineLearning.pojo.DetectedEvent
 import com.alumnus.zebra.machineLearning.pojo.NoiseZone
 import com.alumnus.zebra.machineLearning.utils.LogFileGenerator.appendLog
 import com.alumnus.zebra.machineLearning.utils.SimpsonsRule
-import com.alumnus.zebra.pojo.AccelerationData
+import com.alumnus.zebra.pojo.AccelerationNumericData
 import com.alumnus.zebra.utils.DateFormatter
 
 
@@ -68,11 +68,11 @@ class MachineLearning {
      */
     private lateinit var mFileName: String
     private lateinit var context: Context
-    private lateinit var xyzList: ArrayList<AccelerationData>
+    private lateinit var xyzList: ArrayList<AccelerationNumericData>
     private lateinit var TSV: ArrayList<Double>
 
     // fun name suggested startEventAnalysis()
-    fun CalculateTSV(xyzList: ArrayList<AccelerationData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
+    fun CalculateTSV(xyzList: ArrayList<AccelerationNumericData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
         val TS = ArrayList<Long>()
         val TSV = ArrayList<Double>()
         val dTSV = ArrayList<Double>()

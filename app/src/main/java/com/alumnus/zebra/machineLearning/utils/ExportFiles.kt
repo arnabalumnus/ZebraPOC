@@ -7,7 +7,7 @@ import androidx.room.Room
 import com.alumnus.zebra.db.AppDatabase
 import com.alumnus.zebra.db.entity.CsvFileLogEntity
 import com.alumnus.zebra.machineLearning.MachineLearning
-import com.alumnus.zebra.pojo.AccelerationData
+import com.alumnus.zebra.pojo.AccelerationNumericData
 import com.alumnus.zebra.utils.Constant
 import com.alumnus.zebra.utils.DateFormatter
 import com.alumnus.zebra.utils.FolderFiles
@@ -49,9 +49,9 @@ object ExportFiles {
                     return@Runnable
                 }
 
-                val accelerationsDataList: ArrayList<AccelerationData> = ArrayList()
+                val accelerationsDataList: ArrayList<AccelerationNumericData> = ArrayList()
                 for (accLogEntity in accLogEntities) {
-                    accelerationsDataList.add(AccelerationData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
+                    accelerationsDataList.add(AccelerationNumericData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
                 }
                 exportCSVFile(context, accelerationsDataList, chunkFileName)
                 deleteOldCSVFile(context);
@@ -73,7 +73,7 @@ object ExportFiles {
      * @param accelerationsDataList Data
      * @param fileName CSV fileName
      */
-    private fun exportCSVFile(context: Context, accelerationsDataList: ArrayList<AccelerationData>, fileName: String) {
+    private fun exportCSVFile(context: Context, accelerationsDataList: ArrayList<AccelerationNumericData>, fileName: String) {
 
         //region Store exported .csv file name in DB table. For delete it.
         val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
@@ -128,7 +128,7 @@ object ExportFiles {
      * @param accelerationsDataList Data
      * @param fileName CSV fileName
      */
-    private fun exportLogFile(context: Context, accelerationsDataList: ArrayList<AccelerationData>, fileName: String) {
+    private fun exportLogFile(context: Context, accelerationsDataList: ArrayList<AccelerationNumericData>, fileName: String) {
         MachineLearning().CalculateTSV(accelerationsDataList, context, fileName)
     }
 

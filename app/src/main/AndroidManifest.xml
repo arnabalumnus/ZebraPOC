@@ -55,6 +55,7 @@
                 <action android:name="android.intent.action.BATTERY_OKAY" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".broadcastReceiver.BootReceiver"
             android:enabled="true"
@@ -66,18 +67,18 @@
                 <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
-        <!--
-    <receiver android:name=".broadcastReceiver.ServiceStopReceiver">
-            <intent-filter>
-                <action android:name="com.alumnus.zebra.service.LifeTimeService.stopped" />
-            </intent-filter>
-        </receiver>
-        -->
+
         <service
             android:name=".service.LifeTimeService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
             android:process=":dataCollect" />
+
+        <!--<receiver android:name=".broadcastReceiver.ServiceStopReceiver">
+            <intent-filter>
+                <action android:name="com.alumnus.zebra.service.LifeTimeService.stopped" />
+            </intent-filter>
+        </receiver>-->
     </application>
 
 </manifest>
