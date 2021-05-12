@@ -1,92 +1,94 @@
 package com.alumnus.zebra.machineLearning
 
 import android.content.Context
-import android.util.Log
 import com.alumnus.zebra.BuildConfig
 import com.alumnus.zebra.machineLearning.pojo.DetectPlusNoise
 import com.alumnus.zebra.machineLearning.pojo.DetectedEvent
 import com.alumnus.zebra.machineLearning.pojo.NoiseZone
+import com.alumnus.zebra.machineLearning.utils.Calculator
 import com.alumnus.zebra.machineLearning.utils.LogFileGenerator.appendLog
 import com.alumnus.zebra.machineLearning.utils.SimpsonsRule
 import com.alumnus.zebra.pojo.AccelerationNumericData
 import com.alumnus.zebra.utils.DateFormatter
 
 
-const val EVENT_IMPACT = 1
-const val EVENT_FREEFALL = 2
+//var prefallData TODO convert from python code
 
-const val TYPE_UNKNOWN = 0
-const val TYPE_FREEFALL_SIGNIFICANT = 1
-const val TYPE_FREEFALL_INSIGNIFICANT = 2
-const val TYPE_IMPACT_NEGLIGIBLE = 1
-const val TYPE_IMPACT_SOFT = 2
-const val TYPE_IMPACT_MEDIUM = 3
-const val TYPE_IMPACT_HARD = 4
-const val TYPE_IMPACT_FORCE = 5
+/**
+ * This class does whole data analysis part on top of accelerometer data
+ * and Generate logs for respective data.
+ *
+ * @author Converted code from pre-existing Python script
+ */
+class DataAnalysis {
 
-const val TSV_IMPACT = 24.5
-const val TSV_FREEFALL = 5.8
-const val TSV_CALMZONE_HIGH = 11
-const val TSV_CALMZONE_MEDIUM = 10
-const val TSV_CALMZONE_LOW = 8
-const val TSV_FREEFALL_SPIN = 4
+    //region Constants
+    val EVENT_IMPACT = 1
+    val EVENT_FREEFALL = 2
+    val TYPE_UNKNOWN = 0
+    val TYPE_FREEFALL_SIGNIFICANT = 1
+    val TYPE_FREEFALL_INSIGNIFICANT = 2
+    val TYPE_IMPACT_NEGLIGIBLE = 1
+    val TYPE_IMPACT_SOFT = 2
+    val TYPE_IMPACT_MEDIUM = 3
+    val TYPE_IMPACT_HARD = 4
+    val TYPE_IMPACT_FORCE = 5
+    val TSV_IMPACT = 24.5
+    val TSV_FREEFALL = 5.8
+    val TSV_CALMZONE_HIGH = 11
+    val TSV_CALMZONE_MEDIUM = 10
+    val TSV_CALMZONE_LOW = 8
+    val TSV_FREEFALL_SPIN = 4
+    val DTSV_IMPACT_LOW = 10
+    val DTSV_IMPACT_MEDIUM = 14.7
+    val DTSV_IMPACT_HIGH = 20
+    val interpolateFreq = 10
+    val resampleFactor = 2
+    val ZONE_PREFALL = 1
+    val ZONE_FREEFALL = 2
+    val ZONE_IMPACT = 3
+    val ZONE_NOISE = 4
+    val ZONE_CALM = 0
+    val PREFALL_LENGTH = 200
+    val PREIMPACT_LENGTH = 100
+    val FREEFALL_SIGNIFICANT = 200
+    val CALMZONE_DURATION = 30
+    val IMPACT_LENGTH_MIN = 60
+    val FORCE_AREA_MIN = 600
+    val EVENT_GAP_MIN = 30
 
-const val DTSV_IMPACT_LOW = 10
-const val DTSV_IMPACT_MEDIUM = 14.7
-const val DTSV_IMPACT_HIGH = 20
-
-const val interpolateFreq = 10
-const val resampleFactor = 2
-
-const val ZONE_PREFALL = 1
-const val ZONE_FREEFALL = 2
-const val ZONE_IMPACT = 3
-const val ZONE_NOISE = 4
-const val ZONE_CALM = 0
-
-const val PREFALL_LENGTH = 200
-const val PREIMPACT_LENGTH = 100
-const val FREEFALL_SIGNIFICANT = 200
-const val CALMZONE_DURATION = 30
-const val IMPACT_LENGTH_MIN = 60
-const val FORCE_AREA_MIN = 600
-const val EVENT_GAP_MIN = 30
-
-
-//var prefallData
-
-class MachineLearning {
-    private val TAG = "DataAnalysis"
+    //endregion
 
     private lateinit var mFileName: String
     private lateinit var context: Context
     private lateinit var xyzList: ArrayList<AccelerationNumericData>
     private lateinit var TSV: ArrayList<Double>
 
-    // fun name suggested startEventAnalysis() Total Sum Vector
     /**
      * Starts the long process of event analysis.
      * 1. Calculate TSV (Total Sum Vector)
+     * @see Calculator.calculateTSV
      * 2. Calculate DTSV (Deference between constitutive two TSV value)
-     * 3. And call finalizeDetection() // TODO change method name
+     * @see Calculator.calculateDTSV
+     * 3. Performs data analysis with TSV and dTSV data sets for event detection
+     * @see finalizeDetection
      *
      * @param xyzList       List of xyz axis value of accelerometer
      * @param context       Context contains android background information. Needed to create file.
      * @param fileName      File will generate with provided filename
-     * @return finalizeDetection()
+     * @return              finalizeDetection()
      */
-    // TODO change method name
-    fun CalculateTSV(xyzList: ArrayList<AccelerationNumericData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
-        val TS = ArrayList<Long>()
-        val TSV = ArrayList<Double>()
-        val dTSV = ArrayList<Double>()
+    fun startEventAnalysis(xyzList: ArrayList<AccelerationNumericData>, context: Context, fileName: String? = DateFormatter.getTimeStampFileName(System.currentTimeMillis())): String {
+        val tsList = ArrayList<Long>()
+        val tsvList = ArrayList<Double>()
+        val dtsvList = ArrayList<Double>()
         for (xyz in xyzList) {
-            TS.add(xyz.ts)
-            TSV.add(Math.sqrt((xyz.x.toDouble() * xyz.x) + (xyz.y * xyz.y) + (xyz.z * xyz.z)))
+            tsList.add(xyz.ts)
+            tsvList.add(Calculator.calculateTSV(x = xyz.x.toDouble(), y = xyz.y.toDouble(), z = xyz.z.toDouble()))
         }
-        dTSV.add(0.0)
-        for (i in 1..TSV.size - 1) {
-            dTSV.add(TSV[i] - TSV[i - 1])
+        dtsvList.add(0.0)
+        for (i in 1 until tsvList.size) {
+            dtsvList.add(Calculator.calculateDTSV(tsv = tsvList[i], tsv1 = tsvList[i - 1]))
         }
         this.context = context
         if (fileName == null)
@@ -94,9 +96,8 @@ class MachineLearning {
         else
             mFileName = fileName
         this.xyzList = xyzList
-        this.TSV = TSV
-        return finalizeDetection(TS, TSV, dTSV)
-        //return detectEvents(TS, TSV, dTSV)
+        this.TSV = tsvList
+        return finalizeDetection(tsList, tsvList, dtsvList)
     }
 
 
@@ -174,7 +175,7 @@ class MachineLearning {
                         //areaUnderCurve = simps(tsvDataset[impactStart:i], dx = timeDiffInMs)
                         areaUnderCurve = SimpsonsRule.integrate(tsvDataSet, impactStart, i, 1)
                         appendLog(context, mFileName, "Area under curve:" + areaUnderCurve)
-                        print("Area under curve:" + areaUnderCurve)
+                        println("Area under curve:" + areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
                             // Not actually an impact, just external application of force
                             impactType = TYPE_IMPACT_FORCE
@@ -241,7 +242,7 @@ class MachineLearning {
                         areaUnderCurve = SimpsonsRule.integrate(tsvDataSet, impactStart, i, 1)
 
                         appendLog(context, mFileName, "Area under curve: " + areaUnderCurve)
-                        print("Area under curve: " + areaUnderCurve)
+                        println("Area under curve: " + areaUnderCurve)
                         if (areaUnderCurve >= FORCE_AREA_MIN) {
                             // Not actually an impact, just external application of force
                             impactType = TYPE_IMPACT_FORCE
@@ -278,9 +279,8 @@ class MachineLearning {
                 }
             }
         }
-        Log.d(TAG, "Completed")
         for (i in 0..detectedEvents.size - 1) {
-            Log.e(TAG, "" + detectedEvents[i].toString())
+            println(detectedEvents[i].toString())
         }
         return DetectPlusNoise(detectedEvents, noiseZones)
     }
@@ -309,10 +309,14 @@ class MachineLearning {
     /**
      * Collate all events and noise zones
      *
-     * @param ts
-     * @param tsvDataSet
-     * @param dtsvDataSet
-     * @return
+     * @param ts            List of Timestamp
+     * @param tsvDataSet    List of TSV data set
+     * @param dtsvDataSet   List of dTSV data set
+     *
+     * @return              A string message that contains
+     *                      1. Significant free fall events:
+     *                      2. Significant impact events:
+     *                      3. Force impartions: "
      */
     private fun finalizeDetection(ts: ArrayList<Long>, tsvDataSet: ArrayList<Double>, dtsvDataSet: ArrayList<Double>): String {
 
@@ -320,14 +324,14 @@ class MachineLearning {
         val events: ArrayList<DetectedEvent> = detectPlusNoise.detectedEvents
         val noises: ArrayList<NoiseZone> = detectPlusNoise.noiseZones
         appendLog(context, mFileName, "Detected events:")
-        print("Detected events:")
+        println("Detected events:")
         parseEvents(detectPlusNoise.detectedEvents, ts)
 
         appendLog(context, mFileName, "Noise zones:")
-        print("Noise zones:")
+        println("Noise zones:")
         for (noiseZone in noises) {
             appendLog(context, mFileName, noiseZone.toString())
-            print(noiseZone)
+            println(noiseZone)
         }
 
         //else:
@@ -379,11 +383,11 @@ class MachineLearning {
             }
         }
         appendLog(context, mFileName, "Significant freefall events: $numberOfSignificantFalls")
-        print("Significant freefall events: $numberOfSignificantFalls")
+        println("Significant freefall events: $numberOfSignificantFalls")
         appendLog(context, mFileName, "Significant impact events: $numberOfSignificantImpacts")
-        print("Significant impact events: $numberOfSignificantImpacts")
+        println("Significant impact events: $numberOfSignificantImpacts")
         appendLog(context, mFileName, "Force impartions: $numberOfForces")
-        print("Force impartions: $numberOfForces")
+        println("Force impartions: $numberOfForces")
 
         return "Significant freefall events: $numberOfSignificantFalls , Significant impact events: $numberOfSignificantImpacts ,Force impartions: $numberOfForces"
     }
@@ -401,7 +405,7 @@ class MachineLearning {
         if (BuildConfig.DEBUG) {
             for (event in eventList) {
                 appendLog(context, mFileName, event.toString())
-                print(event)
+                println(event)
             }
         }
         var lastEvent = 0
@@ -413,7 +417,7 @@ class MachineLearning {
                     spinResult = "No"
                 }
                 appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataSet[event.count] - tsDataSet[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataSet[event.count] - tsDataSet[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
-                print("After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataSet[event.count] - tsDataSet[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataSet[event.count] - tsDataSet[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
+                println("After ${(event.eventStart - lastEvent)} ms: Freefall of duration ${(tsDataSet[event.count] - tsDataSet[event.event_type])} ms, minimum TSV: ${(event.minTsv)} m/s2, estimated fall: ${estimateDistance((tsDataSet[event.count] - tsDataSet[event.eventStart]).toDouble())} feet, spin detected: $spinResult")
             } else if (event.event_type == EVENT_IMPACT) {
                 if (event.impactType == TYPE_IMPACT_HARD) {
                     impactType = "Severe"
@@ -427,13 +431,13 @@ class MachineLearning {
                     impactType = "Negligible"
                 }
                 appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
-                print("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
+                println("After ${(event.eventStart - lastEvent)} ms: Impact of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])}, ms maximum TSV: ${(event.maxTsv)} m/s2, maximum DTSV: ${event.dTsv}, type: $impactType")
 
                 appendLog(context, mFileName, detectImpactDirection(TSV, event.eventStart, event.count - 1))
-                //print("${detectImpactDirection(TSV, event.eventStart, event.count - 1)}")
+                //println("${detectImpactDirection(TSV, event.eventStart, event.count - 1)}")
             } else {
                 appendLog(context, mFileName, "After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])} ms")
-                print("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])} ms")
+                println("After ${(event.eventStart - lastEvent)} ms: Unknown event of duration ${(tsDataSet[event.count] - tsDataSet[event.eventStart])} ms")
             }
             lastEvent = event.count - 1
         }

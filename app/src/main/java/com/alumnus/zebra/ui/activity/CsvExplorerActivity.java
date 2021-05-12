@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alumnus.zebra.BuildConfig;
 import com.alumnus.zebra.R;
-import com.alumnus.zebra.machineLearning.MachineLearning;
+import com.alumnus.zebra.machineLearning.DataAnalysis;
 import com.alumnus.zebra.pojo.AccelerationNumericData;
 import com.alumnus.zebra.pojo.AccelerationStringData;
 import com.alumnus.zebra.ui.adapter.AccelerationDataAdapter;
@@ -91,7 +91,7 @@ public class CsvExplorerActivity extends AppCompatActivity {
             accNumericData.setZ(Float.parseFloat(accStringData.z));
             accNumericDataList.add(accNumericData);
         }
-        String result = new MachineLearning().CalculateTSV(accNumericDataList, this, null);
+        String result = new DataAnalysis().startEventAnalysis(accNumericDataList, this, null);
         Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
     }
 }

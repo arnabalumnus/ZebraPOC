@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.room.Room
 import com.alumnus.zebra.db.AppDatabase
 import com.alumnus.zebra.db.entity.CsvFileLogEntity
-import com.alumnus.zebra.machineLearning.MachineLearning
+import com.alumnus.zebra.machineLearning.DataAnalysis
 import com.alumnus.zebra.pojo.AccelerationNumericData
 import com.alumnus.zebra.utils.Constant
 import com.alumnus.zebra.utils.CsvFileOperator
@@ -119,7 +119,7 @@ object ExportFiles {
      * @param fileName CSV fileName
      */
     private fun exportLogFile(context: Context, accelerationsDataList: ArrayList<AccelerationNumericData>, fileName: String) {
-        MachineLearning().CalculateTSV(accelerationsDataList, context, fileName)
+        DataAnalysis().startEventAnalysis(accelerationsDataList, context, fileName)
     }
 
 

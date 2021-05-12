@@ -22,7 +22,7 @@ object Calculator {
 
 
     /**
-     * Calculates dTSV from TSV
+     * Calculates dTSV from two consecutive TSV value
      * @param tsv   A TSV value
      * @param tsv1  Next consecutive TSV value with respect to TimeStamp
      * @return dTSV stand for delta TSV

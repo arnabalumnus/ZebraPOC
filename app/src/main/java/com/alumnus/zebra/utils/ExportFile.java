@@ -12,7 +12,7 @@ import androidx.room.Room;
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.AccLogEntity;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
-import com.alumnus.zebra.machineLearning.MachineLearning;
+import com.alumnus.zebra.machineLearning.DataAnalysis;
 import com.alumnus.zebra.pojo.AccelerationStringData;
 import com.alumnus.zebra.pojo.AccelerationNumericData;
 import com.opencsv.CSVWriter;
@@ -150,7 +150,7 @@ public class ExportFile {
                         Float.parseFloat(tokens[3].replace("\"", "")));
                 accelerationsDataList.add(accelerationData);
             }
-            String result = new MachineLearning().CalculateTSV(accelerationsDataList, context,null);
+            String result = new DataAnalysis().startEventAnalysis(accelerationsDataList, context,null);
             //New approach
             /*ArrayList<Double> tsvList = new ArrayList<>();
             for (AccelerationData accelerationsData : accelerationsDataList) {
