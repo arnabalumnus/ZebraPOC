@@ -32,4 +32,15 @@ object Calculator {
     }
 
 
+    /**
+     * Estimate distance of a free fall event
+     * s = ut + ½gt²
+     * 1 meter = 3.28 ft
+     * TODO ?? unknown fraction 1.225
+     * @param duration      Free fall time in millisecond
+     * @return              Distance(in ft) covered in the that duration of free fall
+     */
+    fun estimateDistance(duration: Double): Double {
+        return Math.round((3.28 * (9.81 * (duration / 1000) * (duration / 1000)) / 2) * 1.225).toDouble()
+    }
 }

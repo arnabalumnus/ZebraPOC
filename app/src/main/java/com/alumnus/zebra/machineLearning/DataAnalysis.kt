@@ -6,6 +6,7 @@ import com.alumnus.zebra.machineLearning.pojo.DetectPlusNoise
 import com.alumnus.zebra.machineLearning.pojo.DetectedEvent
 import com.alumnus.zebra.machineLearning.pojo.NoiseZone
 import com.alumnus.zebra.machineLearning.utils.Calculator
+import com.alumnus.zebra.machineLearning.utils.Calculator.estimateDistance
 import com.alumnus.zebra.machineLearning.utils.LogFileGenerator.appendLog
 import com.alumnus.zebra.machineLearning.utils.SimpsonsRule
 import com.alumnus.zebra.pojo.AccelerationNumericData
@@ -442,15 +443,6 @@ class DataAnalysis {
             lastEvent = event.count - 1
         }
         return
-    }
-
-
-    /**
-     * Estimate distance of a free fall event
-     * @param duration
-     */
-    private fun estimateDistance(duration: Double): Double {
-        return Math.round((3.28 * (9.81 * (duration / 1000) * (duration / 1000)) / 2) * 1.225).toDouble()
     }
 
 

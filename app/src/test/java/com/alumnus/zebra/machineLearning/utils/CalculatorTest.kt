@@ -18,4 +18,10 @@ class CalculatorTest {
     @Test
     fun calculateDTSV() {
     }
+
+    @Test
+    fun estimateDistance() {
+        assertEquals(20.0, Calculator.estimateDistance(1000.0),0.0)
+        assertEquals(79.0, Calculator.estimateDistance(2000.0),0.0)
+    }
 }
