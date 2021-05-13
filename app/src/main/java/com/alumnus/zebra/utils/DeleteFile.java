@@ -9,6 +9,7 @@ import com.alumnus.zebra.db.AppDatabase;
 
 import java.io.File;
 
+@Deprecated
 public class DeleteFile {
 
     private static final String TAG = "ExportFile";
