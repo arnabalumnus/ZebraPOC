@@ -14,7 +14,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "3.0.25"
+        versionName "3.0.26"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -29,14 +29,14 @@ android {
         //main.java.srcDirs += "src/main/kotlin"
         main {
             java {
-                exclude '**/SaveCsvJobService.java', '**/JobActivity.java', '**/ExportFile.java', '**/BatteryOptimizationSettings.java', '**/IpAddress.java'
+                exclude '**/SaveCsvJobService.java', '**/JobActivity.java', '**/ExportFile.java', '**/BatteryOptimizationSettings.java', '**/IpAddress.java'//, '**/ZipManager.java'
             }
             kotlin {
                 exclude '**/Coronines.kt'
             }
         }
     }
-    
+
     buildTypes {
         release {
             minifyEnabled false

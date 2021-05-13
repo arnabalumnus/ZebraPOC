@@ -22,7 +22,7 @@ object FolderFiles {
      * @param context Context required for API level R
      * @param folderName
      */
-    fun createFolder(context: Context? = null, folderName: String) {
+    fun createFolder(context: Context? = null, folderName: String): String {
 
         val logFolder: File = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
             File(Environment.getExternalStorageDirectory(), "$PARENT_DIRECTORY_NAME/$folderName")
@@ -36,6 +36,7 @@ object FolderFiles {
                 e.printStackTrace()
             }
         }
+        return logFolder.absolutePath;
     }
 
 

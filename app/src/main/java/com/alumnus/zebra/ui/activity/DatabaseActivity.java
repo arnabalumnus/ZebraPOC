@@ -14,6 +14,7 @@ import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
 import com.alumnus.zebra.utils.Constant;
 import com.alumnus.zebra.utils.DateFormatter;
+import com.alumnus.zebra.utils.ZipManager;
 
 import java.util.List;
 
@@ -58,6 +59,20 @@ public class DatabaseActivity extends AppCompatActivity {
     public void getCsvListTable(View view) {
         new CsvFileDBTask().execute();
         Toast.makeText(this, "Chunk size: " + Constant.DATA_CHUNK_SIZE + "\nRetain files count: " + Constant.RETAIN_NUMBER_OF_CSV_FILE, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * @param listOfCsv ArrayList of {@link CsvFileLogEntity}
+     */
+    private void zipCSVFiles(List<CsvFileLogEntity> listOfCsv) {
+        String[] s = new String[listOfCsv.size()];
+        String filePath = "/storage/emulated/0/ZebraApp/csvData/"; //TODO Android R filePath
+        for (int row = 0; row < listOfCsv.size(); row++) {
+            s[row] = filePath + listOfCsv.get(row).file_name + ".csv";
+        }
+
+        ZipManager zipManager = new ZipManager();
+        zipManager.zip(s, null);
     }
 
     class DBTask extends AsyncTask<Void, Void, Long> {
@@ -108,6 +123,12 @@ public class DatabaseActivity extends AppCompatActivity {
                 stringBuilder.append(String.format("| %20s | %5s |\n", listOfCsv.get(row).file_name, listOfCsv.get(row).count));
                 //System.out.println(String.format("%12s | %20s | %12s", listOfCsv.get(row).id, listOfCsv.get(row).file_name, listOfCsv.get(row).count));
             }
+
+            /** Zip CSV files */
+            if (listOfCsv.size() >= Constant.RETAIN_NUMBER_OF_CSV_FILE) {
+                zipCSVFiles(listOfCsv);
+            }
+
             System.out.println(stringBuilder.toString());
             return stringBuilder.toString();
         }
