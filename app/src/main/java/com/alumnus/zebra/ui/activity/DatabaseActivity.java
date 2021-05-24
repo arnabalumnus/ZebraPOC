@@ -12,6 +12,7 @@ import androidx.room.Room;
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
+import com.alumnus.zebra.machineLearning.utils.ExportFiles;
 import com.alumnus.zebra.utils.Constant;
 import com.alumnus.zebra.utils.DateFormatter;
 import com.alumnus.zebra.utils.ZipManager;
@@ -75,6 +76,10 @@ public class DatabaseActivity extends AppCompatActivity {
         zipManager.zip(s, null);
     }
 
+    public void archive(View view) {
+        new ZipAndDeleteTask().execute();
+    }
+
     class DBTask extends AsyncTask<Void, Void, Long> {
 
         @Override
@@ -121,12 +126,6 @@ public class DatabaseActivity extends AppCompatActivity {
             List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
             for (int row = 0; row < listOfCsv.size(); row++) {
                 stringBuilder.append(String.format("| %20s | %5s |\n", listOfCsv.get(row).file_name, listOfCsv.get(row).count));
-                //System.out.println(String.format("%12s | %20s | %12s", listOfCsv.get(row).id, listOfCsv.get(row).file_name, listOfCsv.get(row).count));
-            }
-
-            /** Zip CSV files */
-            if (listOfCsv.size() >= Constant.RETAIN_NUMBER_OF_CSV_FILE) {
-                zipCSVFiles(listOfCsv);
             }
 
             System.out.println(stringBuilder.toString());
@@ -137,7 +136,27 @@ public class DatabaseActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             tv_csv_list_table.setText(s);
-            //Toast.makeText(DatabaseActivity.this, s, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    class ZipAndDeleteTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+            List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
+
+            /** Zip CSV files */
+            zipCSVFiles(listOfCsv);
+            /** Delete CSV files */
+            ExportFiles.INSTANCE.deleteOldCSVFile(DatabaseActivity.this);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(DatabaseActivity.this, "Zip successful", Toast.LENGTH_LONG).show();
         }
     }
 }

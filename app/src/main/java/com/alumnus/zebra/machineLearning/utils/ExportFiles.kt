@@ -96,7 +96,7 @@ object ExportFiles {
      * Unless it will fill with large amount of unwanted csv files
      * @param context
      */
-    private fun deleteOldCSVFile(context: Context) {
+    public fun deleteOldCSVFile(context: Context) {
         val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
         if (db.csvFileLogDao().csvFileCount > Constant.RETAIN_NUMBER_OF_CSV_FILE) {
             val fileName = db.csvFileLogDao().oldestCSVFile

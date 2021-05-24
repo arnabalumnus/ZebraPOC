@@ -1,5 +1,9 @@
 package com.alumnus.zebra.utils;
 
+
+/**
+ * @author Arnab Kundu
+ */
 public class Constant {
 
     /**
@@ -22,6 +26,6 @@ public class Constant {
      *
      * @DATA_CHUNK_SIZE of 20,000 approximately makes 790KB size of .csv file. ** TESTED **
      */
-    public static final int DATA_CHUNK_SIZE = 20000;
+    public static final int DATA_CHUNK_SIZE = 130000;
     public static final int RETAIN_NUMBER_OF_CSV_FILE = 100;
 }

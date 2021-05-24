@@ -70,5 +70,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_csv_list" />
 
+    <Button
+        android:id="@+id/btn_archive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Archive csv files"
+        android:textAllCaps="false"
+        android:onClick="archive"
+        app:layout_constraintStart_toEndOf="@+id/btn_csv_list"
+        app:layout_constraintTop_toTopOf="@id/btn_csv_list" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
