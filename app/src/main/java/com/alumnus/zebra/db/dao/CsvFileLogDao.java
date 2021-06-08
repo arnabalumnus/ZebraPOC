@@ -2,6 +2,7 @@ package com.alumnus.zebra.db.dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
@@ -14,7 +15,7 @@ public interface CsvFileLogDao {
     @Query("SELECT * FROM csv_file_log")
     List<CsvFileLogEntity> getAll();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(CsvFileLogEntity... csvFileLogs);
 
     @Query("DELETE FROM csv_file_log WHERE file_name=:file_name")

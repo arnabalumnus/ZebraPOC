@@ -10,16 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alumnus.zebra.R;
-import com.alumnus.zebra.pojo.Acceleration;
+import com.alumnus.zebra.pojo.AccelerationStringData;
 
 import java.util.ArrayList;
 
 public class AccelerationDataAdapter extends RecyclerView.Adapter<AccelerationDataAdapter.ViewHolder> {
 
-    private ArrayList<Acceleration> accelerations;
+    private ArrayList<AccelerationStringData> accelerations;
     Context context;
 
-    public AccelerationDataAdapter(ArrayList<Acceleration> accelerations) {
+    public AccelerationDataAdapter(ArrayList<AccelerationStringData> accelerations) {
         this.accelerations = accelerations;
     }
 

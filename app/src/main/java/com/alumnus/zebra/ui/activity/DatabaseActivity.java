@@ -4,18 +4,33 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.db.AppDatabase;
+import com.alumnus.zebra.db.entity.CsvFileLogEntity;
+import com.alumnus.zebra.machineLearning.utils.ExportFiles;
+import com.alumnus.zebra.utils.Constant;
 import com.alumnus.zebra.utils.DateFormatter;
+import com.alumnus.zebra.utils.ZipManager;
 
+import java.util.List;
+
+
+/**
+ * Contains info about available data in Database accLog table
+ * &
+ * Exported .csv files available in storage @ZebraApp folder
+ *
+ * @author Arnab Kundu
+ */
 public class DatabaseActivity extends AppCompatActivity {
 
     private static final String TAG = "DatabaseActivity";
-    TextView tv_db_record_count_event_table, tv_db_record_count_acc_table, tv_db_record_count_log_table;
+    TextView tv_db_record_count_event_table, tv_db_record_count_acc_table, tv_csv_list_table;
     private AppDatabase db;
 
     @Override
@@ -25,7 +40,7 @@ public class DatabaseActivity extends AppCompatActivity {
 
         tv_db_record_count_event_table = findViewById(R.id.tv_db_record_count_event_table);
         tv_db_record_count_acc_table = findViewById(R.id.tv_db_record_count_acc_table);
-        tv_db_record_count_log_table = findViewById(R.id.tv_db_record_count_log_table);
+        tv_csv_list_table = findViewById(R.id.tv_csv_list_table);
     }
 
     @Override
@@ -34,37 +49,51 @@ public class DatabaseActivity extends AppCompatActivity {
         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
     }
 
-    public void getAllEvent(View view) {
-        Runnable runnable = () -> db.eventLogDao().getAll();
-        Thread thread = new Thread(runnable);
-        thread.start();
-    }
-
     public void getTotalCount(View view) {
         new DBTask().execute();
     }
 
-    class DBTask extends AsyncTask<Void, Void, Long[]> {
+    public void getLastTimeStamp(View v) {
+        new FetchTimeStampDBTask().execute();
+    }
+
+    public void getCsvListTable(View view) {
+        new CsvFileDBTask().execute();
+        Toast.makeText(this, "Chunk size: " + Constant.DATA_CHUNK_SIZE + "\nRetain files count: " + Constant.RETAIN_NUMBER_OF_CSV_FILE, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * @param listOfCsv ArrayList of {@link CsvFileLogEntity}
+     */
+    private void zipCSVFiles(List<CsvFileLogEntity> listOfCsv) {
+        String[] s = new String[listOfCsv.size()];
+        String filePath = "/storage/emulated/0/ZebraApp/csvData/"; //TODO Android R filePath
+        for (int row = 0; row < listOfCsv.size(); row++) {
+            s[row] = filePath + listOfCsv.get(row).file_name + ".csv";
+        }
+
+        ZipManager zipManager = new ZipManager();
+        zipManager.zip(s, null);
+    }
+
+    public void archive(View view) {
+        new ZipAndDeleteTask().execute();
+    }
+
+    class DBTask extends AsyncTask<Void, Void, Long> {
 
         @Override
-        protected Long[] doInBackground(Void... voids) {
+        protected Long doInBackground(Void... voids) {
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-            Long[] count = {0L, 0L, 0L};
-            long eventCount = db.eventLogDao().getCount();
+
             long accCount = db.accLogDao().getCount();
-            long logCount = db.logDao().getCount();
-            count[0] = eventCount;
-            count[1] = accCount;
-            count[2] = logCount;
-            return count;
+            return accCount;
         }
 
         @Override
-        protected void onPostExecute(Long[] count) {
+        protected void onPostExecute(Long count) {
             super.onPostExecute(count);
-            tv_db_record_count_event_table.setText("Event Count: " + count[0]);
-            tv_db_record_count_acc_table.setText("Acc Count: " + count[1]);
-            tv_db_record_count_log_table.setText("Log Count: " + count[2]);
+            tv_db_record_count_acc_table.setText("Accelerometer table row count: " + count);
         }
     }
 
@@ -73,8 +102,10 @@ public class DatabaseActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
-            long[] firstLastRecordTime= db.accLogDao().getLastRecordTime();
-            return "Last: " + DateFormatter.getTimeStamp(firstLastRecordTime[0]);
+            long startingTimeStamp = db.accLogDao().getStartingTimeStamp();
+            long lastRecordTime = db.accLogDao().getLastRecordTime();
+            return "Starting timestamp: " + DateFormatter.getTimeStamp(startingTimeStamp) +
+                    "\nLast timestamp: " + DateFormatter.getTimeStamp(lastRecordTime);
         }
 
         @Override
@@ -84,7 +115,48 @@ public class DatabaseActivity extends AppCompatActivity {
         }
     }
 
-    public void getLastTimeStamp(View v) {
-        new FetchTimeStampDBTask().execute();
+    class CsvFileDBTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("| FileName                                  |  rows |\n");
+            stringBuilder.append("|-----------------------------------------------|----------|\n");
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+            List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
+            for (int row = 0; row < listOfCsv.size(); row++) {
+                stringBuilder.append(String.format("| %20s | %5s |\n", listOfCsv.get(row).file_name, listOfCsv.get(row).count));
+            }
+
+            System.out.println(stringBuilder.toString());
+            return stringBuilder.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            tv_csv_list_table.setText(s);
+        }
+    }
+
+    class ZipAndDeleteTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+            List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
+
+            /** Zip CSV files */
+            zipCSVFiles(listOfCsv);
+            /** Delete CSV files */
+            ExportFiles.INSTANCE.deleteOldCSVFile(DatabaseActivity.this);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(DatabaseActivity.this, "Zip successful", Toast.LENGTH_LONG).show();
+        }
     }
 }

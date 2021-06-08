@@ -1,5 +1,9 @@
 package com.alumnus.zebra.utils;
 
+
+/**
+ * @author Arnab Kundu
+ */
 public class Constant {
 
     /**
@@ -15,5 +19,13 @@ public class Constant {
     public static final String SP = "ZebraSp";
     public static final String isAutoStartPermissionGranted = "isAutoStartPermissionGranted";
 
-
+    /**
+     * @DATA_CHUNK_SIZE of 1,30,000 approximately makes 5MB size of .csv file
+     * &
+     * 43 mints of data @50Hz(50 records/sec)
+     *
+     * @DATA_CHUNK_SIZE of 20,000 approximately makes 790KB size of .csv file. ** TESTED **
+     */
+    public static final int DATA_CHUNK_SIZE = 130000;
+    public static final int RETAIN_NUMBER_OF_CSV_FILE = 100;
 }

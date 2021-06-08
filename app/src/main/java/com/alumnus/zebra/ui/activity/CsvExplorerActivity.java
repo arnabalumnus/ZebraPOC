@@ -2,7 +2,6 @@ package com.alumnus.zebra.ui.activity;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -11,32 +10,32 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alumnus.zebra.BuildConfig;
 import com.alumnus.zebra.R;
-import com.alumnus.zebra.machineLearning.MachineLearning;
-import com.alumnus.zebra.pojo.Acceleration;
-import com.alumnus.zebra.pojo.AccelerationData;
+import com.alumnus.zebra.machineLearning.DataAnalysis;
+import com.alumnus.zebra.pojo.AccelerationNumericData;
+import com.alumnus.zebra.pojo.AccelerationStringData;
 import com.alumnus.zebra.ui.adapter.AccelerationDataAdapter;
+import com.alumnus.zebra.utils.CsvFileOperator;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+
+/**
+ * This activity responsible for opening .csv files exported by Zebra app
+ *
+ * @author Arnab Kundu
+ */
 public class CsvExplorerActivity extends AppCompatActivity {
 
-    private static final String TAG = "CsvExplorerActivity";
-    private ArrayList<Acceleration> accelerations = new ArrayList<>();
-    private ArrayList<AccelerationData> accelerationsDataList = new ArrayList<>();
-    private AccelerationDataAdapter accelerationDataAdapter;
     private RecyclerView rv_acceleration_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -45,106 +44,54 @@ public class CsvExplorerActivity extends AppCompatActivity {
         rv_acceleration_data = findViewById(R.id.rv_acceleration_data);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         rv_acceleration_data.setLayoutManager(linearLayoutManager);
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Uri uri = getIntent().getData();
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            readCSVData(inputStream);                  // If you need to read the whole file row by row
-            //readWeatherDataByColumn();        // If you need to read specific column row by row
 
-            accelerationDataAdapter = new AccelerationDataAdapter(accelerations);
+        Uri uri = getIntent().getData();                                                // Get File data from Intent
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);        // Convert received intent data into InputStream.
+
+            // Convert inputStream to ArrayList
+            ArrayList<AccelerationStringData> accelerations = CsvFileOperator.INSTANCE.readCsvFile(inputStream);
+            Toast.makeText(this, "Row count: " + accelerations.size(), Toast.LENGTH_SHORT).show();
+
+            // Feed adapter with data
+            AccelerationDataAdapter accelerationDataAdapter = new AccelerationDataAdapter(accelerations);
             rv_acceleration_data.setAdapter(accelerationDataAdapter);
+
+            if (BuildConfig.DEBUG)
+                generateLogFile(accelerations);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * @param is
-     */
-    private void readWeatherDataByColumn(InputStream is) {
-        // Read the raw csv file
-
-        // Reads text from character-input stream, buffering characters for efficient reading
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-
-        // Initialization
-        String line = "";
-
-        // Handling exceptions
-        try {
-            // If buffer is not empty
-            while ((line = br.readLine()) != null) {
-                // use comma as separator columns of CSV
-                String[] cols = line.split(",");
-
-                // Print in logcat
-                System.out.println("Coulmn 0 = '" + cols[0] + "', Column 1 = '" + cols[1] + "', Column 2: '" + cols[2] + "'");
-            }
-        } catch (IOException e) {
-            // Prints throwable details
-            e.printStackTrace();
-        }
-    }
 
     /**
-     * @param is
+     * Generate corresponding Log file on opening CSV data file
+     *
+     * @param dataList Array:ist of AccelerationStringData
      */
-    private void readCSVData(InputStream is) {
-        // Read the raw csv file
+    private void generateLogFile(ArrayList<AccelerationStringData> dataList) {
+        /* Acceleration Numeric data collection */
+        ArrayList<AccelerationNumericData> accNumericDataList = new ArrayList<>();
+        AccelerationNumericData accNumericData = new AccelerationNumericData();
 
-        // Reads text from character-input stream, buffering characters for efficient reading
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        //Skip header
+        dataList.remove(0);
 
-        // Initialization
-        String line = "";
-
-        // Initialization
-        try {
-            // Step over headers
-            String header = reader.readLine();
-            String[] headertokens = header.split(",");
-            // Read the data
-            Acceleration acceleration1 = new Acceleration(headertokens[0].replace("\"", ""),
-                    headertokens[1].replace("\"", ""),
-                    headertokens[2].replace("\"", ""),
-                    headertokens[3].replace("\"", ""));
-            accelerations.add(acceleration1);
-            // If buffer is not empty
-            while ((line = reader.readLine()) != null) {
-                Log.d(TAG, "Line: " + line);
-                // use comma as separator columns of CSV
-                String[] tokens = line.split(",");
-                // Read the data
-                Acceleration acceleration = new Acceleration(tokens[0].replace("\"", ""),
-                        tokens[1].replace("\"", ""),
-                        tokens[2].replace("\"", ""),
-                        tokens[3].replace("\"", ""));
-                accelerations.add(acceleration);
-                AccelerationData accelerationData = new AccelerationData(Long.parseLong(tokens[0].replace("\"", "")),
-                        Float.parseFloat(tokens[1].replace("\"", "")),
-                        Float.parseFloat(tokens[2].replace("\"", "")),
-                        Float.parseFloat(tokens[3].replace("\"", "")));
-                accelerationsDataList.add(accelerationData);
-            }
-            String result = new MachineLearning().
-                    CalculateTSV(accelerationsDataList,this,null);
-            Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
-            //Toast.makeText(this, "No of Events: " + detectPlusNoise.detectedEvents.size() + " No of Noise: " + detectPlusNoise.noiseZones.size(), Toast.LENGTH_SHORT).show();
-
-            //detectPlusNoise.noiseZones.size();
-        } catch (IOException e) {
-            // Logs error with priority level
-            Log.wtf("MyActivity", "Error reading data file on line" + line, e);
-
-            // Prints throwable details
-            e.printStackTrace();
+        for (AccelerationStringData accStringData : dataList) {
+            accNumericData.setTs(Long.parseLong(accStringData.ts));
+            accNumericData.setX(Float.parseFloat(accStringData.x));
+            accNumericData.setY(Float.parseFloat(accStringData.y));
+            accNumericData.setZ(Float.parseFloat(accStringData.z));
+            accNumericDataList.add(accNumericData);
         }
+        String result = new DataAnalysis().startEventAnalysis(accNumericDataList, this, null);
+        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
     }
 }

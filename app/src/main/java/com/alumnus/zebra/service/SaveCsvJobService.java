@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * https://codinginflow.com/tutorials/android/jobscheduler
  */
-
+@Deprecated
 public class SaveCsvJobService extends JobService {
     private static final String TAG = "SaveCsvJobService";
     private boolean jobCancelled = false;
@@ -74,7 +74,6 @@ public class SaveCsvJobService extends JobService {
                     /**
                      * DELETE OLD RECORDS
                      */
-                    db.eventLogDao().deleteOldRecord(System.currentTimeMillis());
                     db.accLogDao().deleteAll(System.currentTimeMillis());
                     Log.e(TAG, "Old records DELETED");
                 } catch (Exception sqlEx) {

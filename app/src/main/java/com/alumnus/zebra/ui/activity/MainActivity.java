@@ -17,13 +17,10 @@ import androidx.core.app.ActivityCompat;
 
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver;
+import com.alumnus.zebra.machineLearning.utils.ExportFiles;
 import com.alumnus.zebra.service.LifeTimeService;
 import com.alumnus.zebra.utils.AutoStart;
 import com.alumnus.zebra.utils.Constant;
-import com.alumnus.zebra.utils.ExportFile;
-import com.judemanutd.autostarter.AutoStartPermissionHelper;
-
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -93,21 +90,6 @@ public class MainActivity extends AppCompatActivity {
          */
     }
 
-    public void stopService(View v) {
-
-    }
-
-    public void deleteFile(View v) {
-        String path = "/storage/emulated/0/ZebraApp/manualLog/2021, Mar-25 Time-13 27 16.csv";
-        File fileDelete = new File(path);
-        if (fileDelete.exists()) {
-            if (fileDelete.delete()) {
-                // System.out.println("file Deleted :" + uri.getPath());
-            } else {
-                // System.out.println("file not Deleted :" + uri.getPath());
-            }
-        }
-    }
 
     public void navigateToDatabase(View view) {
         startActivity(new Intent(this, DatabaseActivity.class));
@@ -116,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
     //region Export Data and save into SD card or Phone Storage
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
-            ExportFile.exportDataIntoCSVFile(this, "manualLog");
-            //Toast.makeText(this, "Data exported in 'ZebraApp/manualLog' folder", Toast.LENGTH_SHORT).show();
+            ExportFiles.INSTANCE.prepareDataChunk(this);
         }
     }
 
@@ -149,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
             //resume tasks needing this permission
-            ExportFile.exportDataIntoCSVFile(this, "manualLog");
+            ExportFiles.INSTANCE.prepareDataChunk(this);
             if (!sp.getBoolean(Constant.isAutoStartPermissionGranted, false)) {
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean(Constant.isAutoStartPermissionGranted, true);

@@ -87,6 +87,8 @@ X_train = finalDF.iloc[:, 0:len(finalDF.columns)-1].values
 y_train = finalDF.iloc[:, len(finalDF.columns)-1].values
    
 # Fitting SVM to the Training set
+# Linear Support Vector Classification(SVC)
+# Support Vector Machine(SVM)
 from sklearn.svm import SVC
 svm_classifier = SVC(kernel = 'linear', random_state = 0)
 svm_classifier.fit(X_train, y_train)
