@@ -2,6 +2,7 @@ package com.alumnus.zebra.ui.activity;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -13,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alumnus.zebra.BuildConfig;
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.machineLearning.DataAnalysis;
+import com.alumnus.zebra.machineLearning.RFClassifierForImpactData;
+import com.alumnus.zebra.machineLearning.RandomForestClassifier;
 import com.alumnus.zebra.pojo.AccelerationNumericData;
 import com.alumnus.zebra.pojo.AccelerationStringData;
 import com.alumnus.zebra.ui.adapter.AccelerationDataAdapter;
 import com.alumnus.zebra.utils.CsvFileOperator;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -29,7 +33,7 @@ import java.util.ArrayList;
  * @author Arnab Kundu
  */
 public class CsvExplorerActivity extends AppCompatActivity {
-
+    private static final String TAG = "CsvExplorerActivity";
     private RecyclerView rv_acceleration_data;
 
     @Override
@@ -51,6 +55,9 @@ public class CsvExplorerActivity extends AppCompatActivity {
         super.onResume();
 
         Uri uri = getIntent().getData();                                                // Get File data from Intent
+        File file = new File(uri.getPath());
+        String fileName = file.getName();                                               // Get File name from uri
+        Log.i(TAG, "FileName: " + fileName);
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);        // Convert received intent data into InputStream.
 
@@ -92,6 +99,22 @@ public class CsvExplorerActivity extends AppCompatActivity {
             accNumericDataList.add(accNumericData);
         }
         String result = new DataAnalysis().startEventAnalysis(accNumericDataList, this, null);
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+        Log.i(TAG, "LogFile: " + result);
+
+        double[] data = new double[accNumericDataList.size() * 3];
+        int count = 0;
+        while (count < data.length) {
+            data[count] = accNumericDataList.get(count++ / 3).getX();
+            data[count] = accNumericDataList.get(count++ / 3).getY();
+            data[count] = accNumericDataList.get(count++ / 3).getZ();
+        }
+
+        int predictedFallResult = RandomForestClassifier.predict(data);
+        int predictedImpactResult = RFClassifierForImpactData.predict(data);
+        Log.i(TAG, "Predicted:");
+        Log.i(TAG, "Fall Result: " + predictedFallResult);
+        Log.i(TAG, "Impact Result: " + predictedImpactResult);
+        Log.i(TAG, "=======================================================================================");
+        Toast.makeText(this, result + "\nPredicted\nFall Result: " + predictedFallResult + "\nImpact Result: " + predictedImpactResult, Toast.LENGTH_SHORT).show();
     }
 }

@@ -390,7 +390,7 @@ class DataAnalysis {
         appendLog(context, mFileName, "Force impartions: $numberOfForces")
         println("Force impartions: $numberOfForces")
 
-        return "Significant freefall events: $numberOfSignificantFalls , Significant impact events: $numberOfSignificantImpacts ,Force impartions: $numberOfForces"
+        return "Significant freefall events: $numberOfSignificantFalls, Significant impact events: $numberOfSignificantImpacts, Force impartions: $numberOfForces"
     }
 
 
