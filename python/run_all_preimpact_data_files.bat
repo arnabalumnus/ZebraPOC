@@ -101,3 +101,5 @@ ZebraDeviceAbuseServerTest.py "WSXXXX_2017_11_01_18_54_36  - preimpact.csv"
 ZebraDeviceAbuseServerTest.py "WSXXXX_2017_11_01_18_55_09  - preimpact.csv"
 ZebraDeviceAbuseServerTest.py "WSXXXX_2017_11_01_18_55_22  - preimpact.csv"
 ZebraDeviceAbuseServerTest.py "WSXXXX_2017_11_01_18_55_37  - preimpact.csv"
+
+pause
