@@ -53,6 +53,9 @@ This are some info about accelerometer data collecting service.
 1. All the accelerometer **data** recorded in database will be **exported** in a `.csv` file with current timestamp **whenever** device will be connected in AC power for **charging**. 
 2. Along with this a `log.txt` file will also generate after analysis the data in `.csv` file.
 
+## Zip csv files
+1. All saved csv files can be zipped using `Archive csv files` button in `Database Screen`
+2. No zip file will be saved if any csv file is unavailable in `csvFlies` folder 
 
 ## Android device Folder structure 
 The exported `folder/file` structure will be something like this.
@@ -61,8 +64,11 @@ The exported `folder/file` structure will be something like this.
 sdcard
 ├── ...
 └── ZebraApp
-        ├── data
+        ├── csvData
         |     └── 2021, Apr-30 Time-13 12 25.csv
-        └── logs
-              └── log-2021, Apr-30 Time-13 12 26.txt
+        ├── logs
+        |     └── log-2021, Apr-30 Time-13 12 26.txt
+        └──  zipFiles
+              └── 2021, Jun-29 Time-13 12 26.zip
+
 ```

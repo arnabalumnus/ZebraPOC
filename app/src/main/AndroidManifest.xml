@@ -43,7 +43,7 @@
         </activity>
         <activity android:name=".ui.activity.AccelerometerActivity" />
         <activity android:name=".ui.activity.ServiceActivity" />
-        <activity android:name=".ui.activity.DatabaseActivity" />
+        <activity android:name=".ui.activity.DatabaseActivity" android:label="Database" />
         <!--<activity android:name=".ui.activity.JobActivity" />-->
 
 
