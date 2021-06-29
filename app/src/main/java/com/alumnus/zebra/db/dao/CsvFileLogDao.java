@@ -21,6 +21,9 @@ public interface CsvFileLogDao {
     @Query("DELETE FROM csv_file_log WHERE file_name=:file_name")
     void deleteCSVRecord(String file_name);
 
+    @Query("DELETE FROM csv_file_log WHERE 1=1")
+    void deleteAllCSV();
+
     @Query("SELECT file_name FROM csv_file_log ORDER BY id ASC LIMIT 1")
     String getOldestCSVFile();
 

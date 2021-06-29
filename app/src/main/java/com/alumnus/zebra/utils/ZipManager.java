@@ -39,7 +39,7 @@ public class ZipManager {
 
         String pathOfZebraFolder = FolderFiles.INSTANCE.createFolder(null, "zipFiles/");
         if (zipFileName == null || zipFileName.length() == 0) {
-            zipFileName = DateFormatter.getDateStampForFileName(System.currentTimeMillis());
+            zipFileName = DateFormatter.getTimeStampFileName(System.currentTimeMillis());
         }
         try {
             BufferedInputStream origin = null;

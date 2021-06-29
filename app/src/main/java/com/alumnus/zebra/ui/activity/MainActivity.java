@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     //region Export Data and save into SD card or Phone Storage
     public void exportDataButton(View view) {
         if (isStoragePermissionGranted()) {
-            ExportFiles.INSTANCE.prepareDataChunk(this);
+            ExportFiles.INSTANCE.prepareDataChunk(this, true);
         }
     }
 
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
             //resume tasks needing this permission
-            ExportFiles.INSTANCE.prepareDataChunk(this);
+            ExportFiles.INSTANCE.prepareDataChunk(this, true);
             if (!sp.getBoolean(Constant.isAutoStartPermissionGranted, false)) {
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putBoolean(Constant.isAutoStartPermissionGranted, true);

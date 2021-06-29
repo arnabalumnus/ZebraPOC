@@ -12,11 +12,11 @@ import androidx.room.Room;
 import com.alumnus.zebra.R;
 import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
-import com.alumnus.zebra.machineLearning.utils.ExportFiles;
 import com.alumnus.zebra.utils.Constant;
 import com.alumnus.zebra.utils.DateFormatter;
 import com.alumnus.zebra.utils.ZipManager;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -63,17 +63,39 @@ public class DatabaseActivity extends AppCompatActivity {
     }
 
     /**
+     * Suspended function. Must be running in background Thread always.
      * @param listOfCsv ArrayList of {@link CsvFileLogEntity}
      */
-    private void zipCSVFiles(List<CsvFileLogEntity> listOfCsv) {
+    private void zipAllCSVFiles(List<CsvFileLogEntity> listOfCsv) {
         String[] s = new String[listOfCsv.size()];
         String filePath = "/storage/emulated/0/ZebraApp/csvData/"; //TODO Android R filePath
         for (int row = 0; row < listOfCsv.size(); row++) {
             s[row] = filePath + listOfCsv.get(row).file_name + ".csv";
         }
 
-        ZipManager zipManager = new ZipManager();
-        zipManager.zip(s, null);
+        // Check recoded file in Database is actually available in SD card or not.
+        boolean isFilesAvailableForZipping = false;
+        for (String stringFilePath : s) {
+            File f = new File(stringFilePath);
+            if (f.exists()) {
+                isFilesAvailableForZipping = true;
+                break;
+            }
+        }
+
+        // Zip and delete available csvFiles
+        if (isFilesAvailableForZipping) {
+            ZipManager zipManager = new ZipManager();
+            zipManager.zip(s, null);
+            for (String stringFilePath : s) {
+                File f = new File(stringFilePath);
+                f.delete();
+            }
+        }
+
+        // Delete csvFiles record from DB
+        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
+        db.csvFileLogDao().deleteAllCSV();
     }
 
     public void archive(View view) {
@@ -146,10 +168,10 @@ public class DatabaseActivity extends AppCompatActivity {
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
             List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
 
-            /** Zip CSV files */
-            zipCSVFiles(listOfCsv);
-            /** Delete CSV files */
-            ExportFiles.INSTANCE.deleteOldCSVFile(DatabaseActivity.this);
+            if (listOfCsv.size() > 0) {             // Avoid creating 0 byte Zip file, When no csvFile available.
+                /** Zip CSV files and delete the original .csv files */
+                zipAllCSVFiles(listOfCsv);
+            }
             return null;
         }
 

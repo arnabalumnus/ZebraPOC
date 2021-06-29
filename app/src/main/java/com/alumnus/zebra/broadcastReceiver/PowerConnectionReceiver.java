@@ -25,7 +25,7 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
             context.stopService(serviceIntent);*/
             //endregion
 
-            ExportFiles.INSTANCE.prepareDataChunk(context);
+            ExportFiles.INSTANCE.prepareDataChunk(context,false);
         }
         if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
             Toast.makeText(context, "POWER DISCONNECTED", Toast.LENGTH_SHORT).show();

@@ -29,11 +29,16 @@ object ExportFiles {
      * @param context Context Needed to access DB & External Storage
      */
     @Synchronized
-    fun prepareDataChunk(context: Context) {
+    fun prepareDataChunk(context: Context, isForceExportByUser: Boolean = false) {
         val runnable = Runnable {
             val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
 
             //try {
+            /**
+             * Chunk data to handle ** System not responding ** issue.
+             * While exporting All data in oneshot.
+             * If data size is in Millions or Billions, System will stop responding.
+             */
             while (db.accLogDao().count > Constant.DATA_CHUNK_SIZE) {
                 val chunkFileName = generateChunkFileName(context)
 
@@ -55,8 +60,8 @@ object ExportFiles {
                 for (accLogEntity in accLogEntities) {
                     accelerationsDataList.add(AccelerationNumericData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
                 }
-                exportCSVFile(context, accelerationsDataList, chunkFileName)
-                deleteOldCSVFile(context);
+                exportCSVFile(context, accelerationsDataList, chunkFileName, Constant.DATA_CHUNK_SIZE)
+                deleteOldCSVFile(context)
                 exportLogFile(context, accelerationsDataList, chunkFileName)
 
             }
@@ -64,6 +69,20 @@ object ExportFiles {
                 // Data table may have some unexpected values
                 Log.e(TAG, sqlEx.message, sqlEx)
             }*/
+
+            /** Manually export all Data from DB into a csvFile using Export button. If row count is > Zero */
+            if (db.accLogDao().count > 0 && isForceExportByUser) {
+                val chunkFileName = generateChunkFileName(context)
+                val accLogEntities = db.accLogDao().all
+                db.accLogDao().deleteAll(System.currentTimeMillis())
+                val accelerationsDataList: ArrayList<AccelerationNumericData> = ArrayList()
+                for (accLogEntity in accLogEntities) {
+                    accelerationsDataList.add(AccelerationNumericData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
+                }
+                exportCSVFile(context, accelerationsDataList, chunkFileName, accelerationsDataList.size)
+                deleteOldCSVFile(context)
+                exportLogFile(context, accelerationsDataList, chunkFileName)
+            }
         }
         Thread(runnable).start()
     }
@@ -75,13 +94,13 @@ object ExportFiles {
      * @param accelerationsDataList Data
      * @param fileName CSV fileName
      */
-    private fun exportCSVFile(context: Context, accelerationsDataList: ArrayList<AccelerationNumericData>, fileName: String) {
+    private fun exportCSVFile(context: Context, accelerationsDataList: ArrayList<AccelerationNumericData>, fileName: String, rowCount: Int) {
 
         // Create Database object
         val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
 
         // Store exported .csv filename into DB, To delete saved .csv file later (for storage cleanup)
-        db.csvFileLogDao().insert(CsvFileLogEntity(fileName, Constant.DATA_CHUNK_SIZE.toLong()))
+        db.csvFileLogDao().insert(CsvFileLogEntity(fileName, rowCount.toLong()))
 
         // Create folder
         createFolder(context, "csvData")
@@ -96,7 +115,7 @@ object ExportFiles {
      * Unless it will fill with large amount of unwanted csv files
      * @param context
      */
-    public fun deleteOldCSVFile(context: Context) {
+     fun deleteOldCSVFile(context: Context) {
         val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
         if (db.csvFileLogDao().csvFileCount > Constant.RETAIN_NUMBER_OF_CSV_FILE) {
             val fileName = db.csvFileLogDao().oldestCSVFile
