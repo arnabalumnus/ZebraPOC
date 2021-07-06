@@ -38,32 +38,30 @@ class AppDatabaseTest {
         accLogEntity.setY(0.0F)
         accLogEntity.setZ(0.0F)
 
-        accLogDao.insert(accLogEntity)      // 1st insert
-        accLogDao.insert(accLogEntity)      // Replace 1st insert
+        accLogDao.insert(accLogEntity)                              // 1st insert
+        accLogDao.insert(accLogEntity)                              // Replace 1st insert
         accLogEntity.setTs(System.currentTimeMillis())
-        accLogDao.insert(accLogEntity)      // 2nd insert
+        accLogDao.insert(accLogEntity)                              // 2nd insert
         accLogEntity.setTs(System.currentTimeMillis())
-        accLogDao.insert(accLogEntity)      // 3rd insert
+        accLogDao.insert(accLogEntity)                              // 3rd insert
 
-        assert(accLogDao.count == 3L)       // Size 3
+        assert(accLogDao.count == 3L)                               // Size 3
         assert(accLogDao.startingTimeStamp == firstTS)
-
 
         val lastTs = System.currentTimeMillis()
         accLogEntity.setTs(lastTs)
-        accLogDao.insert(accLogEntity)      // 4th insert
+        accLogDao.insert(accLogEntity)                              // 4th insert
         assert(accLogDao.lastRecordTime == lastTs)
 
         val dataList = accLogDao.getDataChunk(5)
         assert(dataList.size <= 5)
-        assert(dataList.size == 4)           // Size 4
+        assert(dataList.size == 4)                                  // Size 4
 
-        accLogDao.deleteChunk(2)    // Delete 2
-        assert(accLogDao.all.size == 2)      // Size 2
+        accLogDao.deleteChunk(2)                           // Delete 2
+        assert(accLogDao.all.size == 2)                             // Size 2
 
-
-        accLogDao.deleteAll(System.currentTimeMillis())     // Delete all
-        assert(accLogDao.count == 0L)                       // Size 0
+        accLogDao.deleteAll(System.currentTimeMillis())             // Delete all
+        assert(accLogDao.count == 0L)                               // Size 0
     }
 
 

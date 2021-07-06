@@ -39,17 +39,16 @@ public class AppDatabaseTestJava {
         accLogEntity.setX(9.81F);
         accLogEntity.setY(0.0F);
         accLogEntity.setZ(0.0F);
-        accLogDao.insert(accLogEntity);
-        accLogDao.insert(accLogEntity);
+        accLogDao.insert(accLogEntity);                                 // 1st insert
+        accLogDao.insert(accLogEntity);                                 // Replace 1st insert (as Ts is unique)
         accLogEntity.setTs(System.currentTimeMillis());
-        accLogDao.insert(accLogEntity);
+        accLogDao.insert(accLogEntity);                                 // 2nd insert
         accLogEntity.setTs(System.currentTimeMillis());
-        accLogDao.insert(accLogEntity);
-        assert (accLogDao.getCount() == 3L);
-        System.out.println(accLogDao.getAll().get(0).toString());
-        //assert (accLogDao.getAll().contains(accLogEntity));
-        accLogDao.deleteAll(System.currentTimeMillis());
-        assert (accLogDao.getCount() == 0L);
+        accLogDao.insert(accLogEntity);                                 // 3rd insert
+        assert (accLogDao.getCount() == 3L);                            // Test Size. Should be 3
+
+        accLogDao.deleteAll(System.currentTimeMillis());                // Delete all.
+        assert (accLogDao.getCount() == 0L);                            // Test Size. Should be 0
     }
 
     @Test
