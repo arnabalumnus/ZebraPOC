@@ -25,7 +25,10 @@ public class Constant {
      * 43 mints of data @50Hz(50 records/sec)
      *
      * @DATA_CHUNK_SIZE of 20,000 approximately makes 790KB size of .csv file. ** TESTED **
+     *
+     * 2^17 = 131072
+     * for FFT(Fast Fourier Transform) number of row should be power of 2
      */
-    public static final int DATA_CHUNK_SIZE = 130000;
+    public static final int DATA_CHUNK_SIZE = 131072;
     public static final int RETAIN_NUMBER_OF_CSV_FILE = 100;
 }
