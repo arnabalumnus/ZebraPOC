@@ -14,12 +14,18 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "4.0.6"
+        versionName "4.0.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // Rename app-debug.apk
         setProperty("archivesBaseName", "Zebra-v" + versionName)
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     // Exclude java and kotlin file. Avoid compiling specified files

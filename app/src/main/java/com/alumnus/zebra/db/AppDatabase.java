@@ -8,7 +8,7 @@ import com.alumnus.zebra.db.dao.CsvFileLogDao;
 import com.alumnus.zebra.db.entity.AccLogEntity;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
 
-@Database(entities = {AccLogEntity.class, CsvFileLogEntity.class}, version = 1)
+@Database(entities = {AccLogEntity.class, CsvFileLogEntity.class}, views = {}, version = 1, exportSchema = true)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract AccLogDao accLogDao();

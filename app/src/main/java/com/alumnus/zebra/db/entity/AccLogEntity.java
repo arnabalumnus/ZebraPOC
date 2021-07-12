@@ -2,6 +2,7 @@ package com.alumnus.zebra.db.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -26,6 +27,7 @@ public class AccLogEntity {
     public AccLogEntity() {
     }
 
+    @Ignore
     public AccLogEntity(long ts, float x, float y, float z) {
         this.ts = ts;
         this.x = x;
