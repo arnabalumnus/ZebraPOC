@@ -1,109 +1,85 @@
-package com.alumnus.zebra.ui.activity;
+package com.alumnus.zebra.ui.activity
 
-import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.RadioGroup;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.alumnus.zebra.R;
-import com.alumnus.zebra.service.LifeTimeService;
-import com.alumnus.zebra.utils.Constant;
-
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.RadioGroup
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.alumnus.zebra.R
+import com.alumnus.zebra.service.LifeTimeService
+import com.alumnus.zebra.utils.Constant
 
 /**
  * Helps to Starts background service to record accelerometer data with specified frequency
  *
  * @author Arnab Kundu
  */
-public class ServiceActivity extends AppCompatActivity {
+class ServiceActivity : AppCompatActivity() {
 
-    private static final String TAG = "ServiceActivity";
-    int frequency = 50; //Records per second from accelerometer
-    private SharedPreferences sp;
-    private SharedPreferences.Editor editor;
+    private val TAG = "ServiceActivity"
+    var frequency = 50 // Default Records per second from accelerometer(If frequency not selected)
+    private lateinit var sp: SharedPreferences
+    private lateinit var editor:SharedPreferences.Editor
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service);
-
-        sp = getSharedPreferences(Constant.SP, MODE_PRIVATE);
-        int freqId = sp.getInt("frequencyId", 0);
-
-        RadioGroup frequency_radio_group = findViewById(R.id.frequency_radio_group);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_service)
+        sp = getSharedPreferences(Constant.SP, MODE_PRIVATE)
+        val freqId = sp.getInt("frequencyId", 0)
+        val frequency_radio_group = findViewById<RadioGroup>(R.id.frequency_radio_group)
         if (freqId != 0) {
-            frequency_radio_group.check(freqId);
-            switch (frequency_radio_group.getCheckedRadioButtonId()) {
-                case R.id.low_freq:
-                    frequency = 5;
-                    break;
-                case R.id.mid_freq:
-                    frequency = 15;
-                    break;
-                case R.id.high_freq:
-                    frequency = 50;
-                    break;
+            frequency_radio_group.check(freqId)
+            when (frequency_radio_group.checkedRadioButtonId) {
+                R.id.low_freq -> frequency = 5
+                R.id.mid_freq -> frequency = 15
+                R.id.high_freq -> frequency = 50
             }
         } else {
-            Toast.makeText(this, "Frequency not selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Frequency not selected", Toast.LENGTH_SHORT).show()
         }
-        frequency_radio_group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @SuppressLint("NonConstantResourceId")
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                editor = sp.edit();
-                switch (checkedId) {
-                    case R.id.low_freq:
-                        frequency = 5;
-                        Log.d(TAG, "low_freq: ");
-                        editor.putInt("frequencyId", R.id.low_freq);
-                        editor.putInt("frequency", 5);
-                        break;
-                    case R.id.mid_freq:
-                        frequency = 15;
-                        Log.d(TAG, "mid_freq: ");
-                        editor.putInt("frequencyId", R.id.mid_freq);
-                        editor.putInt("frequency", 15);
-                        break;
-                    case R.id.high_freq:
-                        frequency = 50;
-                        Log.d(TAG, "high_freq: ");
-                        editor.putInt("frequencyId", R.id.high_freq);
-                        editor.putInt("frequency", 50);
-                        break;
-                    default:
-                        Log.d(TAG, "default: ");
+        frequency_radio_group.setOnCheckedChangeListener { group, checkedId ->
+            editor = sp.edit()
+            when (checkedId) {
+                R.id.low_freq -> {
+                    frequency = 5
+                    Log.d(TAG, "low_freq: ")
+                    editor.putInt("frequencyId", R.id.low_freq)
+                    editor.putInt("frequency", 5)
                 }
+                R.id.mid_freq -> {
+                    frequency = 15
+                    Log.d(TAG, "mid_freq: ")
+                    editor.putInt("frequencyId", R.id.mid_freq)
+                    editor.putInt("frequency", 15)
+                }
+                R.id.high_freq -> {
+                    frequency = 50
+                    Log.d(TAG, "high_freq: ")
+                    editor.putInt("frequencyId", R.id.high_freq)
+                    editor.putInt("frequency", 50)
+                }
+                else -> Log.d(TAG, "default: ")
             }
-        });
+            editor.apply()
+        }
     }
 
-    public void startLifeTimeService(View v) {
-        Intent intent = new Intent(this, LifeTimeService.class);
-        intent.putExtra("frequency", frequency);
-        if (editor != null)
-            editor.apply();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            startForegroundService(intent);
-        else
-            startService(intent);
-
-        Intent myIntent = new Intent(this, LifeTimeService.class);
-        myIntent.putExtra("ALARM", true);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, myIntent, 0);
-
+    fun startLifeTimeService(v: View?) {
+        val intent = Intent(this, LifeTimeService::class.java)
+        intent.putExtra("frequency", frequency)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(intent) else startService(intent)
+        val myIntent = Intent(this, LifeTimeService::class.java)
+        myIntent.putExtra("ALARM", true)
+        val pendingIntent = PendingIntent.getService(this, 0, myIntent, 0)
         /**
-         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-         long firstTime = SystemClock.elapsedRealtime();
-         alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 5 * 60 * 1000, pendingIntent);
+         * AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+         * long firstTime = SystemClock.elapsedRealtime();
+         * alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 5 * 60 * 1000, pendingIntent);
          */
     }
 }

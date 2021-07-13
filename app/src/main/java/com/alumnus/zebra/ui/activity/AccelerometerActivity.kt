@@ -1,31 +1,24 @@
-package com.alumnus.zebra.ui.activity;
+package com.alumnus.zebra.ui.activity
 
-import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.util.Log;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.alumnus.zebra.R;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ColorTemplate;
-
-import static com.alumnus.zebra.utils.Constant.G_CALIBRATION_FACTOR;
-import static com.alumnus.zebra.utils.Constant.THROW_CALIBRATION_FACTOR;
-
+import android.graphics.Color
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.alumnus.zebra.R
+import com.alumnus.zebra.utils.Constant
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.github.mikephil.charting.utils.ColorTemplate
 
 /**
  * Contains Graph x2
@@ -34,185 +27,164 @@ import static com.alumnus.zebra.utils.Constant.THROW_CALIBRATION_FACTOR;
  *
  * @author Arnab Kundu
  */
-public class AccelerometerActivity extends AppCompatActivity implements SensorEventListener, OnChartValueSelectedListener {
-
-    private final String TAG = this.getClass().getSimpleName();
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    private LineChart xyzChart, tsvChart;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_accelerometer);
-
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        xyzChart = findViewById(R.id.chart_xyz);
-        tsvChart = findViewById(R.id.chart_tsv);
-        setXYZGraph(xyzChart);
-        setTSVGraph(tsvChart);
+class AccelerometerActivity : AppCompatActivity(), SensorEventListener, OnChartValueSelectedListener {
+    private val TAG = this.javaClass.simpleName
+    private var mSensorManager: SensorManager? = null
+    private var mAccelerometer: Sensor? = null
+    private var xyzChart: LineChart? = null
+    private var tsvChart: LineChart? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_accelerometer)
+        mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        mAccelerometer = mSensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        xyzChart = findViewById(R.id.chart_xyz)
+        tsvChart = findViewById(R.id.chart_tsv)
+        setXYZGraph(xyzChart)
+        setTSVGraph(tsvChart)
     }
 
-    protected void onResume() {
-        super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    override fun onResume() {
+        super.onResume()
+        mSensorManager!!.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
-    protected void onPause() {
-        super.onPause();
-        mSensorManager.unregisterListener(this);
+    override fun onPause() {
+        super.onPause()
+        mSensorManager!!.unregisterListener(this)
     }
 
-    private void setXYZGraph(LineChart chart) {
-
-        chart.setOnChartValueSelectedListener(this);
+    private fun setXYZGraph(chart: LineChart?) {
+        chart!!.setOnChartValueSelectedListener(this)
 
         // enable description text
-        chart.getDescription().setEnabled(true);
-        chart.getDescription().setText("Accelerometer data");
+        chart.description.isEnabled = true
+        chart.description.text = "Accelerometer data"
 
         // enable touch gestures
-        chart.setTouchEnabled(true);
+        chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-        chart.setDrawGridBackground(false);
+        chart.isDragEnabled = true
+        chart.setScaleEnabled(true)
+        chart.setDrawGridBackground(false)
 
         // if disabled, scaling can be done on x- and y-axis separately
-        chart.setPinchZoom(true);
+        chart.setPinchZoom(true)
 
         // set an alternative background color
-        chart.setBackgroundColor(Color.LTGRAY);
-
-        LineData data = new LineData();
-        data.setValueTextColor(Color.WHITE);
+        chart.setBackgroundColor(Color.LTGRAY)
+        val data = LineData()
+        data.setValueTextColor(Color.WHITE)
 
         // add empty data
-        chart.setData(data);
+        chart.data = data
 
         // get the legend (only possible after setting data)
-        Legend l = chart.getLegend();
+        val l = chart.legend
 
         // modify the legend ...
-        l.setForm(Legend.LegendForm.LINE);
+        l.form = Legend.LegendForm.LINE
         //l.setTypeface(tfLight);
-        l.setTextColor(Color.WHITE);
-
-        XAxis xl = chart.getXAxis();
+        l.textColor = Color.WHITE
+        val xl = chart.xAxis
         //xl.setTypeface(tfLight);
-        xl.setTextColor(Color.WHITE);
-        xl.setDrawGridLines(false);
-        xl.setAvoidFirstLastClipping(true);
-        xl.setEnabled(true);
-
-        YAxis leftAxis = chart.getAxisLeft();
+        xl.textColor = Color.WHITE
+        xl.setDrawGridLines(false)
+        xl.setAvoidFirstLastClipping(true)
+        xl.isEnabled = true
+        val leftAxis = chart.axisLeft
         //leftAxis.setTypeface(tfLight);
-        leftAxis.setTextColor(Color.WHITE);
-        leftAxis.setAxisMaximum(20f);
-        leftAxis.setAxisMinimum(-20f);
-        leftAxis.setDrawGridLines(true);
-
-        YAxis rightAxis = chart.getAxisRight();
-        rightAxis.setEnabled(false);
+        leftAxis.textColor = Color.WHITE
+        leftAxis.axisMaximum = 20f
+        leftAxis.axisMinimum = -20f
+        leftAxis.setDrawGridLines(true)
+        val rightAxis = chart.axisRight
+        rightAxis.isEnabled = false
     }
 
-    private void setTSVGraph(LineChart chart) {
-
-        chart.setOnChartValueSelectedListener(this);
+    private fun setTSVGraph(chart: LineChart?) {
+        chart!!.setOnChartValueSelectedListener(this)
 
         // enable description text
-        chart.getDescription().setEnabled(true);
-        chart.getDescription().setText("Accelerometer data");
+        chart.description.isEnabled = true
+        chart.description.text = "Accelerometer data"
 
         // enable touch gestures
-        chart.setTouchEnabled(true);
+        chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-        chart.setDrawGridBackground(false);
+        chart.isDragEnabled = true
+        chart.setScaleEnabled(true)
+        chart.setDrawGridBackground(false)
 
         // if disabled, scaling can be done on x- and y-axis separately
-        chart.setPinchZoom(true);
+        chart.setPinchZoom(true)
 
         // set an alternative background color
-        chart.setBackgroundColor(Color.LTGRAY);
-
-        LineData data = new LineData();
-        data.setValueTextColor(Color.WHITE);
+        chart.setBackgroundColor(Color.LTGRAY)
+        val data = LineData()
+        data.setValueTextColor(Color.WHITE)
 
         // add empty data
-        chart.setData(data);
+        chart.data = data
 
         // get the legend (only possible after setting data)
-        Legend l = chart.getLegend();
+        val l = chart.legend
 
         // modify the legend ...
-        l.setForm(Legend.LegendForm.LINE);
+        l.form = Legend.LegendForm.LINE
         //l.setTypeface(tfLight);
-        l.setTextColor(Color.WHITE);
-
-        XAxis xl = chart.getXAxis();
+        l.textColor = Color.WHITE
+        val xl = chart.xAxis
         //xl.setTypeface(tfLight);
-        xl.setTextColor(Color.WHITE);
-        xl.setDrawGridLines(false);
-        xl.setAvoidFirstLastClipping(true);
-        xl.setEnabled(true);
-
-        YAxis leftAxis = chart.getAxisLeft();
+        xl.textColor = Color.WHITE
+        xl.setDrawGridLines(false)
+        xl.setAvoidFirstLastClipping(true)
+        xl.isEnabled = true
+        val leftAxis = chart.axisLeft
         //leftAxis.setTypeface(tfLight);
-        leftAxis.setTextColor(Color.WHITE);
-        leftAxis.setAxisMaximum(100f);
-        leftAxis.setAxisMinimum(0f);
-        leftAxis.setDrawGridLines(true);
-
-        YAxis rightAxis = chart.getAxisRight();
-        rightAxis.setEnabled(false);
+        leftAxis.textColor = Color.WHITE
+        leftAxis.axisMaximum = 100f
+        leftAxis.axisMinimum = 0f
+        leftAxis.setDrawGridLines(true)
+        val rightAxis = chart.axisRight
+        rightAxis.isEnabled = false
     }
 
-    private void addEntry(float x, float y, float z) {
-
-        LineData data = xyzChart.getData();
-
+    private fun addEntry(x: Float, y: Float, z: Float) {
+        val data = xyzChart!!.data
         if (data != null) {
-
-            ILineDataSet setx = data.getDataSetByIndex(0);
-            ILineDataSet sety = data.getDataSetByIndex(1);
-            ILineDataSet setz = data.getDataSetByIndex(2);
+            var setx = data.getDataSetByIndex(0)
+            var sety = data.getDataSetByIndex(1)
+            var setz = data.getDataSetByIndex(2)
             // set.addEntry(...); // can be called as well
-
             if (setx == null) {
-                setx = createSet("X");
-                data.addDataSet(setx);
+                setx = createSet("X")
+                data.addDataSet(setx)
             }
-
             if (sety == null) {
-                sety = createSet("Y");
-                data.addDataSet(sety);
+                sety = createSet("Y")
+                data.addDataSet(sety)
             }
-
             if (setz == null) {
-                setz = createSet("Z");
-                data.addDataSet(setz);
+                setz = createSet("Z")
+                data.addDataSet(setz)
             }
-
-            data.addEntry(new Entry(setx.getEntryCount(), x), 0);
-            data.addEntry(new Entry(sety.getEntryCount(), y), 1);
-            data.addEntry(new Entry(setz.getEntryCount(), z), 2);
-            data.notifyDataChanged();
+            data.addEntry(Entry(setx!!.entryCount.toFloat(), x), 0)
+            data.addEntry(Entry(sety!!.entryCount.toFloat(), y), 1)
+            data.addEntry(Entry(setz!!.entryCount.toFloat(), z), 2)
+            data.notifyDataChanged()
 
             // let the chart know it's data has changed
-            xyzChart.notifyDataSetChanged();
+            xyzChart!!.notifyDataSetChanged()
 
             // limit the number of visible entries
-            xyzChart.setVisibleXRangeMaximum(20);
+            xyzChart!!.setVisibleXRangeMaximum(20f)
             // chart.setVisibleYRange(30, AxisDependency.LEFT);
 
             // move to the latest entry
-            xyzChart.moveViewToX(data.getEntryCount());
+            xyzChart!!.moveViewToX(data.entryCount.toFloat())
 
             // this automatically refreshes the chart (calls invalidate())
             // chart.moveViewTo(data.getXValCount()-7, 55f,
@@ -220,33 +192,28 @@ public class AccelerometerActivity extends AppCompatActivity implements SensorEv
         }
     }
 
-    private void addTSVEntry(float tsv) {
-
-        LineData data = tsvChart.getData();
-
+    private fun addTSVEntry(tsv: Float) {
+        val data = tsvChart!!.data
         if (data != null) {
-
-            ILineDataSet set = data.getDataSetByIndex(0);
+            var set = data.getDataSetByIndex(0)
 
             // set.addEntry(...); // can be called as well
-
             if (set == null) {
-                set = createSet("TSV");
-                data.addDataSet(set);
+                set = createSet("TSV")
+                data.addDataSet(set)
             }
-
-            data.addEntry(new Entry(set.getEntryCount(), tsv), 0);
-            data.notifyDataChanged();
+            data.addEntry(Entry(set!!.entryCount.toFloat(), tsv), 0)
+            data.notifyDataChanged()
 
             // let the chart know it's data has changed
-            tsvChart.notifyDataSetChanged();
+            tsvChart!!.notifyDataSetChanged()
 
             // limit the number of visible entries
-            tsvChart.setVisibleXRangeMaximum(20);
+            tsvChart!!.setVisibleXRangeMaximum(20f)
             // chart.setVisibleYRange(30, AxisDependency.LEFT);
 
             // move to the latest entry
-            tsvChart.moveViewToX(data.getEntryCount());
+            tsvChart!!.moveViewToX(data.entryCount.toFloat())
 
             // this automatically refreshes the chart (calls invalidate())
             // chart.moveViewTo(data.getXValCount()-7, 55f,
@@ -254,45 +221,41 @@ public class AccelerometerActivity extends AppCompatActivity implements SensorEv
         }
     }
 
-    private LineDataSet createSet(String axis) {
-
-        LineDataSet set = null;
-        if (axis.equalsIgnoreCase("X")) {
-            set = new LineDataSet(null, "X Data");
-            set.setColor(ColorTemplate.MATERIAL_COLORS[0]);
+    private fun createSet(axis: String): LineDataSet? {
+        var set: LineDataSet? = null
+        if (axis.equals("X", ignoreCase = true)) {
+            set = LineDataSet(null, "X Data")
+            set.color = ColorTemplate.MATERIAL_COLORS[0]
         }
-        if (axis.equalsIgnoreCase("Y")) {
-            set = new LineDataSet(null, "Y Data");
-            set.setColor(ColorTemplate.MATERIAL_COLORS[2]);
+        if (axis.equals("Y", ignoreCase = true)) {
+            set = LineDataSet(null, "Y Data")
+            set.color = ColorTemplate.MATERIAL_COLORS[2]
         }
-        if (axis.equalsIgnoreCase("Z")) {
-            set = new LineDataSet(null, "Z Data");
-            set.setColor(ColorTemplate.MATERIAL_COLORS[3]);
+        if (axis.equals("Z", ignoreCase = true)) {
+            set = LineDataSet(null, "Z Data")
+            set.color = ColorTemplate.MATERIAL_COLORS[3]
         }
-        if (axis.equalsIgnoreCase("TSV")) {
-            set = new LineDataSet(null, "TSV Data");
-            set.setColor(ColorTemplate.getHoloBlue());
+        if (axis.equals("TSV", ignoreCase = true)) {
+            set = LineDataSet(null, "TSV Data")
+            set.color = ColorTemplate.getHoloBlue()
         }
         if (set != null) {
-            set.setAxisDependency(YAxis.AxisDependency.LEFT);
-            set.setCircleColor(Color.WHITE);
-            set.setLineWidth(2f);
-            set.setCircleRadius(4f);
-            set.setFillAlpha(65);
-            set.setFillColor(ColorTemplate.getHoloBlue());
-            set.setHighLightColor(Color.rgb(244, 117, 117));
-            set.setValueTextColor(Color.WHITE);
-            set.setValueTextSize(9f);
-            set.setDrawValues(false);
+            set.axisDependency = YAxis.AxisDependency.LEFT
+            set.setCircleColor(Color.WHITE)
+            set.lineWidth = 2f
+            set.circleRadius = 4f
+            set.fillAlpha = 65
+            set.fillColor = ColorTemplate.getHoloBlue()
+            set.highLightColor = Color.rgb(244, 117, 117)
+            set.valueTextColor = Color.WHITE
+            set.valueTextSize = 9f
+            set.setDrawValues(false)
         }
-        return set;
+        return set
     }
 
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    public void onSensorChanged(SensorEvent event) {
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+    override fun onSensorChanged(event: SensorEvent) {
         //Log.d(TAG, "onSensorChanged: Name: "+event.sensor.getName());
         //Log.d(TAG, "onSensorChanged: StringType: "+event.sensor.getStringType());
         //Log.d(TAG, "onSensorChanged: Vendor: "+event.sensor.getVendor());
@@ -301,31 +264,20 @@ public class AccelerometerActivity extends AppCompatActivity implements SensorEv
         //Log.d(TAG, "onSensorChanged: X: " + event.values[0]);
         //Log.d(TAG, "onSensorChanged: Y: " + event.values[1]);
         //Log.d(TAG, "onSensorChanged: Z: " + event.values[2]);
-
-        float G_towards_X = event.values[0];
-        float G_towards_Y = event.values[1];
-        float G_towards_Z = event.values[2];
-        addEntry(G_towards_X, G_towards_Y, G_towards_Z);
-
-        double TSV = Math.sqrt((G_towards_X * G_towards_X) + (G_towards_Y * G_towards_Y) + (G_towards_Z * G_towards_Z));
-        addTSVEntry((float) TSV);
-
-        if (Math.abs(G_towards_X) < G_CALIBRATION_FACTOR && Math.abs(G_towards_Y) < G_CALIBRATION_FACTOR && Math.abs(G_towards_Z) < G_CALIBRATION_FACTOR) {
-            Log.d(TAG, "It's a free fall");
+        val G_towards_X = event.values[0]
+        val G_towards_Y = event.values[1]
+        val G_towards_Z = event.values[2]
+        addEntry(G_towards_X, G_towards_Y, G_towards_Z)
+        val TSV = Math.sqrt((G_towards_X * G_towards_X + G_towards_Y * G_towards_Y + G_towards_Z * G_towards_Z).toDouble())
+        addTSVEntry(TSV.toFloat())
+        if (Math.abs(G_towards_X) < Constant.G_CALIBRATION_FACTOR && Math.abs(G_towards_Y) < Constant.G_CALIBRATION_FACTOR && Math.abs(G_towards_Z) < Constant.G_CALIBRATION_FACTOR) {
+            Log.d(TAG, "It's a free fall")
         }
-
-        if (Math.abs(G_towards_X) > THROW_CALIBRATION_FACTOR || Math.abs(G_towards_Y) > THROW_CALIBRATION_FACTOR || Math.abs(G_towards_Z) > THROW_CALIBRATION_FACTOR) {
-            Log.d(TAG, "It's a throw");
+        if (Math.abs(G_towards_X) > Constant.THROW_CALIBRATION_FACTOR || Math.abs(G_towards_Y) > Constant.THROW_CALIBRATION_FACTOR || Math.abs(G_towards_Z) > Constant.THROW_CALIBRATION_FACTOR) {
+            Log.d(TAG, "It's a throw")
         }
     }
 
-    @Override
-    public void onValueSelected(Entry e, Highlight h) {
-
-    }
-
-    @Override
-    public void onNothingSelected() {
-
-    }
+    override fun onValueSelected(e: Entry, h: Highlight) {}
+    override fun onNothingSelected() {}
 }
