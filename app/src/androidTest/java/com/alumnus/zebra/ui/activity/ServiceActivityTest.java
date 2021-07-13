@@ -32,7 +32,7 @@ public class ServiceActivityTest {
         onView(withId(R.id.high_freq)).perform(ViewActions.click());
         onView(withId(R.id.buttonLifeTimeService)).perform(ViewActions.click());
         TestHelper.INSTANCE.delay(500);
-        //TODO verify Zebra notification
+        /** verify Zebra notification */
         UiDevice mDevice = UiDevice.getInstance(getInstrumentation());
         mDevice.swipe(100,1,100,500,10);
         TestHelper.INSTANCE.delay(3000);

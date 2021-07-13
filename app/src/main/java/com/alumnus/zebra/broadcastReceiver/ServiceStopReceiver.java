@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+@Deprecated
 public class ServiceStopReceiver extends BroadcastReceiver {
 
     private final String TAG = this.getClass().getSimpleName();

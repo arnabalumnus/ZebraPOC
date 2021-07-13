@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.provider.Settings;
 
+@Deprecated
 public class BatteryOptimizationSettings {
 
     public static void allowMorePower(Context context) {

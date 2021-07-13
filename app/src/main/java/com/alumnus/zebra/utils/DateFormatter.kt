@@ -1,25 +1,23 @@
-package com.alumnus.zebra.utils;
+package com.alumnus.zebra.utils
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Formats date and time from millisecond
  */
-public class DateFormatter {
-
+object DateFormatter {
     /**
      * Note: Contains spacial character. Don't use for filename.
      *
      * @param currentTimeInMilliSec     Current System time in millisecond.
      * @return                          A string that contains date and time with spacial character.
      */
-    public static String getTimeStamp(long currentTimeInMilliSec) {
-        Date date = new Date(currentTimeInMilliSec);
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
-        return format.format(date);
+    @JvmStatic
+    fun getTimeStamp(currentTimeInMilliSec: Long): String {
+        val date = Date(currentTimeInMilliSec)
+        val format = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+        return format.format(date)
     }
 
     /**
@@ -28,10 +26,11 @@ public class DateFormatter {
      * @param currentTimeInMilliSec     Current System time in millisecond.
      * @return                          A string that contains date and time for filename.
      */
-    public static String getTimeStampFileName(long currentTimeInMilliSec) {
-        Date date = new Date(currentTimeInMilliSec);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy, MMM-dd 'Time-'HH mm ss", Locale.getDefault());
-        return format.format(date);
+    @JvmStatic
+    fun getTimeStampFileName(currentTimeInMilliSec: Long): String {
+        val date = Date(currentTimeInMilliSec)
+        val format = SimpleDateFormat("yyyy, MMM-dd 'Time-'HH mm ss", Locale.getDefault())
+        return format.format(date)
     }
 
     /**
@@ -40,9 +39,9 @@ public class DateFormatter {
      * @param currentTimeInMilliSec     Current System time in millisecond.
      * @return                          A string that contains only date for filename.
      */
-    public static String getDateStampForFileName(long currentTimeInMilliSec) {
-        Date date = new Date(currentTimeInMilliSec);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MMM-dd", Locale.getDefault());
-        return format.format(date);
+    fun getDateStampForFileName(currentTimeInMilliSec: Long): String {
+        val date = Date(currentTimeInMilliSec)
+        val format = SimpleDateFormat("yyyy-MMM-dd", Locale.getDefault())
+        return format.format(date)
     }
 }

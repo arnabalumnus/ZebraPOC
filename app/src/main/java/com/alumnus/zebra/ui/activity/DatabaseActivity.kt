@@ -97,6 +97,7 @@ class DatabaseActivity : AppCompatActivity() {
         ZipAndDeleteTask().execute()
     }
 
+    //TODO
     inner class DBTask : AsyncTask<Void, Void, Long>() {
         override fun doInBackground(vararg voids: Void): Long {
             db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()

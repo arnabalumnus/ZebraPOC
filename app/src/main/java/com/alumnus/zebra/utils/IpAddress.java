@@ -6,6 +6,7 @@ import android.text.format.Formatter;
 
 import static android.content.Context.WIFI_SERVICE;
 
+@Deprecated
 public class IpAddress {
 
     public static String getIPAddress(Context context) {

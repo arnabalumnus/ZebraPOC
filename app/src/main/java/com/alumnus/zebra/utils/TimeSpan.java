@@ -1,5 +1,6 @@
 package com.alumnus.zebra.utils;
 
+@Deprecated
 public final class TimeSpan {
     public static final long ONE_MINUTES = 1000 * 60;
     public static final long FIVE_MINUTES = 1000 * 60 * 5;

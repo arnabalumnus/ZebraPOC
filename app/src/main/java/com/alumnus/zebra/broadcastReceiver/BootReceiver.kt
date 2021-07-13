@@ -1,32 +1,26 @@
-package com.alumnus.zebra.broadcastReceiver;
+package com.alumnus.zebra.broadcastReceiver
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.util.Log;
-import android.widget.Toast;
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import com.alumnus.zebra.service.LifeTimeService
 
-import androidx.core.content.ContextCompat;
+class BootReceiver : BroadcastReceiver() {
 
-import com.alumnus.zebra.service.LifeTimeService;
+    //private val TAG = "BootReceiver"
 
-public class BootReceiver extends BroadcastReceiver {
-
-    private static final String TAG = "BootReceiver";
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, " onReceive()");
-        Toast.makeText(context, "Booting", Toast.LENGTH_LONG).show();
-        SharedPreferences sp = context.getSharedPreferences("Zebra", Context.MODE_PRIVATE);
-        int frequency = sp.getInt("frequency", 5);
-        Intent serviceIntent = new Intent(context, LifeTimeService.class);
-        serviceIntent.putExtra("frequency", frequency);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            ContextCompat.startForegroundService(context, serviceIntent);
-        else
-            context.startService(intent);
+    override fun onReceive(context: Context, intent: Intent) {
+        //Log.d(TAG, " onReceive()")
+        Toast.makeText(context, "Booting", Toast.LENGTH_LONG).show()
+        val sp = context.getSharedPreferences("Zebra", Context.MODE_PRIVATE)
+        val frequency = sp.getInt("frequency", 5)
+        val serviceIntent = Intent(context, LifeTimeService::class.java)
+        serviceIntent.putExtra("frequency", frequency)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ContextCompat.startForegroundService(context, serviceIntent) else context.startService(intent)
     }
+
 }

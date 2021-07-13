@@ -33,23 +33,23 @@ class AppDatabaseTest {
 
         val accLogEntity = AccLogEntity()
         val firstTS = System.currentTimeMillis()
-        accLogEntity.setTs(firstTS)
-        accLogEntity.setX(9.81F)
-        accLogEntity.setY(0.0F)
-        accLogEntity.setZ(0.0F)
+        accLogEntity.ts =firstTS
+        accLogEntity.x=9.81F
+        accLogEntity.y=0.0F
+        accLogEntity.z=0.0F
 
         accLogDao.insert(accLogEntity)                              // 1st insert
         accLogDao.insert(accLogEntity)                              // Replace 1st insert
-        accLogEntity.setTs(System.currentTimeMillis())
+        accLogEntity.ts = System.currentTimeMillis()
         accLogDao.insert(accLogEntity)                              // 2nd insert
-        accLogEntity.setTs(System.currentTimeMillis())
+        accLogEntity.ts = System.currentTimeMillis()
         accLogDao.insert(accLogEntity)                              // 3rd insert
 
         assert(accLogDao.count == 3L)                               // Size 3
         assert(accLogDao.startingTimeStamp == firstTS)
 
         val lastTs = System.currentTimeMillis()
-        accLogEntity.setTs(lastTs)
+        accLogEntity.ts = lastTs
         accLogDao.insert(accLogEntity)                              // 4th insert
         assert(accLogDao.lastRecordTime == lastTs)
 
