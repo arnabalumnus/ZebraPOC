@@ -9,22 +9,22 @@ interface AccLogDao {
     val all: List<AccLogEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg accelerometer_log: AccLogEntity)
+    suspend fun insert(vararg accelerometer_log: AccLogEntity)
 
     @Delete
     fun delete(accelerometer_log: AccLogEntity)
 
     @get:Query("Select count(*) from accelerometer_log;")
-    val count: Long
+    val count: Long //TODO suspend
 
     @Query("Delete from accelerometer_log where ts <:time_stamp")
     fun deleteAll(time_stamp: Long)
 
-    @get:Query("SELECT TS FROM accelerometer_log limit 1")
-    val startingTimeStamp: Long
+    @Query("SELECT TS FROM accelerometer_log limit 1")
+    fun getStartingTimeStamp(): Long
 
-    @get:Query("Select MAX(TS) from accelerometer_log;")
-    val lastRecordTime: Long
+    @Query("Select MAX(TS) from accelerometer_log;")
+    suspend fun getLastRecordTime(): Long
     //region Get data and clear the same from DB
     /**
      * processDataChunk() takes size as params and return List of AccLogEntity

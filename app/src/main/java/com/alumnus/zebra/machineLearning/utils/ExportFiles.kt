@@ -149,6 +149,6 @@ object ExportFiles {
      */
     private fun generateChunkFileName(context: Context): String {
         val db = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "database-name").build()
-        return DateFormatter.getTimeStampFileName(db.accLogDao().startingTimeStamp)
+        return DateFormatter.getTimeStampFileName(db.accLogDao().getStartingTimeStamp())
     }
 }

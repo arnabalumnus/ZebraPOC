@@ -8,8 +8,8 @@ import com.alumnus.zebra.db.entity.CsvFileLogEntity
 
 @Dao
 interface CsvFileLogDao {
-    @get:Query("SELECT * FROM csv_file_log")
-    val all: List<CsvFileLogEntity>
+    @Query("SELECT * FROM csv_file_log")
+     fun getAll(): List<CsvFileLogEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(vararg csvFileLogs: CsvFileLogEntity)

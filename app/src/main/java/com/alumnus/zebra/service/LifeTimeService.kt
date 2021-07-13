@@ -10,7 +10,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.AsyncTask
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -18,6 +17,9 @@ import androidx.room.Room
 import com.alumnus.zebra.R
 import com.alumnus.zebra.db.AppDatabase
 import com.alumnus.zebra.db.entity.AccLogEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LifeTimeService : Service(), SensorEventListener {
     //private final String TAG = this.getClass().getSimpleName();
@@ -89,11 +91,9 @@ class LifeTimeService : Service(), SensorEventListener {
             //eventLogEntity.setZ(G_towards_Z);
             //TODO
             if (db != null) {
-                object : AsyncTask<Void, Void, Unit>() {
-                    override fun doInBackground(vararg voids: Void) {
-                        db!!.accLogDao().insert(accLogEntity!!)
-                    }
-                }.execute()
+                CoroutineScope(Dispatchers.IO).launch {
+                    db!!.accLogDao().insert(accLogEntity!!)
+                }
             }
         } catch (e: Exception) {
             //Log.e(TAG, e.getMessage());
