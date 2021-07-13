@@ -1,35 +1,31 @@
-package com.alumnus.zebra.db.dao;
+package com.alumnus.zebra.db.dao
 
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-
-import com.alumnus.zebra.db.entity.CsvFileLogEntity;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.alumnus.zebra.db.entity.CsvFileLogEntity
 
 @Dao
-public interface CsvFileLogDao {
-
-    @Query("SELECT * FROM csv_file_log")
-    List<CsvFileLogEntity> getAll();
+interface CsvFileLogDao {
+    @get:Query("SELECT * FROM csv_file_log")
+    val all: List<CsvFileLogEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(CsvFileLogEntity... csvFileLogs);
+    fun insert(vararg csvFileLogs: CsvFileLogEntity)
 
     @Query("DELETE FROM csv_file_log WHERE file_name=:file_name")
-    void deleteCSVRecord(String file_name);
+    fun deleteCSVRecord(file_name: String)
 
     @Query("DELETE FROM csv_file_log WHERE 1=1")
-    void deleteAllCSV();
+    fun deleteAllCSV()
 
-    @Query("SELECT file_name FROM csv_file_log ORDER BY id ASC LIMIT 1")
-    String getOldestCSVFile();
+    @get:Query("SELECT file_name FROM csv_file_log ORDER BY id ASC LIMIT 1")
+    val oldestCSVFile: String
 
-    @Query("SELECT SUM(count) as total_records FROM csv_file_log")
-    long getTotalRecordOfAllCSVFile();
+    @get:Query("SELECT SUM(count) as total_records FROM csv_file_log")
+    val totalRecordOfAllCSVFile: Long
 
-    @Query("SELECT count(*) FROM csv_file_log")
-    int getCSVFileCount();
+    @get:Query("SELECT count(*) FROM csv_file_log")
+    val csvFileCount: Int
 }

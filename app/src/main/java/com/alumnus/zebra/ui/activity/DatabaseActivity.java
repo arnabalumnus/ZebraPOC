@@ -70,7 +70,7 @@ public class DatabaseActivity extends AppCompatActivity {
         String[] s = new String[listOfCsv.size()];
         String filePath = "/storage/emulated/0/ZebraApp/csvData/"; //TODO Android R filePath
         for (int row = 0; row < listOfCsv.size(); row++) {
-            s[row] = filePath + listOfCsv.get(row).file_name + ".csv";
+            s[row] = filePath + listOfCsv.get(row).getFile_name() + ".csv";
         }
 
         // Check recoded file in Database is actually available in SD card or not.
@@ -147,7 +147,7 @@ public class DatabaseActivity extends AppCompatActivity {
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
             List<CsvFileLogEntity> listOfCsv = db.csvFileLogDao().getAll();
             for (int row = 0; row < listOfCsv.size(); row++) {
-                stringBuilder.append(String.format("| %20s | %5s |\n", listOfCsv.get(row).file_name, listOfCsv.get(row).count));
+                stringBuilder.append(String.format("| %20s | %5s |\n", listOfCsv.get(row).getFile_name(), listOfCsv.get(row).getCount()));
             }
 
             System.out.println(stringBuilder.toString());

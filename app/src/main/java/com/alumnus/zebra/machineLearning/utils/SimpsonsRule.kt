@@ -1,44 +1,47 @@
-package com.alumnus.zebra.machineLearning.utils;
+package com.alumnus.zebra.machineLearning.utils
 
-import java.util.ArrayList;
-
+import java.util.*
 
 /**
  * Simpson's rule is one of the numerical methods which is used to evaluate the definite integral.
  * Here it's calculating area under the curve.
  */
-public class SimpsonsRule {
-
+object SimpsonsRule {
     /**********************************************************************
      * Standard normal distribution density function.
      * Replace with any sufficiently smooth function.
-     **********************************************************************/
-    public static double f(double x) {
-        return Math.exp(-x * x / 2) / Math.sqrt(2 * Math.PI);
+     */
+    fun f(x: Double): Double {
+        return Math.exp(-x * x / 2) / Math.sqrt(2 * Math.PI)
     }
 
     /**********************************************************************
      * Integrate f from a to b using Simpson's rule.
      * Increase N for more precision.
-     **********************************************************************/
-    public static double integrate(ArrayList<Double> tsvDataset, int impactStart, int impactEnd, int step_size) {
-        int N = impactEnd - impactStart;                    // precision parameter
+     */
+    fun integrate(tsvDataset: ArrayList<Double>, impactStart: Int, impactEnd: Int, step_size: Int): Double {
+        val N = impactEnd - impactStart // precision parameter
 
         // 1/3 terms
-        double sum = 1.0 / 3.0 * (tsvDataset.get(impactStart) + tsvDataset.get(impactEnd));
+        var sum = 1.0 / 3.0 * (tsvDataset[impactStart] + tsvDataset[impactEnd])
 
         // 4/3 terms
-        for (int i = 1; i < N - 1; i += 2) {
-            int x = impactStart + step_size * i;
-            sum += 4.0 / 3.0 * tsvDataset.get(x);
+        run {
+            var i = 1
+            while (i < N - 1) {
+                val x = impactStart + step_size * i
+                sum += 4.0 / 3.0 * tsvDataset[x]
+                i += 2
+            }
         }
 
         // 2/3 terms
-        for (int i = 2; i < N - 1; i += 2) {
-            int x = impactStart + step_size * i;
-            sum += 2.0 / 3.0 * tsvDataset.get(x);
+        var i = 2
+        while (i < N - 1) {
+            val x = impactStart + step_size * i
+            sum += 2.0 / 3.0 * tsvDataset[x]
+            i += 2
         }
-
-        return sum * step_size;
+        return sum * step_size
     }
 }

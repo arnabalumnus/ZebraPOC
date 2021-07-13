@@ -1,17 +1,17 @@
-package com.alumnus.zebra.db;
+package com.alumnus.zebra.db
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
+import androidx.room.Database
+import com.alumnus.zebra.db.entity.AccLogEntity
+import com.alumnus.zebra.db.entity.CsvFileLogEntity
+import androidx.room.RoomDatabase
+import com.alumnus.zebra.db.dao.AccLogDao
+import com.alumnus.zebra.db.dao.CsvFileLogDao
 
-import com.alumnus.zebra.db.dao.AccLogDao;
-import com.alumnus.zebra.db.dao.CsvFileLogDao;
-import com.alumnus.zebra.db.entity.AccLogEntity;
-import com.alumnus.zebra.db.entity.CsvFileLogEntity;
+@Database(entities = [AccLogEntity::class, CsvFileLogEntity::class], views = [], version = 1, exportSchema = true)
+abstract class AppDatabase : RoomDatabase() {
 
-@Database(entities = {AccLogEntity.class, CsvFileLogEntity.class}, views = {}, version = 1, exportSchema = true)
-public abstract class AppDatabase extends RoomDatabase {
+    abstract fun accLogDao(): AccLogDao
 
-    public abstract AccLogDao accLogDao();
+    abstract fun csvFileLogDao(): CsvFileLogDao
 
-    public abstract CsvFileLogDao csvFileLogDao();
 }

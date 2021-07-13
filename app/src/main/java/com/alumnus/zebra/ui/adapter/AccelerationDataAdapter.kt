@@ -1,86 +1,72 @@
-package com.alumnus.zebra.ui.adapter;
+package com.alumnus.zebra.ui.adapter
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.alumnus.zebra.R
+import com.alumnus.zebra.pojo.AccelerationStringData
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.alumnus.zebra.R;
-import com.alumnus.zebra.pojo.AccelerationStringData;
-
-import java.util.ArrayList;
-
-public class AccelerationDataAdapter extends RecyclerView.Adapter<AccelerationDataAdapter.ViewHolder> {
-
-    private ArrayList<AccelerationStringData> accelerations;
-    Context context;
-
-    public AccelerationDataAdapter(ArrayList<AccelerationStringData> accelerations) {
-        this.accelerations = accelerations;
+class AccelerationDataAdapter(private val accelerations: ArrayList<AccelerationStringData>) : RecyclerView.Adapter<AccelerationDataAdapter.ViewHolder>() {
+    var context: Context? = null
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        context = parent.context
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.row_acceleration_data, parent, false)
+        return ViewHolder(itemView)
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_acceleration_data, parent, false);
-        return new ViewHolder(itemView);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.tvTs.setText(accelerations.get(position).ts);
-        holder.tvX.setText(accelerations.get(position).x);
-        holder.tvY.setText(accelerations.get(position).y);
-        holder.tvZ.setText(accelerations.get(position).z);
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.tvTs.text = accelerations[position].ts
+        holder.tvX.text = accelerations[position].x
+        holder.tvY.text = accelerations[position].y
+        holder.tvZ.text = accelerations[position].z
         if (position == 0) {
-            holder.tvTs.setBackground(context.getDrawable(R.drawable.bg_black_with_border));
-            holder.tvX.setBackground(context.getDrawable(R.drawable.bg_black_with_border));
-            holder.tvY.setBackground(context.getDrawable(R.drawable.bg_black_with_border));
-            holder.tvZ.setBackground(context.getDrawable(R.drawable.bg_black_with_border));
+            holder.tvTs.background = context!!.getDrawable(R.drawable.bg_black_with_border)
+            holder.tvX.background = context!!.getDrawable(R.drawable.bg_black_with_border)
+            holder.tvY.background = context!!.getDrawable(R.drawable.bg_black_with_border)
+            holder.tvZ.background = context!!.getDrawable(R.drawable.bg_black_with_border)
         } else if (position % 2 == 0) {
-            holder.tvTs.setBackground(context.getDrawable(R.drawable.bg_gray_with_border));
-            holder.tvX.setBackground(context.getDrawable(R.drawable.bg_gray_with_border));
-            holder.tvY.setBackground(context.getDrawable(R.drawable.bg_gray_with_border));
-            holder.tvZ.setBackground(context.getDrawable(R.drawable.bg_gray_with_border));
+            holder.tvTs.background = context!!.getDrawable(R.drawable.bg_gray_with_border)
+            holder.tvX.background = context!!.getDrawable(R.drawable.bg_gray_with_border)
+            holder.tvY.background = context!!.getDrawable(R.drawable.bg_gray_with_border)
+            holder.tvZ.background = context!!.getDrawable(R.drawable.bg_gray_with_border)
         } else {
-            holder.tvTs.setBackground(context.getDrawable(R.drawable.bg_white_with_border));
-            holder.tvX.setBackground(context.getDrawable(R.drawable.bg_white_with_border));
-            holder.tvY.setBackground(context.getDrawable(R.drawable.bg_white_with_border));
-            holder.tvZ.setBackground(context.getDrawable(R.drawable.bg_white_with_border));
+            holder.tvTs.background = context!!.getDrawable(R.drawable.bg_white_with_border)
+            holder.tvX.background = context!!.getDrawable(R.drawable.bg_white_with_border)
+            holder.tvY.background = context!!.getDrawable(R.drawable.bg_white_with_border)
+            holder.tvZ.background = context!!.getDrawable(R.drawable.bg_white_with_border)
         }
         if (position == 0) {
-            holder.tvTs.setTextColor(context.getColor(R.color.white));
-            holder.tvX.setTextColor(context.getColor(R.color.white));
-            holder.tvY.setTextColor(context.getColor(R.color.white));
-            holder.tvZ.setTextColor(context.getColor(R.color.white));
+            holder.tvTs.setTextColor(context!!.getColor(R.color.white))
+            holder.tvX.setTextColor(context!!.getColor(R.color.white))
+            holder.tvY.setTextColor(context!!.getColor(R.color.white))
+            holder.tvZ.setTextColor(context!!.getColor(R.color.white))
         } else {
-            holder.tvTs.setTextColor(context.getColor(R.color.black));
-            holder.tvX.setTextColor(context.getColor(R.color.black));
-            holder.tvY.setTextColor(context.getColor(R.color.black));
-            holder.tvZ.setTextColor(context.getColor(R.color.black));
+            holder.tvTs.setTextColor(context!!.getColor(R.color.black))
+            holder.tvX.setTextColor(context!!.getColor(R.color.black))
+            holder.tvY.setTextColor(context!!.getColor(R.color.black))
+            holder.tvZ.setTextColor(context!!.getColor(R.color.black))
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return accelerations.size();
+    override fun getItemCount(): Int {
+        return accelerations.size
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var tvTs: TextView
+        var tvX: TextView
+        var tvY: TextView
+        var tvZ: TextView
 
-        TextView tvTs, tvX, tvY, tvZ;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvTs = itemView.findViewById(R.id.tvTs);
-            tvX = itemView.findViewById(R.id.tvX);
-            tvY = itemView.findViewById(R.id.tvY);
-            tvZ = itemView.findViewById(R.id.tvZ);
+        init {
+            tvTs = itemView.findViewById(R.id.tvTs)
+            tvX = itemView.findViewById(R.id.tvX)
+            tvY = itemView.findViewById(R.id.tvY)
+            tvZ = itemView.findViewById(R.id.tvZ)
         }
     }
 }

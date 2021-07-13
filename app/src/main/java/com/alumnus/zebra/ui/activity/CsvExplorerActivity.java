@@ -92,10 +92,10 @@ public class CsvExplorerActivity extends AppCompatActivity {
         dataList.remove(0);
 
         for (AccelerationStringData accStringData : dataList) {
-            accNumericData.setTs(Long.parseLong(accStringData.ts));
-            accNumericData.setX(Float.parseFloat(accStringData.x));
-            accNumericData.setY(Float.parseFloat(accStringData.y));
-            accNumericData.setZ(Float.parseFloat(accStringData.z));
+            accNumericData.setTs(Long.parseLong(accStringData.getTs()));
+            accNumericData.setX(Float.parseFloat(accStringData.getX()));
+            accNumericData.setY(Float.parseFloat(accStringData.getY()));
+            accNumericData.setZ(Float.parseFloat(accStringData.getZ()));
             accNumericDataList.add(accNumericData);
         }
         String result = new DataAnalysis().startEventAnalysis(accNumericDataList, this, null);

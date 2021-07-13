@@ -1,45 +1,31 @@
-package com.alumnus.zebra.db.dao;
+package com.alumnus.zebra.db.dao
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Transaction;
-
-import com.alumnus.zebra.db.entity.AccLogEntity;
-
-import java.util.List;
-
-import kotlin.jvm.Synchronized;
+import androidx.room.*
+import com.alumnus.zebra.db.entity.AccLogEntity
 
 @Dao
-public interface AccLogDao {
-
-    @Query("SELECT * FROM accelerometer_log")
-    List<AccLogEntity> getAll();
+interface AccLogDao {
+    @get:Query("SELECT * FROM accelerometer_log")
+    val all: List<AccLogEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(AccLogEntity... accelerometer_log);
+    fun insert(vararg accelerometer_log: AccLogEntity)
 
     @Delete
-    void delete(AccLogEntity accelerometer_log);
+    fun delete(accelerometer_log: AccLogEntity)
 
-    @Query("Select count(*) from accelerometer_log;")
-    long getCount();
+    @get:Query("Select count(*) from accelerometer_log;")
+    val count: Long
 
     @Query("Delete from accelerometer_log where ts <:time_stamp")
-    void deleteAll(long time_stamp);
+    fun deleteAll(time_stamp: Long)
 
-    @Query("SELECT TS FROM accelerometer_log limit 1")
-    long getStartingTimeStamp();
+    @get:Query("SELECT TS FROM accelerometer_log limit 1")
+    val startingTimeStamp: Long
 
-    @Query("Select MAX(TS) from accelerometer_log;")
-    long getLastRecordTime();
-
-
+    @get:Query("Select MAX(TS) from accelerometer_log;")
+    val lastRecordTime: Long
     //region Get data and clear the same from DB
-
     /**
      * processDataChunk() takes size as params and return List of AccLogEntity
      *
@@ -49,21 +35,19 @@ public interface AccLogDao {
      * AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database-name").build();
      * List<AccLogEntity> accLogEntities = db.accLogDao().processDataChunk(10);
      */
-    @Synchronized
-    @Transaction()
-    default List<AccLogEntity> processDataChunk(int data_chunk_size) {
-        List<AccLogEntity> data = getDataChunk(data_chunk_size);
-        deleteChunk(data_chunk_size);
-        return data;
+    //@Synchronized
+    @Transaction
+    fun processDataChunk(data_chunk_size: Int): List<AccLogEntity> {
+        val data = getDataChunk(data_chunk_size)
+        deleteChunk(data_chunk_size)
+        return data
     }
 
-    @Synchronized
+    //@Synchronized
     @Query("SELECT * FROM accelerometer_log ORDER BY TS ASC limit :chunk_size")
-    List<AccLogEntity> getDataChunk(int chunk_size);
+    fun getDataChunk(chunk_size: Int): List<AccLogEntity>
 
-    @Synchronized
+    //@Synchronized
     @Query("DELETE FROM accelerometer_log WHERE id <=(SELECT id FROM accelerometer_log LIMIT 1 OFFSET :chunk_size-1)")
-    void deleteChunk(int chunk_size);
-    //endregion
-
+    fun deleteChunk(chunk_size: Int) //endregion
 }
