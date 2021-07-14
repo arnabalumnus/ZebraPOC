@@ -15,7 +15,7 @@ interface AccLogDao {
     fun delete(accelerometer_log: AccLogEntity)
 
     @get:Query("Select count(*) from accelerometer_log;")
-    val count: Long //TODO suspend
+    val count: Long
 
     @Query("Delete from accelerometer_log where ts <:time_stamp")
     fun deleteAll(time_stamp: Long)

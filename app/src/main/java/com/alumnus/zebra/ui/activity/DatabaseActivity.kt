@@ -24,6 +24,9 @@ import java.io.File
  * @author Arnab Kundu
  */
 class DatabaseActivity : AppCompatActivity() {
+
+    //private val TAG = javaClass.simpleName
+
     var tv_db_record_count_event_table: TextView? = null
     var tv_db_record_count_acc_table: TextView? = null
     var tv_csv_list_table: TextView? = null
@@ -45,7 +48,6 @@ class DatabaseActivity : AppCompatActivity() {
     }
 
     fun getTotalCount(view: View) {
-        //DBTask().execute()
         CoroutineScope(Dispatchers.Main).launch {
             val deferredLong: Deferred<Long> = CoroutineScope(Dispatchers.IO).async {
                 getRowCountOfAccelerometerTable()
@@ -56,7 +58,6 @@ class DatabaseActivity : AppCompatActivity() {
     }
 
     fun getLastTimeStamp(v: View) {
-        //FetchTimeStampDBTask().execute()
         CoroutineScope(Dispatchers.Main).launch {
             val deferredString: Deferred<String> = CoroutineScope(Dispatchers.IO).async {
                 fetchTimeStampDBTask()
@@ -66,8 +67,13 @@ class DatabaseActivity : AppCompatActivity() {
         }
     }
 
+    fun archive(view: View) {
+        CoroutineScope(Dispatchers.IO).launch {
+            deleteAfterZippingFiles()
+        }
+    }
+
     fun getCsvListTable(view: View) {
-        //CsvFileDBTask().execute()
         CoroutineScope(Dispatchers.Main).launch {
             val deferredString: Deferred<String> = CoroutineScope(Dispatchers.IO).async {
                 getRecordOfCsvFilesAvailableInSdCardFromDatabase()
@@ -83,7 +89,7 @@ class DatabaseActivity : AppCompatActivity() {
      * @param listOfCsv ArrayList of [CsvFileLogEntity]
      */
     private fun zipAllCSVFiles(listOfCsv: List<CsvFileLogEntity>) {
-        val s = Array<String>(listOfCsv.size) { "it = $it" }    //TODO understand
+        val s = Array<String>(listOfCsv.size) { "it = $it" }
         val filePath = "/storage/emulated/0/ZebraApp/csvData/" //TODO Android R filePath
         for (row in listOfCsv.indices) {
             s[row] = filePath + listOfCsv[row].file_name + ".csv"
@@ -114,45 +120,21 @@ class DatabaseActivity : AppCompatActivity() {
         db!!.csvFileLogDao().deleteAllCSV()
     }
 
-    fun archive(view: View) {
-        //ZipAndDeleteTask().execute()
-        CoroutineScope(Dispatchers.IO).launch {
-            deleteAfterZippingFiles()
-        }
-    }
 
-    //TODO
-    /*inner class DBTask : AsyncTask<Void, Void, Long>() {
-        override fun doInBackground(vararg voids: Void): Long {
-            db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
-            return db!!.accLogDao().count
-        }
-
-        override fun onPostExecute(count: Long) {
-            super.onPostExecute(count)
-            tv_db_record_count_acc_table!!.text = "Accelerometer table row count: $count"
-        }
-    }*/
-
+    /**
+     * Get Accelerometer Table row count from RoomDB
+     * @return Long
+     */
     private suspend fun getRowCountOfAccelerometerTable(): Long {
         db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
         return db!!.accLogDao().count
     }
 
-    /*inner class FetchTimeStampDBTask : AsyncTask<Void, Void, String>() {
-        override fun doInBackground(vararg voids: Void): String {
-            db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
-            val startingTimeStamp = db!!.accLogDao().getStartingTimeStamp()
-            val lastRecordTime = db!!.accLogDao().getLastRecordTime()
-            return "Starting timestamp: ${DateFormatter.getTimeStamp(startingTimeStamp)}\nLast timestamp: ${DateFormatter.getTimeStamp(lastRecordTime)}"
-        }
 
-        override fun onPostExecute(s: String) {
-            super.onPostExecute(s)
-            tv_db_record_count_event_table!!.text = s
-        }
-    }*/
-
+    /**
+     * Get Last inserted row TimeStamp of Accelerometer Table
+     * @return String
+     */
     private suspend fun fetchTimeStampDBTask(): String {
         db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
         val startingTimeStamp = db!!.accLogDao().getStartingTimeStamp()
@@ -160,26 +142,11 @@ class DatabaseActivity : AppCompatActivity() {
         return "Starting timestamp: ${DateFormatter.getTimeStamp(startingTimeStamp)}\nLast timestamp: ${DateFormatter.getTimeStamp(lastRecordTime)}"
     }
 
-    /*inner class CsvFileDBTask : AsyncTask<Void, Void, String>() {
-        override fun doInBackground(vararg voids: Void): String {
-            val stringBuilder = StringBuilder()
-            stringBuilder.append("| FileName                                  |  rows |\n")
-            stringBuilder.append("|-----------------------------------------------|----------|\n")
-            val db: AppDatabase = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
-            val listOfCsv = db.csvFileLogDao().getAll()
-            for (row in listOfCsv.indices) {
-                stringBuilder.append(String.format("| %20s | %5s |\n", listOfCsv[row].file_name, listOfCsv[row].count))
-            }
-            println(stringBuilder.toString())
-            return stringBuilder.toString()
-        }
 
-        override fun onPostExecute(s: String) {
-            super.onPostExecute(s)
-            tv_csv_list_table!!.text = s
-        }
-    }*/
-
+    /**
+     * Get list of csv file of Accelerometer data in a TABLE format
+     * @return String
+     */
     private suspend fun getRecordOfCsvFilesAvailableInSdCardFromDatabase(): String {
         val stringBuilder = StringBuilder()
         stringBuilder.append("| FileName                                  |  rows |\n")
@@ -193,22 +160,10 @@ class DatabaseActivity : AppCompatActivity() {
         return stringBuilder.toString()
     }
 
-    /*inner class ZipAndDeleteTask : AsyncTask<Void, Void, Unit>() {
-        override fun doInBackground(vararg voids: Void): Unit {
-            db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
-            val listOfCsv = db!!.csvFileLogDao().getAll()
-            if (listOfCsv.size > 0) {             // Avoid creating 0 byte Zip file, When no csvFile available.
 
-                zipAllCSVFiles(listOfCsv)
-            }
-        }
-
-        override fun onPostExecute(unit: Unit) {
-            super.onPostExecute(unit)
-            Toast.makeText(this@DatabaseActivity, "Zip successful", Toast.LENGTH_LONG).show()
-        }
-    }*/
-
+    /**
+     * Zip those csv file and delete to clear storage
+     */
     private suspend fun deleteAfterZippingFiles() {
         db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
         val listOfCsv = db!!.csvFileLogDao().getAll()
@@ -218,7 +173,4 @@ class DatabaseActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        private const val TAG = "DatabaseActivity"
-    }
 }

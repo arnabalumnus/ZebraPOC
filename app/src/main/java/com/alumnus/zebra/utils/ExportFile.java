@@ -13,8 +13,8 @@ import com.alumnus.zebra.db.AppDatabase;
 import com.alumnus.zebra.db.entity.AccLogEntity;
 import com.alumnus.zebra.db.entity.CsvFileLogEntity;
 import com.alumnus.zebra.machineLearning.DataAnalysis;
-import com.alumnus.zebra.pojo.AccelerationStringData;
 import com.alumnus.zebra.pojo.AccelerationNumericData;
+import com.alumnus.zebra.pojo.AccelerationStringData;
 import com.opencsv.CSVWriter;
 
 import java.io.BufferedReader;
@@ -65,12 +65,12 @@ public class ExportFile {
                         Log.e(TAG, "Error in createNewFile");
                         return;
                     }
-                    db.csvFileLogDao().insert(new CsvFileLogEntity(file.getName(), accLogEntities.size()));
+                    db.csvFileLogDao().insert(new CsvFileLogEntity(file.getName(), accLogEntities.size(), 0));
                     CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
                     csvWrite.writeNext(new String[]{"TS", "X", "Y", "Z"});
                     for (AccLogEntity accLogEntity : accLogEntities) {
                         //Which column you want to export
-                        String[] arrStr = {String.valueOf(accLogEntity.ts), String.valueOf(accLogEntity.x), String.valueOf(accLogEntity.y), String.valueOf(accLogEntity.z)};
+                        String[] arrStr = {String.valueOf(accLogEntity.getTs()), String.valueOf(accLogEntity.getX()), String.valueOf(accLogEntity.getY()), String.valueOf(accLogEntity.getZ())};
                         csvWrite.writeNext(arrStr);
                     }
                     csvWrite.close();
@@ -97,7 +97,7 @@ public class ExportFile {
                                     }
                                 }
                             });
-                    if (db.csvFileLogDao().getTotalRecordOfAllCSVFile() > 18000 && db.csvFileLogDao().getCSVFileCount() > 2) {//432000
+                    if (db.csvFileLogDao().getTotalRecordOfAllCSVFile() > 18000 && db.csvFileLogDao().getCsvFileCount() > 2) {//432000
                         DeleteFile.deleteFile(context, finalExportType);
                     }
                 } catch (Exception sqlEx) {
@@ -110,7 +110,8 @@ public class ExportFile {
     }
 
     /**
-     * @param is
+     * @param is      InputStream
+     * @param context Context
      */
     private static void readCSVData(InputStream is, Context context) {
         // Read the raw csv file
@@ -150,7 +151,7 @@ public class ExportFile {
                         Float.parseFloat(tokens[3].replace("\"", "")));
                 accelerationsDataList.add(accelerationData);
             }
-            String result = new DataAnalysis().startEventAnalysis(accelerationsDataList, context,null);
+            String result = new DataAnalysis().startEventAnalysis(accelerationsDataList, context, null);
             //New approach
             /*ArrayList<Double> tsvList = new ArrayList<>();
             for (AccelerationData accelerationsData : accelerationsDataList) {

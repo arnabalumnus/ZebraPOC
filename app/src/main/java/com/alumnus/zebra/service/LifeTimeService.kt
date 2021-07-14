@@ -21,8 +21,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * LifeTimeService is running 24 x 7 as foregroundService with a notification.
+ * and
+ * Saving accelerometer data into database continuously.
+ * So, memory management for this class is very important
+ *
+ * **Notes: For memory management**
+ *  1. Avoid using TAG, Log messages in this class for memory management.
+ *  2. Follow Singleton design pattern i.e.
+ *      - Avoid repetitive object creation by calling constructor.
+ *      - Use getter(), setter() method.
+ * @author Arnab
+ */
 class LifeTimeService : Service(), SensorEventListener {
-    //private final String TAG = this.getClass().getSimpleName();
+
+    //private val TAG = javaClass.simpleName
+
     private var db: AppDatabase? = null
     private var accLogEntity: AccLogEntity? = null
     private var G_towards_X = 0f
@@ -34,7 +49,8 @@ class LifeTimeService : Service(), SensorEventListener {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val frequency = intent.extras!!.getInt("frequency", 5)
-        //Log.d(TAG, "onStartCommand: frequency=" + frequency);
+
+        //Log.d(TAG, "onStartCommand: frequency=$frequency")
         val mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         if (frequency == 50) mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW) //Value=1 , Frequency: ~50/sec
@@ -77,26 +93,19 @@ class LifeTimeService : Service(), SensorEventListener {
             G_towards_X = event.values[0]
             G_towards_Y = event.values[1]
             G_towards_Z = event.values[2]
-            //Log.i(TAG, "onSensorChanged: X:" + G_towards_X + " Y:" + G_towards_Y + " Z:" + G_towards_Z);
+            //Log.i(TAG, "onSensorChanged: X:$G_towards_X  Y:$G_towards_Y  Z:$G_towards_Z");
             accLogEntity!!.ts = System.currentTimeMillis()
             accLogEntity!!.x = G_towards_X
             accLogEntity!!.y = G_towards_Y
             accLogEntity!!.z = G_towards_Z
 
-            //eventLogEntity.setUid(System.currentTimeMillis());
-            //eventLogEntity.setTime_stamp(getTimeStamp(System.currentTimeMillis()));
-            //eventLogEntity.setEvent("No event");
-            //eventLogEntity.setX(G_towards_X);
-            //eventLogEntity.setY(G_towards_Y);
-            //eventLogEntity.setZ(G_towards_Z);
-            //TODO
             if (db != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     db!!.accLogDao().insert(accLogEntity!!)
                 }
             }
         } catch (e: Exception) {
-            //Log.e(TAG, e.getMessage());
+            //Log.e(TAG, "${e.message}")
         }
     }
 

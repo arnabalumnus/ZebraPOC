@@ -16,6 +16,9 @@ object Constant {
     const val SP = "ZebraSp"
     const val isAutoStartPermissionGranted = "isAutoStartPermissionGranted"
 
+    const val DATABASE_NAME = "ZebraDB"
+
+
     /**
      * @DATA_CHUNK_SIZE of 1,30,000 approximately makes 5MB size of .csv file
      * &
@@ -26,6 +29,6 @@ object Constant {
      * 2^17 = 131072
      * for FFT(Fast Fourier Transform) number of row should be power of 2
      */
-    const val DATA_CHUNK_SIZE = 1000//131072
+    const val DATA_CHUNK_SIZE = 131072
     const val RETAIN_NUMBER_OF_CSV_FILE = 100
 }
