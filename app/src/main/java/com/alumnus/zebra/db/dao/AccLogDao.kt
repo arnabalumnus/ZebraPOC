@@ -24,7 +24,7 @@ interface AccLogDao {
     fun getStartingTimeStamp(): Long
 
     @Query("Select MAX(TS) from accelerometer_log;")
-    suspend fun getLastRecordTime(): Long
+    suspend fun getLastRecordTime(): Long?
     //region Get data and clear the same from DB
     /**
      * processDataChunk() takes size as params and return List of AccLogEntity

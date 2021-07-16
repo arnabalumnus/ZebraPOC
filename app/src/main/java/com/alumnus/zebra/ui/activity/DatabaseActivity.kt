@@ -138,7 +138,7 @@ class DatabaseActivity : AppCompatActivity() {
     private suspend fun fetchTimeStampDBTask(): String {
         db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database-name").build()
         val startingTimeStamp = db!!.accLogDao().getStartingTimeStamp()
-        val lastRecordTime = db!!.accLogDao().getLastRecordTime()
+        val lastRecordTime: Long = db!!.accLogDao().getLastRecordTime() ?: 0
         return "Starting timestamp: ${DateFormatter.getTimeStamp(startingTimeStamp)}\nLast timestamp: ${DateFormatter.getTimeStamp(lastRecordTime)}"
     }
 
