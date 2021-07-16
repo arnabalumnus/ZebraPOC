@@ -2,9 +2,7 @@ package com.alumnus.zebra.ui.activity
 
 import android.Manifest
 import android.app.PendingIntent
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -16,7 +14,6 @@ import com.alumnus.zebra.R
 import com.alumnus.zebra.broadcastReceiver.PowerConnectionReceiver
 import com.alumnus.zebra.machineLearning.utils.ExportFiles.prepareDataChunk
 import com.alumnus.zebra.service.LifeTimeService
-import com.alumnus.zebra.ui.activity.DatabaseActivity
 import com.alumnus.zebra.utils.AutoStart
 import com.alumnus.zebra.utils.Constant
 
@@ -57,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         //AutoStart.addAutoStartup(this);
         //BatteryOptimizationSettings.allowMorePower(this);
+        //turnOffBatterySaverMIUI()
     }
 
     fun goToAccelerometer(view: View?) {
@@ -129,5 +127,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
     } //endregion
+
+    private fun turnOffBatterySaverMIUI() {
+        try {
+            val intent = Intent()
+            intent.component = ComponentName("com.miui.powerkeeper", "com.miui.powerkeeper.ui.HiddenAppsConfigActivity")
+            intent.putExtra("package_name", packageName)
+            intent.putExtra("package_label", getText(R.string.app_name))
+            startActivity(intent)
+        } catch (anfe: ActivityNotFoundException) {
+        }
+    }
 
 }

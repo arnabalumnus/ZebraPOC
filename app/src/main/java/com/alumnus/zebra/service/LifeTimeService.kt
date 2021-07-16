@@ -19,7 +19,9 @@ import com.alumnus.zebra.db.AppDatabase
 import com.alumnus.zebra.db.entity.AccLogEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.concurrent.thread
 
 /**
  * LifeTimeService is running 24 x 7 as foregroundService with a notification.
@@ -43,6 +45,7 @@ class LifeTimeService : Service(), SensorEventListener {
     private var G_towards_X = 0f
     private var G_towards_Y = 0f
     private var G_towards_Z = 0f
+    lateinit var job: Job
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
@@ -100,9 +103,12 @@ class LifeTimeService : Service(), SensorEventListener {
             accLogEntity!!.z = G_towards_Z
 
             if (db != null) {
-                CoroutineScope(Dispatchers.IO).launch {
+                job = CoroutineScope(Dispatchers.IO).launch {
                     db!!.accLogDao().insert(accLogEntity!!)
                 }
+                /*thread {
+                    db!!.accLogDao().insert(accLogEntity!!)
+                }*/
             }
         } catch (e: Exception) {
             //Log.e(TAG, "${e.message}")
