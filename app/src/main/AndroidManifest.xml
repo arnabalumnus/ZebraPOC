@@ -73,7 +73,9 @@
             android:exported="false"
             android:foregroundServiceType="dataSync"
             android:process=":dataCollect" />
-        <activity android:name=".SpecificEventTypeRecorderActivity">
+        <activity
+            android:name=".SpecificEventTypeRecorderActivity"
+            android:label="Event Recorder">
             <!--Make it LAUNCHER to generate separate Event Recorder app-->
         </activity>
     </application>
