@@ -56,7 +56,6 @@
                 <action android:name="android.intent.action.BATTERY_OKAY" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".broadcastReceiver.BootReceiver"
             android:enabled="true"
@@ -74,12 +73,9 @@
             android:exported="false"
             android:foregroundServiceType="dataSync"
             android:process=":dataCollect" />
-
-        <!--<receiver android:name=".broadcastReceiver.ServiceStopReceiver">
-            <intent-filter>
-                <action android:name="com.alumnus.zebra.service.LifeTimeService.stopped" />
-            </intent-filter>
-        </receiver>-->
+        <activity android:name=".SpecificEventTypeRecorderActivity">
+            <!--Make it LAUNCHER to generate separate Event Recorder app-->
+        </activity>
     </application>
 
 </manifest>
