@@ -18,7 +18,10 @@ import com.alumnus.zebra.db.AppDatabase
 import com.alumnus.zebra.db.entity.AccLogEntity
 import com.alumnus.zebra.machineLearning.utils.ExportFiles
 import com.alumnus.zebra.pojo.AccelerationNumericData
-import com.alumnus.zebra.utils.*
+import com.alumnus.zebra.utils.Constant
+import com.alumnus.zebra.utils.CsvFileOperator
+import com.alumnus.zebra.utils.DateFormatter
+import com.alumnus.zebra.utils.FolderFiles
 import kotlinx.android.synthetic.main.activity_specfice_event_type_recorder.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,12 +63,16 @@ class SpecificEventTypeRecorderActivity : AppCompatActivity(), SensorEventListen
      * Button Click
      */
     fun startTracking(view: View) {
-        btn_start_tracking.isEnabled = false
-        val mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        val mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW)
-        trackingUpToTime = System.currentTimeMillis() + et_time_span.text.toString().toLong() * 1000 ?: 0
-        fileName = et_event_type.text.toString() ?: "UndefinedFileName"
+        if (et_time_span.text.toString().isNotBlank()) {
+            btn_start_tracking.isEnabled = false
+            val mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+            val mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_STATUS_ACCURACY_LOW)
+            trackingUpToTime = System.currentTimeMillis() + et_time_span.text.toString().toLong() * 1000 ?: 0
+            fileName = et_event_type.text.toString() ?: "UndefinedFileName"
+        } else {
+            et_time_span.error = "Cannot be empty"
+        }
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -106,7 +113,7 @@ class SpecificEventTypeRecorderActivity : AppCompatActivity(), SensorEventListen
         for (accLogEntity in accLogEntities) {
             accelerationsDataList.add(AccelerationNumericData(accLogEntity.ts, accLogEntity.x, accLogEntity.y, accLogEntity.z))
         }
-        FolderFiles.createFolder(this,"KnownTypesEvent")
+        FolderFiles.createFolder(this, "KnownTypesEvent")
         CsvFileOperator.writeCsvFile(this, accelerationsDataList, folderName = "KnownTypesEvent", fileName = "$fileName-${DateFormatter.getTimeStampFileName(System.currentTimeMillis())}")
         db!!.accLogDao().deleteAll(System.currentTimeMillis())
         Log.d("msg", "fetchRecordFromDBAndExportIntoCsvFile: $fileName ${DateFormatter.getTimeStampFileName(System.currentTimeMillis())}")
